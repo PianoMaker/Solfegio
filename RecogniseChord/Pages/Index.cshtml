@@ -1,0 +1,47 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Головна";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Інтервали та акорди</h1>
+
+    <div class="innercontainer">
+        <div id="rightcontainer" class="halfcontainer">
+            right
+            <form method="post" asp-route-handler="play">
+                <button type="submit">"Відтворити"</button>
+            </form>
+
+            <div id="soundcount" class="innercontainer">
+                <p>Скільки звуків?</p>
+                <form id="selectform" method="post" asp-route-handler="select">
+                    <input type="radio" name="SelectedCount" value="2">2
+                    <input type="radio" name="SelectedCount" value="3">3
+                    <input type="radio" name="SelectedCount" value="4">4
+                    <input type="radio" name="SelectedCount" value="5">5
+                </form>
+            </div>
+            <div class="innercontainer">
+                <form id="recogniseform" method="post" asp-route-handler="recognise">
+                    <select asp-for="SelectedChord" id="SelectedChord">
+                        @foreach (var o in Model.Options)
+                        {
+                            <option value="@o">@o</option>
+                        }
+                    </select>
+                    <select asp-for="SelectedType" id="SelectedType">
+                        @foreach (var o in Model.Types)
+                        {
+                            <option value="@o">@o</option>
+                        }
+                    </select>
+                    <input type="hidden" asp-for="SelectedCount" />
+                    <button type="submit">"Розпізнати"</button>
+                </form>
+            </div>
+        </div>
+        <div id="leftcontainer" class="halfcontainer">left</div>
+    </div>
+</div>

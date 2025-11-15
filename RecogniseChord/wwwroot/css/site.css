@@ -1,0 +1,109 @@
+:root {
+    --margin-bottom: 10px;
+    --header-height: 60px;
+    --header-color: #371d77;
+    --footer-color: #c6b246;
+}
+
+
+html {
+    font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  
+}
+
+html, body {
+    height: calc(100% - var(--margin-bottom) - var(--header-height));
+}
+
+body {
+  margin-bottom: var(--margin-bottom); 
+  background-color: #fefecc;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+.container {
+    flex-wrap: wrap;
+    justify-content: center;
+    border: 1px solid #ddd;
+    height: auto;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    max-width: 100%;
+    padding: 0px !important;
+    
+}
+
+.container-fluid {
+    padding: 0px !important;
+    height: 100%;
+}
+
+.main {
+    width: 95%;
+    max-width: 95%;
+    margin: 0 auto;
+    padding: 0px;
+    
+}
+
+.innercontainer, .halfcontainer {
+    margin-top: 0px;
+    padding: 0px;
+    display: inline-flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2%;
+    border: 1px solid #ddd;
+    width: 100%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    height: 100%;
+}
+.halfcontainer{
+  width: 48%;
+}
+
+/* Прив'язати реальну висоту header до змінної і вирівняти вміст по центру */
+header {
+    height: var(--header-height);
+    background-color: var(--header-color);
+}
+
+header .navbar {
+  height: 100%;
+  padding-top: 0;
+  padding-bottom: 0;
+
+}
+
+/* Вертикальне центровання бренда та навігації */
+    header .navbar-brand,
+    header .navbar-nav {
+        height: 100%;
+        display: flex;
+        align-items: center;
+        background-color: var(--header-color);
+    }
+
+.navbar-coloured {
+    background-color: var(--header-color);
+}
+
+footer {
+    background-color: var(--footer-color);
+}
