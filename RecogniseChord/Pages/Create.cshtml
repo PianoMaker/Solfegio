@@ -107,41 +107,5 @@
 </div>
 
 @section Scripts {
-    <script>
-        // submit count form on radio change
-        document.querySelectorAll('#countForm input[type=radio]').forEach(r => {
-        r.addEventListener('change', () => {
-        document.getElementById('countForm').submit();
-        });
-        });
-
-        document.addEventListener('DOMContentLoaded', () => {
-        const btn = document.getElementById('playBtn');
-        const audio = document.getElementById('chordAudio');
-        const hidden = document.getElementById('generatedRel');
-
-        function refreshAudio() {
-        const rel = hidden.value;
-        if (rel && rel.trim() !== '') {
-        audio.src = rel;
-        try { audio.load(); } catch(e) { console.error(e); }
-        btn.disabled = false;
-        } else {
-        audio.removeAttribute('src');
-        btn.disabled = true;
-        }
-        }
-
-        refreshAudio();
-
-        btn.addEventListener('click', () => {
-        try {
-        audio.pause();
-        audio.currentTime =0;
-        audio.play();
-        } catch(e) { console.error('play error', e); }
-        });
-
-        });
-    </script>
+    <script src="~/js/create.js"></script>
 }

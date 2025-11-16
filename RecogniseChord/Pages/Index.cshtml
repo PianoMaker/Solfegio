@@ -10,13 +10,15 @@
     <div class="innercontainer">
         <div id="rightcontainer" class="halfcontainer">
             right
-            <form id="playform" method="post" asp-route-handler="play">
+            <form id="playform" method="post" asp-page-handler="Play">
                 <button id="playButton" type="button">Відтворити</button>
             </form>
 
+            <audio id="chordAudio" preload="auto"></audio>
+
             <div id="soundcount" class="innercontainer">
                 <p>Скільки звуків?</p>
-                <form id="selectform" method="post" asp-route-handler="select">
+                <form id="selectform" method="post" asp-page-handler="Select">
                     <input type="radio" name="SelectedCount" value="2">2
                     <input type="radio" name="SelectedCount" value="3">3
                     <input type="radio" name="SelectedCount" value="4">4
@@ -24,7 +26,7 @@
                 </form>
             </div>
             <div class="innercontainer">
-                <form id="recogniseform" method="post" asp-route-handler="recognise">
+                <form id="recogniseform" method="post" asp-page-handler="Recognise">
                     <select asp-for="SelectedChord" id="SelectedChord">
                         @foreach (var o in Model.Options)
                         {
@@ -42,7 +44,24 @@
                 </form>
             </div>
         </div>
-        <div id="leftcontainer" class="halfcontainer">left</div>
+        <div id="leftcontainer" class="halfcontainer">
+            @if (Model.RecogniseOk is not null)
+            {
+                @if (Model.RecogniseOk == true)
+                {
+                    <p class="text-success">Ви вгадали: @Model.GuessResult</p>
+                }
+                else
+                {
+                    <p class="text-danger">Ви не вгадали: @Model.GuessResult</p>
+                }
+                <p>Правильна відповідь: <code>@Model.RecogniseCorrect</code></p>
+            }
+            else
+            {
+                <p>left</p>
+            }
+        </div>
     </div>
 </div>
 
@@ -50,6 +69,8 @@
     <script>
         // generated chord JSON available as window.generatedChord
         window.generatedChord = @Html.Raw(Model.GeneratedChordJson ?? "null");
+        // generated WAV file relative path available as window.generatedFile
+        window.generatedFile = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.GeneratedFileRelative ?? string.Empty));
     </script>
     <script src="~/js/index.js"></script>
 }
