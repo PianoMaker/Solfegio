@@ -57,6 +57,8 @@ document.addEventListener('DOMContentLoaded', function () {
 	const triadTypes = ['TRI', 'SEXT', 'QSEXT'];
 	const intervalTypesPerfect = ['PRIMA', 'QUARTA', 'QUINTA', 'OCTAVA'];
 	const intervalTypesImperfect = ['SECUNDA', 'TERZIA', 'SEKSTA', 'SEPTYMA'];
+	// NINTHS options (exclude OTHER)
+	const ninthQualities = ['HAUG','HMAJ','HDOM','NMJAUG','NMAJ','NDOM','NMIN','NMDOM','NMMIN','NMHALFDIM','NMDIM'];
 
 	// When user changes SelectedType, update qualities client-side for triad and interval types
 	if (selectedType) {
@@ -68,6 +70,12 @@ document.addEventListener('DOMContentLoaded', function () {
 			if (triadTypes.includes(val)) {
 				setQualityOptions(['MAJ', 'MIN', 'AUG', 'DIM'], true);
 				return; // do not submit
+			}
+
+			// Ninth chords -> use NINTHS enum names (client-side)
+			if (val === 'NONACORD' || val.startsWith('NONACORD') || val === 'CORD69') {
+				setQualityOptions(ninthQualities, true);
+				return;
 			}
 
 			// Perfect intervals -> PERFECT/AUG/DIM
@@ -82,7 +90,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				return; // do not submit
 			}
 
-			// For other types leave quality list as-is; server will supply correct list when needed
+			// For other types leave quality list as-is; server will handle when needed
 		});
 	}
 
