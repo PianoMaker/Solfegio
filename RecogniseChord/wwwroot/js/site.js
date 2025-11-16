@@ -6,6 +6,7 @@
 document.addEventListener('DOMContentLoaded', function () {
 	const chordSelector = document.querySelectorAll('#soundcount input[type=radio]');	//кількість звуків
 	const selectform = document.getElementById('selectform');							//форма select
+	const recogniseform = document.getElementById('recogniseform');						//форма recognise
 
 	const selectedChord = document.getElementById('SelectedChord');
 	const selectedType = document.getElementById('SelectedType');
@@ -32,18 +33,18 @@ document.addEventListener('DOMContentLoaded', function () {
 		});
 	});
 
-	// Delegate change for chord/type selects and submit their containing form (recognise)
+	// Submit explicit forms by id for chord/type changes
 	document.addEventListener('change', (e) => {
 		const t = e.target;
 		if (!(t instanceof HTMLSelectElement)) return;
 		if (t.id === 'SelectedChord') {
 			localStorage.setItem('selectedChord', t.value);
-			t.closest('form')?.submit();
+			recogniseform?.submit();
 			return;
 		}
 		if (t.id === 'SelectedType') {
-			localStorage.setItem('selectedType', t.value);
-			t.closest('form')?.submit();
+			localStorage.setItem('selectedType', t.value);			
+			recogniseform?.submit();
 		}
 	});
 });

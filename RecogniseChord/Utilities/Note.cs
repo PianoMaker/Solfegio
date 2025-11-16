@@ -565,6 +565,26 @@ namespace Music
 
         }
 
+        public static Note GenerateRandomNoteInRange(int minAbsPitch, int maxAbsPitch)
+        {
+            if (minAbsPitch > maxAbsPitch)
+            {
+                var t = minAbsPitch; minAbsPitch = maxAbsPitch; maxAbsPitch = t;
+            }
+            if (minAbsPitch <0) minAbsPitch =0;
+            var rnd = new Random();
+            int abs = rnd.Next(minAbsPitch, maxAbsPitch +1);
+            // compute pitch within octave and octave number (oct is1-based in this project)
+            int pitchInOctave = abs % NotesInOctave;
+            int oct = (abs / NotesInOctave) +1;
+            // pitch_to_step_alter returns tuple (step, alter)
+            var pair = pitch_to_step_alter(pitchInOctave);
+            int step = pair.Item1;
+            int alter = pair.Item2;
+            // use constructor that accepts NOTES, ALTER, oct
+            return new Note((NOTES)step, (ALTER)alter, oct);
+        }
+
         //public string GetJSON()
         //{
         //    return JsonConvert.SerializeObject(this);
