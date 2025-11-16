@@ -5,6 +5,11 @@ using static Music.Globals;
 using static Music.Messages;
 using System.Diagnostics.Metrics;
 using NAudio.Midi;
+using NAudio.Wave;
+using System.Threading;
+using System.Collections.Generic;
+using System.Linq;
+using System.IO;
 
 namespace Music
 {
@@ -38,13 +43,13 @@ namespace Music
 
         public int Alter { get { return pitch_to_alter(step, pitch); } }
 
-        
+
         public int MidiNote { get { return AbsPitch() + GMCorrection; } }
         // 1-а октава відповідає 4-й MIDI-октаві, нумерація MIDI-октав з нуля
 
         // розташування на квінтовому колі. D = 0.
         public float Sharpness { get { return sharpness_counter(step, Alter); } }
-        
+
         public int MidiDur { get { return duration.MidiDuration(PPQN); } }
 
         public string DurSymbol
@@ -54,8 +59,9 @@ namespace Music
 
         public (string, string) DurName
         {
-            get {
-                return (duration.Symbol(rest), GetName());                  
+            get
+            {
+                return (duration.Symbol(rest), GetName());
             }
         }
 
@@ -70,8 +76,7 @@ namespace Music
             }
         }
 
-
-
+        // копіювання ноти
         public Note(Note note)
         {
             pitch = note.pitch;
@@ -80,7 +85,20 @@ namespace Music
             duration = note.duration;
             rest = note.rest;
         }
-
+        // створення ноти за абсолютною висотою
+        // abspitch - абсолютна висота у півтонах від "до" першої октави
+        public Note(int abspitch)
+        {
+            Tuple<int, int> step_alter = pitch_to_step_alter(abspitch);
+            step = step_alter.Item1;            
+            pitch = abspitch % 12;  
+            oct = abspitch / 12; 
+            duration = new Duration(); 
+            rest = false;
+        }
+        // створення ноти за звуковисотністю і ступенем
+        // pitch - звуковисотність від 0 до 11
+        // step - ступінь від 0 до 6
         public Note(int pitch, int step)
         {
             this.pitch = pitch; this.step = step; oct = 1; duration = new Duration(); rest = false;
@@ -185,7 +203,7 @@ namespace Music
             }
         }
 
-        
+
         public static Note GenerateRandomNote(int oct)
         {
             var rnd = new Random();
@@ -217,7 +235,7 @@ namespace Music
                         break;
                     }
                 if (distinct) return newnote;
-                
+
             }
             throw new Exception("no distinct note found");
         }
@@ -590,9 +608,97 @@ namespace Music
         //    return JsonConvert.SerializeObject(this);
         //}
 
+        // Add Play() method to play this note using NAudio and SynthWaveProvider
+        public void Play()
+        {
+            int absPitch = AbsPitch();
+            int dur = AbsDuration();
 
+            // If rest, just wait for duration
+            if (absPitch <0)
+            {
+                Thread.Sleep(dur);
+                return;
+            }
 
+            double freq = Pitch_to_hz(absPitch);
 
+            var sequence = new List<(double frequency, int durationMs)>
+            {
+                (freq, dur)
+            };
+
+            // Add short pause after note to ensure release phase is audible
+            sequence.Add((0,50));
+
+            using var waveOut = new WaveOutEvent();
+            var provider = new SynthWaveProvider(sequence);
+            waveOut.Init(provider);
+            waveOut.Play();
+
+            int totalMs = sequence.Sum(s => s.durationMs);
+            Thread.Sleep(totalMs);
+
+            waveOut.Stop();
+        }
+
+        // Save wave file for this note into given directory Path (default wwwroot/sound)
+        public void SaveWave(string Path = null)
+        {
+            int absPitch = AbsPitch();
+            int dur = AbsDuration();
+
+            var sequence = new List<(double frequency, int durationMs)>();
+
+            if (absPitch <0)
+            {
+                // rest -> silent segment
+                sequence.Add((0, dur));
+            }
+            else
+            {
+                double freq = Pitch_to_hz(absPitch);
+                sequence.Add((freq, dur));
+            }
+
+            // short pause to allow release tail
+            sequence.Add((0,50));
+
+            // Default directory wwwroot/sound
+            string directory = Path ?? System.IO.Path.Combine("wwwroot", "sound");
+
+            // Ensure directory exists
+            try
+            {
+                Directory.CreateDirectory(directory);
+            }
+            catch (Exception ex)
+            {
+                ErrorMessageL($"Unable to create directory '{directory}': {ex.Message}");
+                throw;
+            }
+
+            // Sanitize filename
+            string baseName = GetName();
+            var invalid = System.IO.Path.GetInvalidFileNameChars();
+            foreach (var c in invalid)
+                baseName = baseName.Replace(c, '_');
+
+            string filename = $"{baseName}_{absPitch}_{DateTime.Now:yyyyMMddHHmmss}.wav";
+            string fullPath = System.IO.Path.Combine(directory, filename);
+
+            // Generate WAV file
+            try
+            {
+                WaveConverter.GenerateWave(sequence, fullPath);
+                MessageL(COLORS.olive, $"WAV saved to {fullPath}");
+            }
+            catch (Exception ex)
+            {
+                ErrorMessageL($"Failed to save WAV '{fullPath}': {ex.Message}");
+                throw;
+            }
+        }
 
     };
 

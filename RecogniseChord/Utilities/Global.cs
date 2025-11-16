@@ -20,9 +20,11 @@ namespace Music
         NONACORD, NONACORD_1i, NONACORD_2i, NONACORD_3i, NONACORD_4i, CORD69, HUNDECCORD, HUNDECCORD_1i, HUNDECCORD_2i, HUNDECCORD_3i, HUNDECCORD_4i, HUNDECCORD_5i,
         UNDECCORD, UNDECCORD_1i, UNDECCORD_2i, UNDECCORD_3i, UNDECCORD_4i, UNDECCORD_5i, TERZDEC, CLUSTER, UNKNOWN, UNIS
     }; // тип акордів
-    public enum SEPTS { MAJAUG, MAJMAJ, MAJMIN, MINMAJ, MINMIN, MINDIM, DIMDIM, ALTQUINT, ALTPRIM }; // якість септакордів
+    public enum SEPTS { MAJAUG, MAJMAJ, MAJMIN, MINMAJ, MINMIN, MINDIM, DIMDIM, ALTQUINT, ALTPRIM }; // якість септакордів - збільшений, мажорний, мінорний, зменшений, подвійно зменшений, альтерований
 
-    public enum NINTHS { NMJAUG, NMNAUG, NDAUG, NMAJ, NDOM, NMDOM, NMIN, NMDIM, NDDIM, HMAJ, HMIN, HAUG, HDOM, OTHER }; // якість акордів
+    public enum TRIADS { MAJ, MIN, AUG, DIM}; // якість секстакордів
+
+    public enum NINTHS { HAUG, HMAJ, HDOM, NMJAUG, NMAJ, NDOM, NMIN, NMDOM, NMMIN, NMHALFDIM, NMDIM, OTHER }; // якість акордів
     public enum MODE { dur, moll, chrome }; // лад
 
     public enum DURATION { whole = 1, half = 2, quater = 4, eigth = 8, sixteenth = 16, thirtysecond = 32 } // тривалості

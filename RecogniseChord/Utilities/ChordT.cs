@@ -1,4 +1,5 @@
-﻿using static Music.ChordPermutation;
+﻿using System.Security.Cryptography;
+using static Music.ChordPermutation;
 using static Music.Engine;
 using static Music.Globals;
 using static Music.Messages;
@@ -6,7 +7,7 @@ using static System.Console;
 
 namespace Music
 {
-    public class ChordT : Chord 
+    public class ChordT : Chord
     {
         private CHORDS chordtype;
         IntervalStructure intervals;
@@ -19,7 +20,7 @@ namespace Music
         }
 
         public ChordT() : base() { /*chordtype = CHORDS.UNKNOWN; */AnalyzeChord(); }
-        public ChordT(List<Note> nt) : base(nt) 
+        public ChordT(List<Note> nt) : base(nt)
         {
             AnalyzeChord();
         }
@@ -36,15 +37,15 @@ namespace Music
 
         private void AnalyzeChord()
         {
-          intervals = new(this);
-          SetChordType();
-          function_intervals = new IntervalStructure(intervals, chordtype);
-          if(function_intervals.prima is not null) maintone = new Note(notes[(int)function_intervals.prima]);
+            intervals = new(this);
+            SetChordType();
+            function_intervals = new IntervalStructure(intervals, chordtype);
+            if (function_intervals.prima is not null) maintone = new Note(notes[(int)function_intervals.prima]);
         }
 
         public CHORDS GetChordType
         {
-            get { AnalyzeChord();  return chordtype; }
+            get { AnalyzeChord(); return chordtype; }
         }
 
 
@@ -56,7 +57,7 @@ namespace Music
             return (x, y) => x.Notes.Count.CompareTo(y.Notes.Count); // Ваш метод порівняння за замовчуванням
         }
 
-        public static new Comparison<ChordT> SortByRange() 
+        public static new Comparison<ChordT> SortByRange()
         {
             return (first, second) => first.Range().CompareTo(second.Range());
         }
@@ -75,40 +76,40 @@ namespace Music
         protected void SetChordType()
         {
 
-            if (intervals.secunda is null  && intervals.terzia > 0 && intervals.quarta is null  && intervals.quinta > 0 && intervals.seksta is null  && intervals.septyma > 0) chordtype = CHORDS.SEPT; // 7-акорд
-            else if (intervals.secunda is null  && intervals.terzia > 0 && intervals.quarta > 0 && intervals.quinta is null  && intervals.seksta > 0 && intervals.septyma is null ) chordtype = CHORDS.TERZQ; // 3-4-акорд
-            else if (intervals.secunda is null  && intervals.terzia > 0 && intervals.quarta is null  && intervals.quinta > 0 && intervals.seksta > 0 && intervals.septyma is null ) chordtype = CHORDS.QUINTS; // 5-6--акорд
-            else if (intervals.secunda > 0 && intervals.terzia is null  && intervals.quarta > 0 && intervals.quinta is null  && intervals.seksta > 0 && intervals.septyma is null ) chordtype = CHORDS.SEC; // 2--акорд
-            else if (intervals.secunda is null  && intervals.terzia > 0 && intervals.quinta > 0 && intervals.quarta is null  && intervals.seksta is null  && intervals.septyma is null ) chordtype = CHORDS.TRI;// тризвук
-            else if (intervals.secunda is null  && intervals.terzia > 0 && intervals.quarta is null  && intervals.quinta is null  && intervals.seksta > 0 && intervals.septyma is null ) chordtype = CHORDS.SEXT; // секстакорд
-            else if (intervals.secunda is null  && intervals.terzia is null  && intervals.quarta > 0 && intervals.quinta is null  && intervals.seksta > 0 && intervals.septyma is null ) chordtype = CHORDS.QSEXT; // квартсекстакорд
-            else if (intervals.secunda is null  && intervals.terzia > 0 && intervals.quarta is null  && intervals.quinta is null  && intervals.seksta is null  && intervals.septyma > 0) chordtype = CHORDS.HSEPT; // неповний 7-акорд
-            else if (intervals.secunda > 0 && intervals.terzia is null  && intervals.quarta > 0 && intervals.quinta is null  && intervals.seksta is null  && intervals.septyma is null ) chordtype = CHORDS.HSEC; // неповний 2-акорд
-            else if (intervals.secunda is null  && intervals.terzia is null  && intervals.quarta is null  && intervals.quinta > 0 && intervals.seksta > 0 && intervals.septyma is null ) chordtype = CHORDS.HQUINTS; // неповний 6-5-акорд
-            else if (intervals.quinta > 0 && intervals.terzia > 0 && intervals.secunda > 0 && intervals.quarta is null  && intervals.seksta is null  && intervals.septyma is null ) chordtype = CHORDS.ADDSEC; // тризвук з доданою секундою
-            else if (intervals.secunda is null  && intervals.terzia > 0 && intervals.quarta > 0 && intervals.quinta is null  && intervals.seksta is null  && intervals.septyma > 0) chordtype = CHORDS.ADDQUARTA; // септакорд з доданою квартою
-            else if (intervals.secunda is null  && intervals.terzia > 0 && intervals.quarta > 0 && intervals.quinta is null  && intervals.seksta is null  && intervals.septyma > 0) chordtype = CHORDS.SUSQUARTA; // септакорд з затриманою квартою
-            else if (intervals.secunda > 0 && intervals.terzia > 0 && intervals.quarta is null  && intervals.quinta > 0 && intervals.seksta is null  && intervals.septyma > 0) chordtype = CHORDS.NONACORD; // нонакорд
-            else if (intervals.secunda is null  && intervals.terzia > 0 && intervals.quarta is null  && intervals.quinta > 0 && intervals.seksta > 0 && intervals.septyma > 0) chordtype = CHORDS.NONACORD_1i; // нонакорд в 1-му оберненні
-            else if (intervals.secunda is null  && intervals.terzia > 0 && intervals.quarta > 0 && intervals.quinta > 0 && intervals.seksta > 0 && intervals.septyma is null ) chordtype = CHORDS.NONACORD_2i; // нонакорд в 2-му оберненні
-            else if (intervals.secunda > 0 && intervals.terzia > 0 && intervals.quarta > 0 && intervals.quinta is null  && intervals.seksta > 0 && intervals.septyma is null ) chordtype = CHORDS.NONACORD_3i; // нонакорд в 3-му оберненні
-            else if (intervals.secunda > 0 && intervals.terzia is null  && intervals.quarta > 0 && intervals.quinta is null  && intervals.seksta > 0 && intervals.septyma > 0) chordtype = CHORDS.NONACORD_4i; // нонакорд в 4-му оберненні
-            else if (intervals.secunda > 0 && intervals.terzia > 0 && intervals.quarta is null  && intervals.quinta > 0 && intervals.seksta > 0 && intervals.septyma is null ) chordtype = CHORDS.CORD69; // нонакорд із секстою
-            else if (intervals.secunda > 0 && intervals.terzia > 0 && intervals.quarta > 0 && intervals.quinta > 0 && intervals.seksta is null  && intervals.septyma > 0) chordtype = CHORDS.UNDECCORD; // ундецимакорд
-            else if (intervals.secunda > 0 && intervals.terzia > 0 && intervals.quarta is null  && intervals.quinta > 0 && intervals.seksta > 0 && intervals.septyma > 0) chordtype = CHORDS.UNDECCORD_1i; // ундецимакорд в 1-му оберненні
-            else if (intervals.secunda is null  && intervals.terzia > 0 && intervals.quarta > 0 && intervals.quinta > 0 && intervals.seksta > 0 && intervals.septyma > 0) chordtype = CHORDS.UNDECCORD_2i; // ундецимакорд в 2-му оберненні
-            else if (intervals.secunda > 0 && intervals.terzia > 0 && intervals.quarta > 0 && intervals.quinta > 0 && intervals.seksta > 0 && intervals.septyma is null ) chordtype = CHORDS.UNDECCORD_3i; // ундецимакорд в 3-му оберненні
-            else if (intervals.secunda > 0 && intervals.terzia > 0 && intervals.quarta > 0 && intervals.quinta is null  && intervals.seksta > 0 && intervals.septyma > 0) chordtype = CHORDS.UNDECCORD_4i; // ундецимакорд в 4-му оберненні
-            else if (intervals.secunda > 0 && intervals.terzia is null  && intervals.quarta > 0 && intervals.quinta > 0 && intervals.seksta > 0 && intervals.septyma > 0) chordtype = CHORDS.UNDECCORD_5i; // ундецимакорд в 5-му оберненні
-            else if (intervals.secunda > 0 && intervals.terzia > 0 && intervals.quarta > 0 && intervals.quinta is null  && intervals.seksta is null  && intervals.septyma > 0) chordtype = CHORDS.HUNDECCORD; // неповний ундецимакорд (-квінта)
-            else if (intervals.secunda > 0 && intervals.terzia is null  && intervals.quarta > 0 && intervals.quinta > 0 && intervals.seksta > 0 && intervals.septyma > 0) chordtype = CHORDS.HUNDECCORD_1i; // неповний ундецимакорд в 1-му оберненні
-            else if (intervals.secunda > 0 && intervals.terzia > 0 && intervals.quarta is null  && intervals.quinta is null  && intervals.seksta > 0 && intervals.septyma > 0) chordtype = CHORDS.HUNDECCORD_2i; // неповний ундецимакорд в 2-му оберненні
-            else if (intervals.secunda > 0 && intervals.terzia is null  && intervals.quarta is null  && intervals.quinta > 0 && intervals.seksta > 0 && intervals.septyma > 0) chordtype = CHORDS.HUNDECCORD_3i; // неповний ундецимакорд в 3-му оберненні
-            else if (intervals.secunda is null  && intervals.terzia is null  && intervals.quarta > 0 && intervals.quinta > 0 && intervals.seksta > 0 && intervals.septyma > 0) chordtype = CHORDS.HUNDECCORD_4i; // неповний ундецимакорд в 4-му оберненні
+            if (intervals.secunda is null && intervals.terzia > 0 && intervals.quarta is null && intervals.quinta > 0 && intervals.seksta is null && intervals.septyma > 0) chordtype = CHORDS.SEPT; // 7-акорд
+            else if (intervals.secunda is null && intervals.terzia > 0 && intervals.quarta > 0 && intervals.quinta is null && intervals.seksta > 0 && intervals.septyma is null) chordtype = CHORDS.TERZQ; // 3-4-акорд
+            else if (intervals.secunda is null && intervals.terzia > 0 && intervals.quarta is null && intervals.quinta > 0 && intervals.seksta > 0 && intervals.septyma is null) chordtype = CHORDS.QUINTS; // 5-6--акорд
+            else if (intervals.secunda > 0 && intervals.terzia is null && intervals.quarta > 0 && intervals.quinta is null && intervals.seksta > 0 && intervals.septyma is null) chordtype = CHORDS.SEC; // 2--акорд
+            else if (intervals.secunda is null && intervals.terzia > 0 && intervals.quinta > 0 && intervals.quarta is null && intervals.seksta is null && intervals.septyma is null) chordtype = CHORDS.TRI;// тризвук
+            else if (intervals.secunda is null && intervals.terzia > 0 && intervals.quarta is null && intervals.quinta is null && intervals.seksta > 0 && intervals.septyma is null) chordtype = CHORDS.SEXT; // секстакорд
+            else if (intervals.secunda is null && intervals.terzia is null && intervals.quarta > 0 && intervals.quinta is null && intervals.seksta > 0 && intervals.septyma is null) chordtype = CHORDS.QSEXT; // квартсекстакорд
+            else if (intervals.secunda is null && intervals.terzia > 0 && intervals.quarta is null && intervals.quinta is null && intervals.seksta is null && intervals.septyma > 0) chordtype = CHORDS.HSEPT; // неповний 7-акорд
+            else if (intervals.secunda > 0 && intervals.terzia is null && intervals.quarta > 0 && intervals.quinta is null && intervals.seksta is null && intervals.septyma is null) chordtype = CHORDS.HSEC; // неповний 2-акорд
+            else if (intervals.secunda is null && intervals.terzia is null && intervals.quarta is null && intervals.quinta > 0 && intervals.seksta > 0 && intervals.septyma is null) chordtype = CHORDS.HQUINTS; // неповний 6-5-акорд
+            else if (intervals.quinta > 0 && intervals.terzia > 0 && intervals.secunda > 0 && intervals.quarta is null && intervals.seksta is null && intervals.septyma is null) chordtype = CHORDS.ADDSEC; // тризвук з доданою секундою
+            else if (intervals.secunda is null && intervals.terzia > 0 && intervals.quarta > 0 && intervals.quinta is null && intervals.seksta is null && intervals.septyma > 0) chordtype = CHORDS.ADDQUARTA; // септакорд з доданою квартою
+            else if (intervals.secunda is null && intervals.terzia > 0 && intervals.quarta > 0 && intervals.quinta is null && intervals.seksta is null && intervals.septyma > 0) chordtype = CHORDS.SUSQUARTA; // септакорд з затриманою квартою
+            else if (intervals.secunda > 0 && intervals.terzia > 0 && intervals.quarta is null && intervals.quinta > 0 && intervals.seksta is null && intervals.septyma > 0) chordtype = CHORDS.NONACORD; // нонакорд
+            else if (intervals.secunda is null && intervals.terzia > 0 && intervals.quarta is null && intervals.quinta > 0 && intervals.seksta > 0 && intervals.septyma > 0) chordtype = CHORDS.NONACORD_1i; // нонакорд в 1-му оберненні
+            else if (intervals.secunda is null && intervals.terzia > 0 && intervals.quarta > 0 && intervals.quinta > 0 && intervals.seksta > 0 && intervals.septyma is null) chordtype = CHORDS.NONACORD_2i; // нонакорд в 2-му оберненні
+            else if (intervals.secunda > 0 && intervals.terzia > 0 && intervals.quarta > 0 && intervals.quinta is null && intervals.seksta > 0 && intervals.septyma is null) chordtype = CHORDS.NONACORD_3i; // нонакорд в 3-му оберненні
+            else if (intervals.secunda > 0 && intervals.terzia is null && intervals.quarta > 0 && intervals.quinta is null && intervals.seksta > 0 && intervals.septyma > 0) chordtype = CHORDS.NONACORD_4i; // нонакорд в 4-му оберненні
+            else if (intervals.secunda > 0 && intervals.terzia > 0 && intervals.quarta is null && intervals.quinta > 0 && intervals.seksta > 0 && intervals.septyma is null) chordtype = CHORDS.CORD69; // нонакорд із секстою
+            else if (intervals.secunda > 0 && intervals.terzia > 0 && intervals.quarta > 0 && intervals.quinta > 0 && intervals.seksta is null && intervals.septyma > 0) chordtype = CHORDS.UNDECCORD; // ундецимакорд
+            else if (intervals.secunda > 0 && intervals.terzia > 0 && intervals.quarta is null && intervals.quinta > 0 && intervals.seksta > 0 && intervals.septyma > 0) chordtype = CHORDS.UNDECCORD_1i; // ундецимакорд в 1-му оберненні
+            else if (intervals.secunda is null && intervals.terzia > 0 && intervals.quarta > 0 && intervals.quinta > 0 && intervals.seksta > 0 && intervals.septyma > 0) chordtype = CHORDS.UNDECCORD_2i; // ундецимакорд в 2-му оберненні
+            else if (intervals.secunda > 0 && intervals.terzia > 0 && intervals.quarta > 0 && intervals.quinta > 0 && intervals.seksta > 0 && intervals.septyma is null) chordtype = CHORDS.UNDECCORD_3i; // ундецимакорд в 3-му оберненні
+            else if (intervals.secunda > 0 && intervals.terzia > 0 && intervals.quarta > 0 && intervals.quinta is null && intervals.seksta > 0 && intervals.septyma > 0) chordtype = CHORDS.UNDECCORD_4i; // ундецимакорд в 4-му оберненні
+            else if (intervals.secunda > 0 && intervals.terzia is null && intervals.quarta > 0 && intervals.quinta > 0 && intervals.seksta > 0 && intervals.septyma > 0) chordtype = CHORDS.UNDECCORD_5i; // ундецимакорд в 5-му оберненні
+            else if (intervals.secunda > 0 && intervals.terzia > 0 && intervals.quarta > 0 && intervals.quinta is null && intervals.seksta is null && intervals.septyma > 0) chordtype = CHORDS.HUNDECCORD; // неповний ундецимакорд (-квінта)
+            else if (intervals.secunda > 0 && intervals.terzia is null && intervals.quarta > 0 && intervals.quinta > 0 && intervals.seksta > 0 && intervals.septyma > 0) chordtype = CHORDS.HUNDECCORD_1i; // неповний ундецимакорд в 1-му оберненні
+            else if (intervals.secunda > 0 && intervals.terzia > 0 && intervals.quarta is null && intervals.quinta is null && intervals.seksta > 0 && intervals.septyma > 0) chordtype = CHORDS.HUNDECCORD_2i; // неповний ундецимакорд в 2-му оберненні
+            else if (intervals.secunda > 0 && intervals.terzia is null && intervals.quarta is null && intervals.quinta > 0 && intervals.seksta > 0 && intervals.septyma > 0) chordtype = CHORDS.HUNDECCORD_3i; // неповний ундецимакорд в 3-му оберненні
+            else if (intervals.secunda is null && intervals.terzia is null && intervals.quarta > 0 && intervals.quinta > 0 && intervals.seksta > 0 && intervals.septyma > 0) chordtype = CHORDS.HUNDECCORD_4i; // неповний ундецимакорд в 4-му оберненні
             else if (intervals.secunda - intervals.prima == 1 && intervals.terzia - intervals.secunda == 1 && intervals.quarta - intervals.terzia == 1 && intervals.quinta - intervals.quarta == 1 && intervals.seksta - intervals.quinta == 1 && intervals.septyma - intervals.seksta == 1
                ) chordtype = CHORDS.CLUSTER; // кластер
 
-            else if (intervals. secunda > 0 && intervals.terzia > 0 && intervals.quarta > 0 && intervals.quinta > 0 && intervals.seksta > 0 && intervals.septyma > 0) chordtype = CHORDS.TERZDEC; // терцдецимакорд
+            else if (intervals.secunda > 0 && intervals.terzia > 0 && intervals.quarta > 0 && intervals.quinta > 0 && intervals.seksta > 0 && intervals.septyma > 0) chordtype = CHORDS.TERZDEC; // терцдецимакорд
             else
                 chordtype = CHORDS.UNKNOWN;
         }
@@ -117,41 +118,41 @@ namespace Music
         {
 
             string Chordname = "";
-            
-            
-                if (chordtype == CHORDS.SEPT) Chordname = SEPT();
-                else if (chordtype == CHORDS.TERZQ) Chordname = TERZQ();
-                else if (chordtype == CHORDS.QUINTS) Chordname = QUINTS();
-                else if (chordtype == CHORDS.SEC) Chordname = SEC();
-                else if (chordtype == CHORDS.TRI) Chordname = TRI();
-                else if (chordtype == CHORDS.SEXT) Chordname = SEXT();
-                else if (chordtype == CHORDS.QSEXT) Chordname = QSEXT();
-                else if (chordtype == CHORDS.HSEPT) Chordname = HSEPT();
-                else if (chordtype == CHORDS.HSEC) Chordname = HSEC();
-                else if (chordtype == CHORDS.HQUINTS) Chordname = HQUINTS();
-                else if (chordtype == CHORDS.ADDSEC) Chordname = ADDSEC();
-                else if (chordtype == CHORDS.ADDQUARTA) Chordname = ADDQUARTA();
-                else if (chordtype == CHORDS.SUSQUARTA) Chordname = SUSQUARTA();
-                else if (chordtype == CHORDS.NONACORD) Chordname = NONACORD();
-                else if (chordtype == CHORDS.CORD69) Chordname = CORD69();
-                else if (chordtype == CHORDS.NONACORD_1i) Chordname = NONACORD_1i();
-                else if (chordtype == CHORDS.NONACORD_2i) Chordname = NONACORD_2i();
-                else if (chordtype == CHORDS.NONACORD_3i) Chordname = NONACORD_3i();
-                else if (chordtype == CHORDS.NONACORD_4i) Chordname = NONACORD_4i();
-                else if (chordtype == CHORDS.UNDECCORD) Chordname = UNDECCORD();
-                else if (chordtype == CHORDS.HUNDECCORD) Chordname = HUNDECCORD();
-                else if (chordtype == CHORDS.HUNDECCORD_1i) Chordname = HUNDECCORD_1i();
-                else if (chordtype == CHORDS.HUNDECCORD_2i) Chordname = HUNDECCORD_2i();
-                else if (chordtype == CHORDS.HUNDECCORD_3i) Chordname = HUNDECCORD_3i();
-                else if (chordtype == CHORDS.HUNDECCORD_4i) Chordname = HUNDECCORD_4i();
-                else if (chordtype == CHORDS.UNDECCORD_1i) Chordname = UNDECCORD_1i();
-                else if (chordtype == CHORDS.UNDECCORD_2i) Chordname = UNDECCORD_2i();
-                else if (chordtype == CHORDS.UNDECCORD_3i) Chordname = UNDECCORD_3i();
-                else if (chordtype == CHORDS.UNDECCORD_4i) Chordname = UNDECCORD_4i();
-                else if (chordtype == CHORDS.UNDECCORD_5i) Chordname = UNDECCORD_5i();
-                else if (chordtype == CHORDS.TERZDEC) Chordname = TERZDEC();
-                else if (chordtype == CHORDS.CLUSTER) Chordname = CLUSTER();
-                else Chordname = "акорд невідомої структури";
+
+
+            if (chordtype == CHORDS.SEPT) Chordname = SEPT();
+            else if (chordtype == CHORDS.TERZQ) Chordname = TERZQ();
+            else if (chordtype == CHORDS.QUINTS) Chordname = QUINTS();
+            else if (chordtype == CHORDS.SEC) Chordname = SEC();
+            else if (chordtype == CHORDS.TRI) Chordname = TRI();
+            else if (chordtype == CHORDS.SEXT) Chordname = SEXT();
+            else if (chordtype == CHORDS.QSEXT) Chordname = QSEXT();
+            else if (chordtype == CHORDS.HSEPT) Chordname = HSEPT();
+            else if (chordtype == CHORDS.HSEC) Chordname = HSEC();
+            else if (chordtype == CHORDS.HQUINTS) Chordname = HQUINTS();
+            else if (chordtype == CHORDS.ADDSEC) Chordname = ADDSEC();
+            else if (chordtype == CHORDS.ADDQUARTA) Chordname = ADDQUARTA();
+            else if (chordtype == CHORDS.SUSQUARTA) Chordname = SUSQUARTA();
+            else if (chordtype == CHORDS.NONACORD) Chordname = NONACORD();
+            else if (chordtype == CHORDS.CORD69) Chordname = CORD69();
+            else if (chordtype == CHORDS.NONACORD_1i) Chordname = NONACORD_1i();
+            else if (chordtype == CHORDS.NONACORD_2i) Chordname = NONACORD_2i();
+            else if (chordtype == CHORDS.NONACORD_3i) Chordname = NONACORD_3i();
+            else if (chordtype == CHORDS.NONACORD_4i) Chordname = NONACORD_4i();
+            else if (chordtype == CHORDS.UNDECCORD) Chordname = UNDECCORD();
+            else if (chordtype == CHORDS.HUNDECCORD) Chordname = HUNDECCORD();
+            else if (chordtype == CHORDS.HUNDECCORD_1i) Chordname = HUNDECCORD_1i();
+            else if (chordtype == CHORDS.HUNDECCORD_2i) Chordname = HUNDECCORD_2i();
+            else if (chordtype == CHORDS.HUNDECCORD_3i) Chordname = HUNDECCORD_3i();
+            else if (chordtype == CHORDS.HUNDECCORD_4i) Chordname = HUNDECCORD_4i();
+            else if (chordtype == CHORDS.UNDECCORD_1i) Chordname = UNDECCORD_1i();
+            else if (chordtype == CHORDS.UNDECCORD_2i) Chordname = UNDECCORD_2i();
+            else if (chordtype == CHORDS.UNDECCORD_3i) Chordname = UNDECCORD_3i();
+            else if (chordtype == CHORDS.UNDECCORD_4i) Chordname = UNDECCORD_4i();
+            else if (chordtype == CHORDS.UNDECCORD_5i) Chordname = UNDECCORD_5i();
+            else if (chordtype == CHORDS.TERZDEC) Chordname = TERZDEC();
+            else if (chordtype == CHORDS.CLUSTER) Chordname = CLUSTER();
+            else Chordname = "акорд невідомої структури";
 
             try
             {
@@ -224,7 +225,7 @@ namespace Music
                 case 5: degreesymbol = "VI"; break;
                 case 6: degreesymbol = "VII"; break;
             }
-            if (degree.Quality == QUALITY.DIM) degreesymbol+= "b";
+            if (degree.Quality == QUALITY.DIM) degreesymbol += "b";
             else if (degree.Quality == QUALITY.AUG) degreesymbol += "#";
 
             Chordsymbol = degreesymbol + Chordsymbol;
@@ -232,7 +233,7 @@ namespace Music
         }
 
 
-            private string DefineChordSymbol()
+        private string DefineChordSymbol()
         {
             string Chordsymbol = "";
 
@@ -275,7 +276,7 @@ namespace Music
             string altersymbol = "";
             try
             {
-                
+
                 if (function_intervals.quinta is not null)
                 {
                     if (Q_Quinta() == QUALITY.AUG) altersymbol = "+"; //збільшений
@@ -304,7 +305,7 @@ namespace Music
                     if (function_intervals.secunda is not null)
                     {
                         if (Q_Nona() == QUALITY.MAJ) ;
-                        else if (Q_Nona() == QUALITY.MIN) altersymbol = "(b9)"; 
+                        else if (Q_Nona() == QUALITY.MIN) altersymbol = "(b9)";
                         else if (Q_Nona() == QUALITY.AUG) altersymbol = "(#9)";
                     }
                 }
@@ -405,7 +406,7 @@ namespace Music
 
 
         public int? If_note_in_Chord(INTERVALS interval) // перевіряє наявність в акорді заданого інтервалу. Якщо не знаходить, повертає null
-        {            
+        {
             for (int i = 0; i < Notes.Count; i++)
             {
                 if (stepdiff(Notes[0].Step, Notes[i].Step) == (int)interval) // виявлення заданого інтервалу в одному з голосів
@@ -423,25 +424,65 @@ namespace Music
             return PermuteToAdjustedList(this, octave);
         }
 
-        public static void Display(List<ChordT> scale, bool octtrigger = true, int color = 14) 
+        public static void Display(List<ChordT> scale, bool octtrigger = true, int color = 14)
         {
             StringOutput.Display(scale, octtrigger, color);
 
             WriteLine("type T");
         }
 
+        // генерує акорди терцієвої структури, якщо основний тон акорду вже задано.
+        // alter - масив змінень для кожної наступної ноти акорду
+        // alter[0] - зміна для терції (2 - збільшена, 1 - мажорна, -1 - мінорна)
+        // alter[1] - зміна для квінти (2 - збільшена, 0 - чиста, -1 - зменшена)
+        // alter[2] - зміна для септими (1 - велика, -1 - мала, -1 - зменшена)
+        // alter[3] - зміна для нони (2 - збільшена, 1 - велика, -1 - мала)
+        // alter[4] - зміна для ундецими (2 - збільшена, 1 - велика, -1 - мала)
         public void Construct(params int[] alter)
-        {// генерує акорди терцієвої структури, якщо основний тон акорду вже задано.
-             for (int i=0; i<alter.Length; i++)
+        {
+            for (int i = 0; i < alter.Length; i++)
             {
                 //додає ноти по терціях
-                try { 
-                AddNote(2*(i+1), alter[i]);
+                try
+                {
+                    AddNote(2 * (i + 1), alter[i]);
                 }
-                catch (IncorrectNote e) { MessageL(12, "incorrect note " + (i+1) + " was omitted"); }
+                catch (IncorrectNote e) { MessageL(12, "incorrect note " + (i + 1) + " was omitted"); }
             }
         }
 
+        public void Construct(params QUALITY[] alter)
+        {
+            for (int i = 0; i < alter.Length; i++)
+            {
+                //додає ноти по терціях
+                try
+                {
+                    int altervalue = 0;
+                    switch (alter[i])
+                    {
+                        case QUALITY.AUG: altervalue = 2; break;
+                        case QUALITY.MAJ: altervalue = 1; break;
+                        case QUALITY.MIN: altervalue = -1; break;
+                        case QUALITY.PERFECT: altervalue = 0; break;
+                        case QUALITY.DIM: altervalue = -2; break;
+                    }
+                    AddNote(2 * (i + 1), altervalue);
+                }
+                catch (IncorrectNote e) { MessageL(12, "incorrect note " + (i + 1) + " was omitted"); }
+            }
+        }
+
+        public void Construct(ChordT chord, params QUALITY[] alter)
+        {// генерує акорди терцієвої структури від заданої ноти
+            Note note = (Note)chord.Notes[0].Clone();
+            AddNote(note);
+            Construct(alter);
+        }
+
+
+
+        // генерує акорди терцієвої структури від заданої ноти
         public void Construct(Note nt, params int[] alter)
         {// генерує акорди терцієвої структури від заданої ноти
             Note note = (Note)nt.Clone();
@@ -449,7 +490,8 @@ namespace Music
             Construct(alter);
         }
 
-
+        // генерує акорди терцієвої структури від заданої ноти
+        // input - назва ноти
         public void Construct(string input, params int[] alter)
         {// генерує акорди терцієвої структури від заданої ноти
             Note note = new(input);
@@ -463,9 +505,6 @@ namespace Music
         }
 
 
-
-
-
         public void MajorTriad(string input)
         {
             try
@@ -473,8 +512,8 @@ namespace Music
                 Note nt = new(input);
                 MajorTriad(nt);
             }
-            catch 
-            { Message(12, "impossible to create Maj");}
+            catch
+            { Message(12, "impossible to create Maj"); }
 
         }
         public void MajorTriad(Note nt)
@@ -536,6 +575,166 @@ namespace Music
                 case SEPTS.ALTPRIM: Construct(nt, -2, -2, -2); break;
             }
             chordtype = CHORDS.SEPT;
+        }
+
+        public void SeventhChord(string input, SEPTS mode = SEPTS.MAJMIN)
+        {
+            Note nt = new(input);
+            SeventhChord(nt, mode);
+        }
+
+        public void SeventhChord(string input, MODE mode = MODE.dur)
+        {
+            Note nt = new(input);
+            switch (mode)
+            {
+                default:
+                case MODE.dur: SeventhChord(nt, SEPTS.MAJMAJ); break;
+                case MODE.moll: SeventhChord(nt, SEPTS.MINMIN); break;
+            }
+        }
+
+        public void SeventhChord(Note nt, MODE mode = MODE.dur)
+        {
+            switch (mode)
+            {
+                default:
+                case MODE.dur: SeventhChord(nt, SEPTS.MAJMAJ); break;
+                case MODE.moll: SeventhChord(nt, SEPTS.MINMIN); break;
+            }
+        }
+
+        public void TriadChord(string input, MODE mode = MODE.dur)
+        {
+            Note nt = new(input);
+            switch (mode)
+            {
+                default:
+                case MODE.dur: MajorTriad(nt); break;
+                case MODE.moll: MinorTriad(nt); break;
+            }
+        }
+
+        public void TriadChord(Note nt, MODE mode = MODE.dur)
+        {
+            switch (mode)
+            {
+                default:
+                case MODE.dur: MajorTriad(nt); break;
+                case MODE.moll: MinorTriad(nt); break;
+            }
+        }
+
+        public void TriadChord(Note nt, TRIADS quality = TRIADS.MAJ)
+        {
+            switch (quality)
+            {
+                default:
+                case TRIADS.MAJ:
+                    MajorTriad(nt);
+                    break;
+                case TRIADS.MIN:
+                    MinorTriad(nt);
+                    break;
+                case TRIADS.AUG:
+                    MajorTriad(nt);
+                    // підвищити квінту на півтона (зручний, читабельний виклик)
+                    notes[2].Transpose(INTERVALS.PRIMA, QUALITY.AUG, DIR.UP);
+                    break;
+                case TRIADS.DIM:
+                    MinorTriad(nt);
+                    // знизити квінту (зручний, читабельний виклик)
+                    notes[2].Transpose(INTERVALS.PRIMA, QUALITY.AUG, DIR.DOWN);
+                    break;
+            }
+        }
+
+        public void NinthChord(Note nt, NINTHS quality = NINTHS.NMAJ)
+        {
+            //HAUG, HMAJ, HDOM, NMJAUG, NMAJ, NDOM, NMIN, NMDOM, NMMIN, NMHALFDIM, NMDIM
+            switch (quality)
+            {
+
+                //зі збільшеною ноною
+                case NINTHS.HAUG: Construct(nt, 1, 2, 0, 2); break;     // зі збільшеною квінтою
+                case NINTHS.HMAJ: Construct(nt, 1, 0, 1, 2); break;     // мажорний нонакорд зі збільшеною ноною
+                case NINTHS.HDOM: Construct(nt, 1, 0, -1, 2); break;    // домінантовий зі збільшеною ноною
+                
+                //з великою ноною 
+                default:
+                case NINTHS.NMJAUG: Construct(nt, 1, 2, 1, 1); break;   // великий зі збільшеною квінтою
+                case NINTHS.NMAJ: Construct(nt, 1, 0, 1, 1); break;      // мажорний 
+                case NINTHS.NDOM: Construct(nt, 1, 0, -1, 1); break;    // домінантовий 
+                case NINTHS.NMIN: Construct(nt, -1, 0, -1, 1); break;    // мінорний               
+                
+                
+                                                           
+                    //з малою ноною
+                
+                case NINTHS.NMDOM: Construct(nt, 1, 0, -1, -1); break;      // домінантовий нонакорд з малою ноною
+                case NINTHS.NMMIN: Construct(nt, -1, 0, -1, -1); break;     // мінорний нонакорд з малою ноною
+                case NINTHS.NMHALFDIM: Construct(nt, -1, -2, -1, -1); break; // напівзменшений нонакорд з малою ноною
+                case NINTHS.NMDIM: Construct(nt, -1, -2, -2, -1); break;    // зменшений нонакорд з малою ноною
+                                              
+                
+
+            }
+            chordtype = CHORDS.NONACORD;
+        }
+
+        public void InvertUp(int n)
+        {
+            for (int i = 0; i < n; i++)
+            {
+                Note temp = Notes[0];
+                Notes.RemoveAt(0);
+                temp.OctUp();
+                Notes.Add(temp);
+            }
+            Adjust();
+        }
+
+        public void InvertDown(int n)
+        {
+            for (int i = 0; i < n; i++)
+            {
+                Note temp = Notes[Notes.Count - 1];
+                Notes.RemoveAt(Notes.Count - 1);
+                temp.OctDown();
+                Notes.Insert(0, temp);
+            }
+            Adjust();
+        }
+
+        public void InvertTo(int n)
+        {
+            if (n < 0 || n >= Notes.Count) throw new IncorrectNote("impossible to invert to " + n);
+            InvertUp(n);
+        }
+
+        public void CreateRandomChord(int notecount, int minpitch = 48, int maxpitch = 72)
+        {
+            Random rand = new();
+            int rootpitch = rand.Next(minpitch, maxpitch - 12);
+            Note root = new(rootpitch);
+
+            switch (notecount)
+            {
+                case 3:
+                    {
+                        TRIADS type = (TRIADS)rand.Next(0, 4);
+                        TriadChord(root, type);
+                        break;
+                    }
+                case 4:
+                    {
+                        SEPTS type = (SEPTS)rand.Next(0, 8);
+                        SeventhChord(root, type);
+                        break;
+                    }
+                default:
+                    throw new IncorrectNote("only triads and seventh chords are supported");
+            }
         }
 
 

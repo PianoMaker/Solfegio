@@ -254,10 +254,10 @@ namespace Music
 
         // СПЕТАКОРДИ 
 
-        public static List<ChordT> SeventhChords_InTonal(Note note, SEPTS mode = default)
+        public static List<ChordT> SeventhChords_InTonal(Note note, SEPTS mode)
         {
             ChordT chord = new();
-            chord.SeventhChord(note);            
+            chord.SeventhChord(note, mode);
             return chord.PermuteList();
         }
 

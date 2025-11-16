@@ -498,25 +498,17 @@ namespace Music
 
         public static bool operator ==(Scale A, Scale B)
         {
-            if(A.Notes.Count!=B.Notes.Count) return false;
+            if (ReferenceEquals(A, B)) return true;
+            if (A is null || B is null) return false;
+            if (A.Notes is null && B.Notes is null) return true;
+            if (A.Notes is null || B.Notes is null) return false;
+            if (A.Notes.Count != B.Notes.Count) return false;
             for (int i = 0; i < A.Notes.Count; i++)
-            {
-                if (A.Notes[i] != B.Notes[i])
-                    return false;
-            }
+                if (A.Notes[i] != B.Notes[i]) return false;
             return true;
         }
 
-        public static bool operator !=(Scale A, Scale B)
-        {
-            if (A.Notes.Count != B.Notes.Count) return true;
-            for (int i = 0; i < A.Notes.Count; i++)
-            {
-                if (A.Notes[i] != B.Notes[i])
-                    return true;
-            }
-            return false;
-        }
+        public static bool operator !=(Scale A, Scale B) => !(A == B);
 
         /// <summary>
         /// Клонування об'єктів

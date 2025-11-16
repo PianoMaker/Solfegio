@@ -10,8 +10,8 @@
     <div class="innercontainer">
         <div id="rightcontainer" class="halfcontainer">
             right
-            <form method="post" asp-route-handler="play">
-                <button type="submit">"Відтворити"</button>
+            <form id="playform" method="post" asp-route-handler="play">
+                <button id="playButton" type="button">Відтворити</button>
             </form>
 
             <div id="soundcount" class="innercontainer">
@@ -45,3 +45,11 @@
         <div id="leftcontainer" class="halfcontainer">left</div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        // generated chord JSON available as window.generatedChord
+        window.generatedChord = @Html.Raw(Model.GeneratedChordJson ?? "null");
+    </script>
+    <script src="~/js/index.js"></script>
+}

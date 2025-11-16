@@ -5,6 +5,8 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.DotNet.Scaffolding.Shared.Messaging;
 using Music;
 using static Music.Messages;
+using static Music.Engine;
+using System.Text.Json;
 
 namespace RecogniseChord.Pages
 {
@@ -19,11 +21,14 @@ namespace RecogniseChord.Pages
         public string SelectedType { get; set; }
 
         [BindProperty]
-        public int SelectedCount { get; set; } = 0;
+        public int SelectedCount { get; set; } =0;
 
         public List<string> Options { get; set; } = new();
 
         public List<string> Types { get; set; } = new();
+
+        // JSON representation of generated chord (frequencies and durations)
+        public string GeneratedChordJson { get; set; }
 
         ChordT currentChord = new ChordT();
 
@@ -36,7 +41,8 @@ namespace RecogniseChord.Pages
 
         public void OnGet()
         {
-            MessageL(14, "OnGet starts!");
+            MessageL(14, "OnGet starts!"); 
+            GenerateChord();
             PopulateOptions(0);
         }
 
@@ -44,7 +50,7 @@ namespace RecogniseChord.Pages
         public IActionResult OnPostSelect()
         {
             MessageL(14, $"OnPostSelect starts! SelectedCount={SelectedCount}");
-            PopulateOptions(SelectedCount > 0 ? SelectedCount : 1);
+            PopulateOptions(SelectedCount >0 ? SelectedCount :1);
             PopulateTypes(SelectedChord);
             return Page();
         }
@@ -60,8 +66,7 @@ namespace RecogniseChord.Pages
         public IActionResult OnPostPlay()
         {
             MessageL(14, "Play button clicked!");
-            GenerateChord();
-
+            
 
             return Page();
         }
@@ -84,11 +89,33 @@ namespace RecogniseChord.Pages
             var chosenType = chordTypes[rnd.Next(chordTypes.Length)];
 
             // determine number of voices: use SelectedCount if set, otherwise default3
-            int voices = rnd.Next(2, 6); // default random between 2 and 5
+            int voices = rnd.Next(2,6); // default random between2 and5
 
             // create base Chord and wrap into ChordT
             var baseChord = Chord.CreateRandomFrom(root, chosenType, voices, rnd, true);
             currentChord = new ChordT(baseChord.GetNotes());
+
+            // Prepare JSON sequence for frontend: array of { frequency: double, duration: int }
+            var seq = new List<object>();
+            foreach (var note in baseChord.GetNotes())
+            {
+                int ap = note.AbsPitch();
+                if (ap >=0)
+                {
+                    double hz = Pitch_to_hz(ap);
+                    int dur = note.AbsDuration();
+                    seq.Add(new { frequency = hz, duration = dur });
+                }
+                else
+                {
+                    // rest
+                    seq.Add(new { frequency =0.0, duration = note.AbsDuration() });
+                }
+            }
+            // add small pause tail
+            seq.Add(new { frequency =0.0, duration =50 });
+
+            GeneratedChordJson = JsonSerializer.Serialize(seq);
 
             MessageL(14, $"Generated chord root={root.GetName()} type={chosenType} voices={voices}");
         }
@@ -96,7 +123,7 @@ namespace RecogniseChord.Pages
         public IActionResult OnPostRecognise()
         {
             MessageL(14, "OnPostRecognise starts!");
-            PopulateOptions(SelectedCount > 0 ? SelectedCount : 1);
+            PopulateOptions(SelectedCount >0 ? SelectedCount :1);
             PopulateTypes(SelectedChord);
             return Page();
 
@@ -137,7 +164,7 @@ namespace RecogniseChord.Pages
         {
             MessageL(14, $"PopulateOptions starts with {count}!");
             Options.Clear();
-            if (count <= 1)
+            if (count <=1)
             {
                 Options.Add("—початку обер≥ть к≥льк≥сть нот");
                 return;

@@ -1,7 +1,15 @@
 ﻿using Music;
 using static Music.ChordPermutation;
+using static Music.Engine;
+using static Music.Messages;
 using System.Numerics;
 using System.Xml.Linq;
+using NAudio.Wave;
+using System.IO;
+using System.Linq;
+using System.Threading;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace Music
 {
@@ -375,14 +383,19 @@ namespace Music
                     var n = Note.GenerateRandomNote(octaves);
                     rndChord.AddNote(n);
                 }
-                rndChord.Adjust(); // привести ноти в корректний порядок/октави
-            }
-            catch (Exception ex)
-            {
-                // зберегти існуючу поведінку логування у проекті
-                Music.Messages.MessageL(12, "CreateRandom chord error: " + ex.Message);
-            }
-            return rndChord;
+ rndChord.Adjust(); // привести ноти в корректний порядок/октави
+ // log generated notes
+ try {
+ var names = string.Join(", ", rndChord.Notes.Select(n => n.GetName()));
+ MessageL(COLORS.gray, "CreateRandom generated: " + names);
+ } catch { }
+ }
+ catch (Exception ex)
+ {
+ // зберегти існуючу поведінку логування у проекті
+ Music.Messages.MessageL(12, "CreateRandom chord error: " + ex.Message);
+ }
+ return rndChord;
         }
 
         public static Chord CreateRandomFrom(Note root, CHORDS chordType, Random? rnd = null, bool randomVoicing = true)
@@ -532,9 +545,14 @@ namespace Music
             if (randomVoicing)
             {
                 int inversions = rnd.Next(0, Math.Max(1, chord.Size()));
-                for (int i = 0; i < inversions; i++)
-                    chord.Inversion();
+                for (int i =0; i < inversions; i++)
+                chord.Inversion();
             }
+            // log generated notes
+            try {
+            var names = string.Join(", ", chord.Notes.Select(n => n.GetName()));
+            MessageL(COLORS.gray, "CreateRandomFrom generated: " + names);
+            } catch { }
 
             return chord;
         }
@@ -635,5 +653,111 @@ namespace Music
             return chord;
         }
 
+        // Play chord: sound all notes simultaneously. Duration chosen as max of notes' durations.
+        public void Play()
+        {
+            // collect frequencies for notes that are not rests
+            var freqs = new List<double>();
+            int maxDur = 0;
+            foreach (var n in Notes)
+            {
+                int ap = n.AbsPitch();
+                if (ap >= 0)
+                {
+                    freqs.Add(Pitch_to_hz(ap));
+                    maxDur = Math.Max(maxDur, n.AbsDuration());
+                }
+            }
+
+            if (freqs.Count == 0)
+            {
+                // all rests: just wait max duration among notes (if any) or return
+                Thread.Sleep(0);
+                return;
+            }
+
+            // add small tail for release
+            int totalMs = maxDur + 50;
+
+            using var waveOut = new WaveOutEvent();
+            var provider = new ChordWaveProvider(freqs, totalMs);
+            waveOut.Init(provider);
+            waveOut.Play();
+
+            Thread.Sleep(totalMs);
+            waveOut.Stop();
+        }
+
+        // Save chord to WAV file with optional explicit musical duration (Duration).
+        // Files named sequentially: example1.wav, example2.wav, ...
+        public string SaveWave(string Path = null, Duration duration = null)
+        {
+            MessageL(COLORS.olive, $"Saving chord to WAV...");
+
+            var freqs = new List<double>();
+            int maxDur = 0;
+            foreach (var n in Notes)
+            {
+                int ap = n.AbsPitch();
+                if (ap >= 0)
+                {
+                    freqs.Add(Pitch_to_hz(ap));
+                    maxDur = Math.Max(maxDur, n.AbsDuration());
+                }
+            }
+
+            // Determine active duration from parameter, falling back to notes' max duration
+            int activeMs = duration != null ? duration.AbsDuration() : maxDur;
+            const int MaxMs = 5000;
+            if (activeMs > MaxMs) activeMs = MaxMs;
+            if (activeMs <= 0) activeMs = 200;
+
+            string directory = Path ?? System.IO.Path.Combine("wwwroot", "sound");
+            Directory.CreateDirectory(directory);
+
+            // find next sequential filename exampleN.wav
+            int nextIndex = 1;
+            try
+            {
+                var files = Directory.GetFiles(directory, "example*.wav");
+                var rx = new Regex(@"example(\d+)\.wav$", RegexOptions.IgnoreCase);
+                int max = 0;
+                foreach (var f in files)
+                {
+                    var name = System.IO.Path.GetFileName(f);
+                    var m = rx.Match(name);
+                    if (m.Success && int.TryParse(m.Groups[1].Value, out var val))
+                    {
+                        if (val > max) max = val;
+                    }
+                }
+                nextIndex = max + 1;
+            }
+            catch (Exception ex)
+            {
+                // if directory read fails, fallback to1
+                GrayMessageL("Failed to enumerate existing files: " + ex.Message);
+                nextIndex = 1;
+            }
+
+            string filename = $"example{nextIndex}.wav";
+            string fullPath = System.IO.Path.Combine(directory, filename);
+
+            var provider = new ChordWaveProvider(freqs, activeMs);
+
+            using (var writer = new WaveFileWriter(fullPath, provider.WaveFormat))
+            {
+                int bufferSamples = provider.WaveFormat.SampleRate / 10; //0.1s buffer
+                float[] buffer = new float[bufferSamples];
+                int samplesRead;
+                while ((samplesRead = provider.Read(buffer, 0, buffer.Length)) > 0)
+                {
+                    writer.WriteSamples(buffer, 0, samplesRead);
+                }
+            }
+
+            MessageL(COLORS.olive, $"WAV saved to {fullPath}");
+            return fullPath;
+        }
     }
 }
