@@ -8,9 +8,9 @@
     <h1 class="display-4">Інтервали та акорди</h1>
 
     <div class="innercontainer">
-        <div id="rightcontainer" class="halfcontainer">
-            right
-            <form id="playform" method="post" asp-page-handler="Play">
+        <div id="rightcontainer" class="halfcontainer">    
+            <p class="full-row">Акорд згенеровано! Спробуєш вгадати?</p>
+            <form id="playform" class="full-row" method="post" asp-page-handler="Play">
                 <button id="playButton" type="button">Відтворити</button>
             </form>
 
@@ -49,11 +49,11 @@
             {
                 @if (Model.RecogniseOk == true)
                 {
-                    <p class="text-success">Ви вгадали: @Model.GuessResult</p>
+                    <p class="text-success">@Model.GuessResult</p>
                 }
                 else
                 {
-                    <p class="text-danger">Ви не вгадали: @Model.GuessResult</p>
+                    <p class="text-danger">@Model.GuessResult</p>
                 }
                 <p>Правильна відповідь: <code>@Model.RecogniseCorrect</code></p>
             }

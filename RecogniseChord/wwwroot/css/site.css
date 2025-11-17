@@ -62,20 +62,40 @@ body {
     
 }
 
-.innercontainer, .halfcontainer {
+.innercontainer {
     margin-top: 0px;
     padding: 0px;
-    display: inline-flex;
+    display: flex; /* was inline-flex */
     flex-wrap: wrap;
     justify-content: center;
+    align-items: stretch; /* ensure children stretch to same height */
     gap: 2%;
     border: 1px solid #ddd;
     width: 100%;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     height: 100%;
 }
-.halfcontainer{
-  width: 48%;
+
+.halfcontainer {
+    flex: 0 0 48%;
+    display: flex;
+    flex-direction: column;
+    background-color: #ffffff;
+    box-sizing: border-box;
+}
+
+/* keep nested innercontainer behavior (used inside halves) but allow it to wrap content */
+.halfcontainer .innercontainer {
+ display: flex;
+ flex-wrap: wrap;
+ justify-content: center;
+ gap: 2%;
+ border: none; /* avoid double border inside halves */
+}
+
+/* Make right/left containers explicitly stretch and allow content to grow */
+#rightcontainer, #leftcontainer {
+ align-items: stretch;
 }
 
 /* Прив'язати реальну висоту header до змінної і вирівняти вміст по центру */
@@ -107,3 +127,45 @@ header .navbar {
 footer {
     background-color: var(--footer-color);
 }
+
+/* Responsive: on narrow screens stack columns and ensure rightcontainer is above leftcontainer */
+@media (max-width: 768px) {
+  /* Make the parent a normal flex column so children stack vertically */
+  .innercontainer {
+    display: flex !important;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  /* Each half becomes full width when stacked */
+  .halfcontainer {
+    width: 100% !important;
+    flex: 0 0 auto;
+  }
+
+  /* Ensure rightcontainer is rendered above leftcontainer even if markup/order changes */
+  #rightcontainer {
+    order: -1;
+  }
+
+  /* Optional: tighten borders/padding on small screens */
+  .innercontainer, .halfcontainer {
+    border-width: 1px;
+    padding: 0.5rem;
+  }
+}
+
+/* utility to force an element to take full width inside flex/flex-wrap containers */
+.full-row {
+ display: block;
+ width:100%;
+}
+
+/* ensure the play button is centered within the full row */
+#playform { text-align: center; margin-bottom:0.5rem; }
+#playform button { min-width:160px; }
+
+/* Make success/danger messages bold for better visibility */
+.text-success { font-weight:700; }
+.text-danger { font-weight:700; }

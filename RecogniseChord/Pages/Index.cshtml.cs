@@ -161,7 +161,7 @@ namespace RecogniseChord.Pages
 
                 RecogniseOk = ok;
                 GuessResult = ok ? "в≥рно" : "нев≥рно";
-                RecogniseCorrect = $"{actual.Type} {actual.Quality} (кор≥нь {actual.Root}) Ч ноти: {actual.NotesDisplay}";
+                RecogniseCorrect = $"{actual.Type} {actual.Quality} (в≥д ноти {actual.Root}) Ч ноти: {actual.NotesDisplay}";
 
                 // keep current chord in TempData while we display feedback
                 TempData.Keep(CurrentChordKey);
@@ -222,24 +222,19 @@ namespace RecogniseChord.Pages
                 INTERVALS interval = Enum.TryParse<INTERVALS>(typeKey, out var intr) ? intr : INTERVALS.SECUNDA;
 
                 // choose quality set depending on whether interval is a "perfect" type
-                // perfect-type intervals: PRIMA, QUARTA, QUINTA, OCTAVA
+                // perfect-type intervals: PRIMA, QUARTA, QUINTј, OCTAVA
                 var perfectSet = new[] { INTERVALS.PRIMA, INTERVALS.QUARTA, INTERVALS.QUINTA, INTERVALS.OCTAVA };
                 QUALITY qual;
                 if (perfectSet.Contains(interval))
-                {
-                    // choose among perfect/aug/dim for perfect intervals
-                    var qopts = new[] { "PERFECT", "AUG", "DIM" };
-                    qualityKey = qopts[rnd.Next(qopts.Length)];
-                    qual = qualityKey == "AUG" ? QUALITY.AUG
-                         : qualityKey == "DIM" ? QUALITY.DIM
-                         : QUALITY.PERFECT;
+                {                    
+                    qual = QUALITY.PERFECT;
                 }
                 else
                 {
                     // for imperfect intervals (seconds, thirds, sixths, sevenths) choose sensible qualities
-                    var qopts = new[] { "MAJ", "MIN", "AUG", "DIM" };
+                    var qopts = new[] { "MAJ", "MIN" };
                     qualityKey = qopts[rnd.Next(qopts.Length)];
-                    qual = qualityKey == "MIN" ? QUALITY.MIN : qualityKey == "AUG" ? QUALITY.AUG : qualityKey == "DIM" ? QUALITY.DIM : QUALITY.MAJ;
+                    qual = qualityKey == "MIN" ? QUALITY.MIN : QUALITY.MAJ;
                 }
 
                 var note2 = (Note)root.Clone();
@@ -250,10 +245,15 @@ namespace RecogniseChord.Pages
             }
             else if (count ==3)
             {
+                // Allow triad types including SEXT/QSEXT, but do not generate augmented variants
                 var triTypes = new[] { "TRI", "SEXT", "QSEXT" };
+
                 typeKey = triTypes[rnd.Next(triTypes.Length)];
-                var qualities = new[] { "MAJ", "MIN", "AUG", "DIM" };
-                qualityKey = qualities[rnd.Next(qualities.Length)];
+                // If the type is SEXT or QSEXT, disallow the AUG quality for generation
+                string[] qualitiesForGen = (typeKey == "SEXT" || typeKey == "QSEXT")
+                 ? new[] { "MAJ", "MIN", "DIM" }
+                 : new[] { "MAJ", "MIN", "AUG", "DIM" };
+                qualityKey = qualitiesForGen[rnd.Next(qualitiesForGen.Length)];
                 TRIADS triadQuality = Enum.TryParse<TRIADS>(qualityKey, out var tq) ? tq : TRIADS.MAJ;
                 chord.TriadChord(root, triadQuality);
                 ApplyTriadInversion(chord, typeKey);
@@ -354,7 +354,9 @@ namespace RecogniseChord.Pages
         private void PopulateQualities(int count, string type)
         {
             QualityOptions.Clear();
-            if (string.IsNullOrEmpty(type)) return;
+            // Some handlers call PopulateQualities before SelectedType is set in binding.
+            // Only bail out when count is invalid; otherwise populate based on count.
+            if (count <=0) return;
             switch (count)
             {
                 case 2: QualityOptions.AddRange(new[] { "MAJ", "MIN" }); break;
