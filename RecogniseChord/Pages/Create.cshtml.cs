@@ -118,15 +118,17 @@ namespace RecogniseChord.Pages
 
         private void PopulateQualities()
         {
+            // Populate internal keys (MAJ/MIN/AUG/DIM and enum names) Ч UI will show Ukrainian labels.
             QualityOptions.Clear();
             if (string.IsNullOrEmpty(SelectedType)) return;
             switch (SelectedCount)
             {
                 case 2:
-                    // interval qualities
-                    QualityOptions.AddRange(new[]{ "велика","мала" });
+                    // interval qualities: use internal keys
+                    QualityOptions.AddRange(new[]{ "MAJ","MIN" });
                     break;
                 case 3:
+                    // triad qualities (internal keys)
                     QualityOptions.AddRange(new[]{ "MAJ","MIN","AUG","DIM" });
                     break;
                 case 4:
@@ -134,7 +136,7 @@ namespace RecogniseChord.Pages
                     QualityOptions.AddRange(Enum.GetNames(typeof(SEPTS)));
                     break;
                 case 5:
-                    // ninth chord qualities (NINTHS enum names excluding OTHER maybe)
+                    // ninth chord qualities (NINTHS enum names excluding OTHER)
                     QualityOptions.AddRange(Enum.GetNames(typeof(NINTHS)).Where(n => n != "OTHER"));
                     break;
             }
@@ -149,7 +151,7 @@ namespace RecogniseChord.Pages
             if (SelectedCount ==2)
             {
                 var note2 = (Note)root.Clone();
-                QUALITY qual = SelectedQuality == "мала" ? QUALITY.MIN : QUALITY.MAJ;
+                QUALITY qual = SelectedQuality == "MIN" || SelectedQuality == "мала" ? QUALITY.MIN : QUALITY.MAJ;
                 INTERVALS interval = Enum.TryParse<INTERVALS>(SelectedType, out var intr) ? intr : INTERVALS.SECUNDA;
                 // transpose second note
                 note2.Transpose(interval, qual, DIR.UP);
@@ -162,6 +164,7 @@ namespace RecogniseChord.Pages
             if (SelectedCount ==3)
             {
                 // triads & inversions
+                // SelectedQuality is internal key (MAJ/MIN/AUG/DIM)
                 TRIADS triadQuality = Enum.TryParse<TRIADS>(SelectedQuality, out var tq) ? tq : TRIADS.MAJ;
                 chord.TriadChord(root, triadQuality);
                 ApplyTriadInversion(chord, SelectedType);

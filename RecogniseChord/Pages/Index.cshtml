@@ -27,12 +27,51 @@
             </div>
             <div class="innercontainer">
                 <form id="recogniseform" method="post" asp-page-handler="Recognise">
+                    @{ 
+                        // decide which count to use for labeling: user selection if available, otherwise generated chord
+                        var displayCount = Model.SelectedCount > 0 ? Model.SelectedCount : Model.GeneratedCount;
+                    }
                     <select asp-for="SelectedChord" id="SelectedChord">
                         @foreach (var o in Model.Options)
                         {
-                            <option value="@o">@o</option>
+                            var label = displayCount switch
+                            {
+                                2 => o switch { "MAJ" => "велика", "MIN" => "мала", _ => o },
+                                3 => o switch { "MAJ" => "мажорний", "MIN" => "мінорний", "AUG" => "збільшений", "DIM" => "зменшений", _ => o },
+                                4 => o switch {
+                                    // SEPTS enum names -> українські підписи
+                                    "MAJAUG" => "мажорний зі збільшеною квінтою",
+                                    "MAJMAJ" => "великий мажорний",
+                                    "MAJMIN" => "малий мажорний",
+                                    "MINMAJ" => "великий мінорний",
+                                    "MINMIN" => "малий мінорний",
+                                    "MINDIM" => "малий зменшений",
+                                    "DIMDIM" => "зменшений",
+                                    "ALTQUINT" => "з понеженою квінтою",
+                                    "ALTPRIM" => "альт. прима",
+                                    _ => o
+                                },
+                                5 => o switch {
+                                    // NINTHS enum names -> українські підписи
+                                    "HAUG" => "збільшений",
+                                    "HMAJ" => "збільшений мажорний",
+                                    "HDOM" => "збільшений домінантовий",
+                                    "NMJAUG" => "великий збільшений",
+                                    "NMAJ" => "великий мажорний",
+                                    "NDOM" => "великий домінантовий",
+                                    "NMIN" => "великий мінорний",
+                                    "NMDOM" => "малий домінантовий",
+                                    "NMMIN" => "малий мінорний",
+                                    "NMHALFDIM" => "малий напівзменшений",
+                                    "NMDIM" => "малий зменшений",
+                                    _ => o
+                                },
+                                _ => o
+                            };
+                            <option value="@o">@label</option>
                         }
                     </select>
+
                     <select asp-for="SelectedType" id="SelectedType">
                         <option value="">--</option>
                         @foreach (var t in Model.Types)

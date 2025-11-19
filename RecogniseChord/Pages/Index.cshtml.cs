@@ -68,6 +68,44 @@ namespace RecogniseChord.Pages
             PopulateTypesForGenerated();
             PopulateQualitiesForGenerated();
             SyncLegacyLists();
+            CleanOldFiles();
+        }
+
+        private void CleanOldFiles()
+        {
+            try
+            {
+                // sound directory under the app root
+                var soundDir = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "wwwroot", "sound");
+                if (!System.IO.Directory.Exists(soundDir))
+                {
+                    MessageL(COLORS.gray, $"CleanOldFiles: directory not found: {soundDir}");
+                    return;
+                }
+
+                var threshold = DateTime.UtcNow.AddHours(-1);
+
+                foreach (var file in System.IO.Directory.EnumerateFiles(soundDir))
+                {
+                    try
+                    {
+                        var lastWriteUtc = System.IO.File.GetLastWriteTimeUtc(file);
+                        if (lastWriteUtc < threshold)
+                        {
+                            System.IO.File.Delete(file);
+                            MessageL(COLORS.gray, $"Deleted old sound file: {System.IO.Path.GetFileName(file)}");
+                        }
+                    }
+                    catch (Exception exFile)
+                    {
+                        ErrorMessageL($"Failed to delete file '{file}': {exFile.Message}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ErrorMessageL($"CleanOldFiles failed: {ex.Message}");
+            }
         }
 
         public IActionResult OnPostPlay()
@@ -206,7 +244,7 @@ namespace RecogniseChord.Pages
         private ChordData GenerateRandomChord()
         {
             var rnd = new Random();
-            int count = rnd.Next(2,6); //2..5
+            int count = rnd.Next(2,5); //2..5
             string typeKey = string.Empty;
             string qualityKey = string.Empty;
             string rootLetter = RootOptions[rnd.Next(RootOptions.Count)];
