@@ -80,47 +80,7 @@
                         <option value="">--</option>
                         @foreach (var q in Model.QualityOptions)
                         {
-                            var qlabel = displayCount switch
-                            {
-                                2 => q switch { "MAJ" => "велика", "MIN" => "мала", _ => q },
-                                3 => q switch { "MAJ" => "мажорний", "MIN" => "мінорний", "AUG" => "збільшений", "DIM" => "зменшений", _ => q },
-                                4 => q switch {
-                                    "MAJAUG" => "мажорний зі збільшеною квінтою",
-                                    "MAJMAJ" => "мажорний (мажорна септима)",
-                                    "MAJMIN" => "мажорний (мала септима)",
-                                    "MINMAJ" => "мінорний (мажорна септима)",
-                                    "MINMIN" => "мінорний (мала септима)",
-                                    "MINDIM" => "мінорний із зменшеною квінтою",
-                                    "DIMDIM" => "подвійно зменшений",
-                                    "ALTQUINT" => "альтерована квінта",
-                                    "ALTPRIM" => "альтерована прима",
-                                    _ => q
-                                },
-                                5 => q switch {
-                                    "HAUG" => "нона зі збільшеною ноною",
-                                    "HMAJ" => "велика нона",
-                                    "HDOM" => "домінантова (зі збільшеною ноною)",
-                                    "NMJAUG" => "мажорна з збільшеною ноною",
-                                    "NMAJ" => "мажорна нона",
-                                    "NDOM" => "домінантова нона",
-                                    "NMIN" => "мінорна нона",
-                                    "NMDOM" => "домінантова (мала нона)",
-                                    "NMMIN" => "мінорна (мала нона)",
-                                    "NMHALFDIM" => "напівзменшена нона",
-                                    "NMDIM" => "зменшена нона",
-                                    _ => q
-                                },
-                                _ => q
-                            };
-
-                            if (Model.SelectedQuality == q)
-                            {
-                                <option value="@q" selected>@qlabel</option>
-                            }
-                            else
-                            {
-                                <option value="@q">@qlabel</option>
-                            }
+                            <option value="@q" selected="@(Model.SelectedQuality == q ? "selected" : null)">@q</option>
                         }
                     </select>
                 </div>

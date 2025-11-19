@@ -712,7 +712,7 @@ namespace Music
             InvertUp(n);
         }
 
-        public void CreateRandomChord(int notecount, int minpitch = 48, int maxpitch = 72)
+        public void CreateRandomChord(int notecount, int minpitch = 44, int maxpitch = 64)
         {
             Random rand = new();
             int rootpitch = rand.Next(minpitch, maxpitch - 12);

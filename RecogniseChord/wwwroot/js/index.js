@@ -60,37 +60,47 @@ document.addEventListener('DOMContentLoaded', function () {
 	// NINTHS options (exclude OTHER)
 	const ninthQualities = ['HAUG','HMAJ','HDOM','NMJAUG','NMAJ','NDOM','NMIN','NMDOM','NMMIN','NMHALFDIM','NMDIM'];
 
-	// When user changes SelectedType, update qualities client-side for triad and interval types
+	// Additional mappings (do not change existing triadTypes / ninthQualities)
+	// These arrays are used only to recognize SelectedType values rendered in UI
+	const intervalPerfectKeys = ['QUARTA', 'QUINTA', 'OCTAVA', 'PRIMA'];
+	const intervalPerfectUkr = ['кварта', 'квінта', 'октава', 'прима'];
+	const intervalImperfectKeys = ['SECUNDA', 'TERZIA', 'SEKSTA', 'SEPTYMA'];
+	const intervalImperfectUkr = ['секунда', 'терція', 'секста', 'септима'];
+
+	// When user changes SelectedType, update qualities client-side ONLY for intervals (SelectedCount == 2).
+	// Do NOT alter or handle chords (SelectedCount != 2) on the client side — server continues to manage chord lists.
 	if (selectedType) {
 		selectedType.addEventListener('change', (e) => {
-			const val = e.target.value;
+			const val = (e.target.value || '').trim();
 			localStorage.setItem('selectedType', val);
 
-			// Triad types -> triad qualities
-			if (triadTypes.includes(val)) {
-				setQualityOptions(['MAJ', 'MIN', 'AUG', 'DIM'], true);
-				return; // do not submit
-			}
+			// Determine currently selected count (radio)
+			const countRadio = document.querySelector('input[name="SelectedCount"]:checked');
+			const currentCount = countRadio ? countRadio.value : null;
 
-			// Ninth chords -> use NINTHS enum names (client-side)
-			if (val === 'NONACORD' || val.startsWith('NONACORD') || val === 'CORD69') {
-				setQualityOptions(ninthQualities, true);
+			// Strict: only handle immediate client-side update for intervals (2 sounds).
+			// This preserves all chord handling on server and does not change chord-related constants.
+			if (currentCount !== '2') {
 				return;
 			}
 
-			// Perfect intervals -> PERFECT/AUG/DIM
-			if (intervalTypesPerfect.includes(val)) {
-				setQualityOptions(['PERFECT', 'AUG', 'DIM'], true);
-				return; // do not submit
+			const valLower = val.toLowerCase();
+
+			// Perfect intervals (allow 'чиста' + augment/diminish)
+			const isPerfect = intervalPerfectKeys.some(k => k.toLowerCase() === valLower) || intervalPerfectUkr.includes(valLower);
+			if (isPerfect) {
+				setQualityOptions(['чиста', 'збільшений', 'зменшений'], true);
+				return;
 			}
 
-			// Imperfect intervals -> MAJ/MIN/AUG/DIM (show major/minor first)
-			if (intervalTypesImperfect.includes(val)) {
-				setQualityOptions(['MAJ', 'MIN', 'AUG', 'DIM'], true);
-				return; // do not submit
+			// Imperfect intervals (never 'чиста') => 'велика' / 'мала' (+ aug/dim)
+			const isImperfect = intervalImperfectKeys.some(k => k.toLowerCase() === valLower) || intervalImperfectUkr.includes(valLower);
+			if (isImperfect) {
+				setQualityOptions(['велика', 'мала', 'збільшений', 'зменшений'], true);
+				return;
 			}
 
-			// For other types leave quality list as-is; server will handle when needed
+			// Fallback: if unrecognized interval string, do not change options — server will provide correct list on postback.
 		});
 	}
 

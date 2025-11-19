@@ -51,6 +51,18 @@ namespace Music
 
         public new List<Note> GetNotes() { return notes; }
 
+        public int GetHighestAbsPitch()
+        {
+            int highest = -1;
+            foreach (Note note in notes)
+            {
+                int ap = note.AbsPitch();
+                if (ap > highest)
+                    highest = ap;
+            }
+            return highest;
+        }
+
         public List<Chord> AllTonalities()
         {
             return Interval.AllTonalities(this);
