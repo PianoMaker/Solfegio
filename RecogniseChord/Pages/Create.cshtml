@@ -31,15 +31,27 @@
                         <option value="">--</option>
                         @foreach (var t in Model.TypeOptions)
                         {
+                            // render localized label but keep option value as internal key (enum name)
+                            var label = t switch
+                            {
+                                "SECUNDA" => "секунда",
+                                "TERZIA"  => "терція",
+                                "QUARTA"  => "кварта",
+                                "QUINTA"  => "квінта",
+                                "SEKSTA"  => "секста",
+                                "SEPTYMA" => "септима",
+                                "OCTAVA"  => "октава",
+                                // keep inversion/type names as-is (they are not simple intervals)
+                                _ => t
+                            };
+
                             if (Model.SelectedType == t)
                             {
-                                @:
-                                <option value="@t" selected>@t</option>
+                                <option value="@t" selected>@label</option>
                             }
                             else
                             {
-                                @:
-                                <option value="@t">@t</option>
+                                <option value="@t">@label</option>
                             }
                         }
                     </select>

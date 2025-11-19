@@ -34,9 +34,33 @@
                         }
                     </select>
                     <select asp-for="SelectedType" id="SelectedType">
-                        @foreach (var o in Model.Types)
+                        <option value="">--</option>
+                        @foreach (var t in Model.Types)
                         {
-                            <option value="@o">@o</option>
+                            var label = t switch
+                            {
+                                "SECUNDA" => "секунда",
+                                "TERZIA"  => "терція",
+                                "QUARTA"  => "кварта",
+                                "QUINTA"  => "квінта",
+                                "SEKSTA"  => "секста",
+                                "SEPTYMA" => "септима",
+                                "OCTAVA"  => "октава",
+                                "TRI"     => "тризвук",
+                                "SEXT"    => "сексакторд",
+                                "QSEXT"   => "квартсекстакорд",
+                                "SEPT"    => "септакорд",
+                                "QUINTS"  => "квінтсекстакорд",
+                                "TERZQ"   => "терцквартакорд",
+                                "SEC"     => "секундакорд",
+                                "NONACORD" => "нонакорд",
+                                "NONACORD_1i" => "нонакорд в 1 оберненні",
+                                "NONACORD_2i" => "нонакорд в 2 оберненні",
+                                "NONACORD_3i" => "нонакорд в 3 оберненні",
+                                "NONACORD_4i" => "нонакорд в 4 оберненні",
+                                _ => t
+                            };
+                            <option value="@t">@label</option>
                         }
                     </select>
                     <input type="hidden" asp-for="SelectedCount" />

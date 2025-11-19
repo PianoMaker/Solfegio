@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using NAudio.Wave;
 using NAudio.Dsp;
@@ -126,7 +126,7 @@ namespace Music
                     {
                         if (_phaseInc[t] == 0.0) continue;
                         float amp = _envs[t].Process();
-                        mixed += Math.Sin(_phase[t]) * amp;
+                        mixed += WaveSample(_phase[t], Globals.timbre) * amp;
                         _phase[t] += _phaseInc[t];
                         if (_phase[t] > 2.0 * Math.PI) _phase[t] -= 2.0 * Math.PI;
                     }
@@ -152,7 +152,7 @@ namespace Music
                 {
                     if (_phaseInc[t] == 0.0) continue; // silent tone
                     float amp = _envs[t].Process();
-                    mixed += Math.Sin(_phase[t]) * amp;
+                    mixed += WaveSample(_phase[t], Globals.timbre) * amp;
                     _phase[t] += _phaseInc[t];
                     if (_phase[t] > 2.0 * Math.PI) _phase[t] -= 2.0 * Math.PI;
                 }
@@ -162,6 +162,23 @@ namespace Music
             _samplesRemaining -= samplesToWrite;
             if (_samplesRemaining < 0) _samplesRemaining = 0; // normalize to zero to enter tail on next call
             return samplesToWrite;
+        }
+
+        private static double WaveSample(double phase, TIMBRE timbre)
+        {
+            switch (timbre)
+            {
+                case TIMBRE.tri:
+                    // triangle from -1..1
+                    return 2.0 * Math.Asin(Math.Sin(phase)) / Math.PI;
+                case TIMBRE.sawtooth:
+                    // naive saw: map phase 0..2π -> -1..1
+                    return 2.0 * (phase / (2.0 * Math.PI)) - 1.0;
+                case TIMBRE.square:
+                    return Math.Sin(phase) >= 0 ? 1.0 : -1.0;
+                default: // TIMBRE.sin
+                    return Math.Sin(phase);
+            }
         }
     }
 }

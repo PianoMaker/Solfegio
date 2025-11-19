@@ -124,7 +124,7 @@ namespace RecogniseChord.Pages
             {
                 case 2:
                     // interval qualities
-                    QualityOptions.AddRange(new[]{ "MAJ","MIN" });
+                    QualityOptions.AddRange(new[]{ "велика","мала" });
                     break;
                 case 3:
                     QualityOptions.AddRange(new[]{ "MAJ","MIN","AUG","DIM" });
@@ -149,7 +149,7 @@ namespace RecogniseChord.Pages
             if (SelectedCount ==2)
             {
                 var note2 = (Note)root.Clone();
-                QUALITY qual = SelectedQuality == "MIN" ? QUALITY.MIN : QUALITY.MAJ;
+                QUALITY qual = SelectedQuality == "мала" ? QUALITY.MIN : QUALITY.MAJ;
                 INTERVALS interval = Enum.TryParse<INTERVALS>(SelectedType, out var intr) ? intr : INTERVALS.SECUNDA;
                 // transpose second note
                 note2.Transpose(interval, qual, DIR.UP);
