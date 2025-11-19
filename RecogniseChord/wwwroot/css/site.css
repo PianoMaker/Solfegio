@@ -63,12 +63,12 @@ body {
 }
 
 .innercontainer {
-    margin-top: 0px;
+  margin-top: 0px;
     padding: 0px;
     display: flex; /* was inline-flex */
     flex-wrap: wrap;
     justify-content: center;
-    align-items: stretch; /* ensure children stretch to same height */
+ align-items: stretch; /* ensure children stretch to same height */
     gap: 2%;
     border: 1px solid #ddd;
     width: 100%;
@@ -115,9 +115,9 @@ header .navbar {
     header .navbar-brand,
     header .navbar-nav {
         height: 100%;
-        display: flex;
-        align-items: center;
-        background-color: var(--header-color);
+      display: flex;
+ align-items: center;
+   background-color: var(--header-color);
     }
 
 .navbar-coloured {
@@ -152,14 +152,30 @@ footer {
   /* Optional: tighten borders/padding on small screens */
   .innercontainer, .halfcontainer {
     border-width: 1px;
-    padding: 0.5rem;
+ padding: 0.5rem;
   }
+}
+
+/* Стала ширина селектів для консистентного UI */
+.select-quality {
+    width: 320px;
+    max-width: 100%;
+}
+
+.select-chord {
+    width: 240px;
+    max-width: 100%;
+}
+
+.select-root {
+    width: 80px;
+    max-width: 100%;
 }
 
 /* utility to force an element to take full width inside flex/flex-wrap containers */
 .full-row {
- display: block;
- width:100%;
+    display: block;
+    width: 100%;
 }
 
 /* ensure the play button is centered within the full row */

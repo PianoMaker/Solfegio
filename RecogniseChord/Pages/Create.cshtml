@@ -27,7 +27,7 @@
             <form method="post" asp-page-handler="Type" id="typeForm">
                 <div class="mt-3">
                     <label>Тип:</label>
-                    <select asp-for="SelectedType" onchange="document.getElementById('typeForm').submit();">
+                    <select asp-for="SelectedType" class="select-chord" onchange="document.getElementById('typeForm')?.submit();">
                         <option value="">--</option>
                         @foreach (var t in Model.TypeOptions)
                         {
@@ -76,7 +76,7 @@
                     @{
                         var displayCount = Model.SelectedCount;
                     }
-                    <select asp-for="SelectedQuality" onchange="document.getElementById('qualityForm').submit();">
+                    <select asp-for="SelectedQuality" class="select-quality" onchange="document.getElementById('qualityForm')?.submit();">
                         <option value="">--</option>
                         @foreach (var q in Model.QualityOptions)
                         {
@@ -125,8 +125,8 @@
                     </select>
                 </div>
                 <div class="mt-3">
-                    <label>Корінь:</label>
-                    <select asp-for="RootNote" onchange="document.getElementById('qualityForm').submit();">
+                    <label>Від ноти:</label>
+                    <select asp-for="RootNote" class="select-root" onchange="document.getElementById('qualityForm')?.submit();">
                         @foreach (var r in Model.RootOptions)
                         {
                             if (Model.RootNote == r)

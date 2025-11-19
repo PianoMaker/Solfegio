@@ -25,104 +25,51 @@
                     <input type="radio" name="SelectedCount" value="5">5
                 </form>
             </div>
+
             <div class="innercontainer">
                 <form id="recogniseform" method="post" asp-page-handler="Recognise">
-                    @{ 
-                        // decide which count to use for labeling: user selection if available, otherwise generated chord
-                        var displayCount = Model.SelectedCount > 0 ? Model.SelectedCount : Model.GeneratedCount;
-                    }
-                    <select asp-for="SelectedChord" id="SelectedChord">
-                        @foreach (var o in Model.Options)
+                    <select asp-for="SelectedQuality" id="SelectedChord" class="select-quality">
+                        @foreach (var quality in Model.QualityOptions)
                         {
-                            var label = displayCount switch
-                            {
-                                2 => o switch { "MAJ" => "велика", "MIN" => "мала", _ => o },
-                                3 => o switch { "MAJ" => "мажорний", "MIN" => "мінорний", "AUG" => "збільшений", "DIM" => "зменшений", _ => o },
-                                4 => o switch {
-                                    // SEPTS enum names -> українські підписи
-                                    "MAJAUG" => "мажорний зі збільшеною квінтою",
-                                    "MAJMAJ" => "великий мажорний",
-                                    "MAJMIN" => "малий мажорний",
-                                    "MINMAJ" => "великий мінорний",
-                                    "MINMIN" => "малий мінорний",
-                                    "MINDIM" => "малий зменшений",
-                                    "DIMDIM" => "зменшений",
-                                    "ALTQUINT" => "з понеженою квінтою",
-                                    "ALTPRIM" => "альт. прима",
-                                    _ => o
-                                },
-                                5 => o switch {
-                                    // NINTHS enum names -> українські підписи
-                                    "HAUG" => "збільшений",
-                                    "HMAJ" => "збільшений мажорний",
-                                    "HDOM" => "збільшений домінантовий",
-                                    "NMJAUG" => "великий збільшений",
-                                    "NMAJ" => "великий мажорний",
-                                    "NDOM" => "великий домінантовий",
-                                    "NMIN" => "великий мінорний",
-                                    "NMDOM" => "малий домінантовий",
-                                    "NMMIN" => "малий мінорний",
-                                    "NMHALFDIM" => "малий напівзменшений",
-                                    "NMDIM" => "малий зменшений",
-                                    _ => o
-                                },
-                                _ => o
-                            };
-                            <option value="@o">@label</option>
+                            <option value="@quality">@quality</option>
                         }
                     </select>
 
-                    <select asp-for="SelectedType" id="SelectedType">
+                    <select asp-for="SelectedType" id="SelectedType" class="select-chord">
                         <option value="">--</option>
-                        @foreach (var t in Model.Types)
+                        @foreach (var type in Model.TypeOptions)
                         {
-                            var label = t switch
-                            {
-                                "SECUNDA" => "секунда",
-                                "TERZIA"  => "терція",
-                                "QUARTA"  => "кварта",
-                                "QUINTA"  => "квінта",
-                                "SEKSTA"  => "секста",
-                                "SEPTYMA" => "септима",
-                                "OCTAVA"  => "октава",
-                                "TRI"     => "тризвук",
-                                "SEXT"    => "сексакторд",
-                                "QSEXT"   => "квартсекстакорд",
-                                "SEPT"    => "септакорд",
-                                "QUINTS"  => "квінтсекстакорд",
-                                "TERZQ"   => "терцквартакорд",
-                                "SEC"     => "секундакорд",
-                                "NONACORD" => "нонакорд",
-                                "NONACORD_1i" => "нонакорд в 1 оберненні",
-                                "NONACORD_2i" => "нонакорд в 2 оберненні",
-                                "NONACORD_3i" => "нонакорд в 3 оберненні",
-                                "NONACORD_4i" => "нонакорд в 4 оберненні",
-                                _ => t
-                            };
-                            <option value="@t">@label</option>
+                            <option value="@type">@type</option>
                         }
                     </select>
+  
                     <input type="hidden" asp-for="SelectedCount" />
-                    <button type="submit">"Розпізнати"</button>
+                    <button type="submit">Розпізнати</button>
                 </form>
             </div>
         </div>
+
         <div id="leftcontainer" class="halfcontainer">
             @if (Model.RecogniseOk is not null)
             {
                 @if (Model.RecogniseOk == true)
                 {
-                    <p class="text-success">@Model.GuessResult</p>
+                    <div class="answer-correct">
+                        <p class="text-success">@Model.GuessResult</p>
+                        <p>Правильна відповідь: <code>@Model.RecogniseCorrect</code></p>
+                    </div>
                 }
                 else
                 {
-                    <p class="text-danger">@Model.GuessResult</p>
+                    <div>
+                        <p class="text-danger">@Model.GuessResult</p>
+                        <p>Правильна відповідь: <code>@Model.RecogniseCorrect</code></p>
+                    </div>
                 }
-                <p>Правильна відповідь: <code>@Model.RecogniseCorrect</code></p>
             }
             else
             {
-                <p>left</p>
+                <p>Виберіть параметри акорду та натисніть "Розпізнати"</p>
             }
         </div>
     </div>
@@ -130,9 +77,7 @@
 
 @section Scripts {
     <script>
-        // generated chord JSON available as window.generatedChord
         window.generatedChord = @Html.Raw(Model.GeneratedChordJson ?? "null");
-        // generated WAV file relative path available as window.generatedFile
         window.generatedFile = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.GeneratedFileRelative ?? string.Empty));
     </script>
     <script src="~/js/index.js"></script>

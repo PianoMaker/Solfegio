@@ -14,19 +14,19 @@ namespace RecogniseChord.Pages
     {
         private readonly ILogger<IndexModel> _logger;
 
-        // User selections (guess)
-        [BindProperty] public int SelectedCount { get; set; } =0; //2..5
-        [BindProperty] public string SelectedType { get; set; } = string.Empty; // chord type key (internal)
-        [BindProperty] public string SelectedQuality { get; set; } = string.Empty; // quality key (internal)
-        [BindProperty] public string RootNoteGuess { get; set; } = string.Empty; // optional root guess
+        // User selections (guess) — тепер зберігають українські назви
+        [BindProperty] public int SelectedCount { get; set; } = 0; //2..5
+        [BindProperty] public string SelectedType { get; set; } = string.Empty; // українська назва
+        [BindProperty] public string SelectedQuality { get; set; } = string.Empty; // українська назва
+        [BindProperty] public string RootNoteGuess { get; set; } = string.Empty;
         // Legacy / UI binding names (map to existing quality/type)
         [BindProperty] public string SelectedChord { get; set; } = string.Empty; // mapped to SelectedQuality
 
         // Generated chord info (current one to play / guess)
         public string? GeneratedFileRelative { get; private set; }
         public int GeneratedCount { get; private set; }
-        public string GeneratedType { get; private set; } = string.Empty;
-        public string GeneratedQuality { get; private set; } = string.Empty;
+        public string GeneratedType { get; private set; } = string.Empty; // internal key from generator
+        public string GeneratedQuality { get; private set; } = string.Empty; // internal key from generator
         public string GeneratedRoot { get; private set; } = string.Empty;
         public string GeneratedNotesDisplay { get; private set; } = string.Empty;
         public bool CanPlay => !string.IsNullOrEmpty(GeneratedFileRelative);
@@ -37,13 +37,11 @@ namespace RecogniseChord.Pages
         public bool? RecogniseOk { get; private set; }
         public string? RecogniseCorrect { get; private set; }
 
-        // Options for UI
+        // Options for UI (display strings in Ukrainian)
         public List<string> CountOptions { get; } = new() { "2", "3", "4", "5" };
-        // Legacy property names expected by Razor page
-        public List<string> Options { get; private set; } = new(); // qualities list (maps QualityOptions)
-        public List<string> Types { get; private set; } = new(); // inversion/type list (maps TypeOptions)
-        // Internal collections retained for clarity
-        public List<string> TypeOptions { get; private set; } = new();
+        public List<string> Options { get; private set; } = new(); // qualities list (display)
+        public List<string> Types { get; private set; } = new(); // type list (display)
+        public List<string> TypeOptions { get; private set; } = new(); // internal storage for display strings
         public List<string> QualityOptions { get; private set; } = new();
         public List<string> RootOptions { get; } = new() { "C", "D", "E", "F", "G", "A", "B" };
 
@@ -53,6 +51,73 @@ namespace RecogniseChord.Pages
         // TempData key for the current chord
         private const string CurrentChordKey = "__currentChord";
 
+        // Маппінг enum -> українська назва
+        private static readonly Dictionary<string, string> TypeToUkrainian = new()
+        {
+            ["SECUNDA"] = "секунда",
+            ["TERZIA"] = "терція",
+            ["QUARTA"] = "кварта",
+            ["QUINTA"] = "квінта",
+            ["SEKSTA"] = "секста",
+            ["SEPTYMA"] = "септима",
+            ["OCTAVA"] = "октава",
+            ["TRI"] = "тризвук",
+            ["SEXT"] = "сексакторд",
+            ["QSEXT"] = "квартсекстакорд",
+            ["SEPT"] = "септакорд",
+            ["QUINTS"] = "квінтсекстакорд",
+            ["TERZQ"] = "терцквартакорд",
+            ["SEC"] = "секундакорд",
+            ["NONACORD"] = "нонакорд",
+            ["NONACORD_1i"] = "нонакорд в 1 оберненні",
+            ["NONACORD_2i"] = "нонакорд в 2 оберненні",
+            ["NONACORD_3i"] = "нонакорд в 3 оберненні",
+            ["NONACORD_4i"] = "нонакорд в 4 оберненні",
+        };
+
+        private static readonly Dictionary<string, string> UkrainianToType =
+            TypeToUkrainian.ToDictionary(kv => kv.Value, kv => kv.Key);
+
+        // Маппінг для якостей (залежить від кількості нот)
+        private static Dictionary<string, string> GetQualityToUkrainian(int count) => count switch
+        {
+            2 => new() { ["MAJ"] = "велика", ["MIN"] = "мала" },
+            3 => new() { ["MAJ"] = "мажорний", ["MIN"] = "мінорний", ["AUG"] = "збільшений", ["DIM"] = "зменшений" },
+            4 => new()
+            {
+                ["MAJAUG"] = "мажорний зі збільшеною квінтою",
+                ["MAJMAJ"] = "великий мажорний",
+                ["MAJMIN"] = "малий мажорний",
+                ["MINMAJ"] = "великий мінорний",
+                ["MINMIN"] = "малий мінорний",
+                ["MINDIM"] = "малий зменшений",
+                ["DIMDIM"] = "зменшений",
+                ["ALTQUINT"] = "з понеженою квінтою",
+                ["ALTPRIM"] = "альт. прима"
+            },
+            5 => new()
+            {
+                ["HAUG"] = "збільшений",
+                ["HMAJ"] = "збільшений мажорний",
+                ["HDOM"] = "збільшений домінантовий",
+                ["NMJAUG"] = "великий збільшений",
+                ["NMAJ"] = "великий мажорний",
+                ["NDOM"] = "великий домінантовий",
+                ["NMIN"] = "великий мінорний",
+                ["NMDOM"] = "малий домінантовий",
+                ["NMMIN"] = "малий мінорний",
+                ["NMHALFDIM"] = "малий напівзменшений",
+                ["NMDIM"] = "малий зменшений"
+            },
+            _ => new()
+        };
+
+        private static Dictionary<string, string> GetUkrainianToQuality(int count)
+        {
+            var map = GetQualityToUkrainian(count);
+            return map.ToDictionary(kv => kv.Value, kv => kv.Key);
+        }
+
         public IndexModel(ILogger<IndexModel> logger)
         { _logger = logger; }
 
@@ -61,10 +126,10 @@ namespace RecogniseChord.Pages
             MessageL(14, "Index OnGet: generating initial chord");
             var chordData = GenerateRandomChord();
             ApplyChordData(chordData); // show to user
-            // store current shown chord so recognise can validate
+                                       // store current shown chord so recognise can validate
             TempData[CurrentChordKey] = JsonSerializer.Serialize(chordData);
 
-            // Prepare UI option lists for initial generated chord
+            // Prepare UI option lists for initial generated chord (display strings)
             PopulateTypesForGenerated();
             PopulateQualitiesForGenerated();
             SyncLegacyLists();
@@ -110,6 +175,7 @@ namespace RecogniseChord.Pages
 
         public IActionResult OnPostPlay()
         {
+            MessageL(14, "Index OnPostPlay: processing user play request");
             // Play should use the current chord stored in TempData and must NOT generate a new chord
             if (TempData.TryGetValue(CurrentChordKey, out var curObj) && curObj is string curJson && !string.IsNullOrWhiteSpace(curJson))
             {
@@ -119,7 +185,6 @@ namespace RecogniseChord.Pages
                     if (data != null)
                     {
                         ApplyChordData(data);
-                        // keep it available for subsequent actions
                         TempData.Keep(CurrentChordKey);
                         MessageL(COLORS.gray, $"Play chord notes: {data.NotesDisplay}");
                     }
@@ -131,7 +196,6 @@ namespace RecogniseChord.Pages
             }
             else
             {
-                // If no current chord found, generate one (edge case) and store it
                 var generated = GenerateRandomChord();
                 ApplyChordData(generated);
                 TempData[CurrentChordKey] = JsonSerializer.Serialize(generated);
@@ -146,8 +210,9 @@ namespace RecogniseChord.Pages
         // Handler when user changes count of notes (radio buttons) -> refresh type/quality lists
         public IActionResult OnPostSelect()
         {
+            MessageL(14, "Index OnPostSelect: processing user selection change");
             PopulateTypes(SelectedCount);
-            PopulateQualities(SelectedCount, SelectedType);
+            PopulateQualities(SelectedCount);
             SyncLegacyLists();
             // restore current chord info from TempData so UI keeps the ability to play it
             if (TempData.TryGetValue(CurrentChordKey, out var curObj) && curObj is string curJson && !string.IsNullOrWhiteSpace(curJson))
@@ -170,10 +235,10 @@ namespace RecogniseChord.Pages
             return Page();
         }
 
-        // Handler when user changes chord/type selects (legacy recognise)
+        // When user posts recognise, convert displayed strings back to internal keys before comparing
         public IActionResult OnPostRecognise()
         {
-            // Retrieve current generated chord (the one user is trying to recognise)
+            MessageL(14, "Index OnPostRecognise: processing user recognise");
             ChordData actual = null;
             if (TempData.TryGetValue(CurrentChordKey, out var curObj) && curObj is string curJson && !string.IsNullOrWhiteSpace(curJson))
             {
@@ -189,17 +254,31 @@ namespace RecogniseChord.Pages
 
             if (actual != null)
             {
-                // Map legacy SelectedChord to SelectedQuality for comparison
+                // Legacy support: якщо SelectedChord заповнено, копіюємо в SelectedQuality
                 if (!string.IsNullOrEmpty(SelectedChord))
                     SelectedQuality = SelectedChord;
 
+                // Маппінг українських назв -> enum ключі
+                var typeKey = UkrainianToType.GetValueOrDefault(SelectedType, string.Empty);
+                var qualityMap = GetUkrainianToQuality(SelectedCount > 0 ? SelectedCount : actual.Count);
+                var qualityKey = qualityMap.GetValueOrDefault(SelectedQuality, string.Empty);
+
                 bool ok = SelectedCount == actual.Count &&
-                           string.Equals(SelectedType, actual.Type, StringComparison.OrdinalIgnoreCase) &&
-                           string.Equals(SelectedQuality, actual.Quality, StringComparison.OrdinalIgnoreCase);
+                         string.Equals(typeKey, actual.Type, StringComparison.OrdinalIgnoreCase) &&
+                   string.Equals(qualityKey, actual.Quality, StringComparison.OrdinalIgnoreCase);
 
                 RecogniseOk = ok;
                 GuessResult = ok ? "вірно" : "невірно";
-                RecogniseCorrect = $"{actual.Type} {actual.Quality} (від ноти {actual.Root}) — ноти: {actual.NotesDisplay}";
+
+                // Показуємо правильну відповідь українською
+                var correctTypeUkr = TypeToUkrainian.GetValueOrDefault(actual.Type, actual.Type);
+                var correctQualMap = GetQualityToUkrainian(actual.Count);
+                var correctQualUkr = correctQualMap.GetValueOrDefault(actual.Quality, actual.Quality);
+
+                RecogniseCorrect = $"{correctTypeUkr} {correctQualUkr} (від ноти {actual.Root}) — ноти: {actual.NotesDisplay}";
+
+                MessageL(ok ? COLORS.green : COLORS.red,
+                         $"Recognise: user={SelectedCount}/{typeKey}/{qualityKey} actual={actual.Count}/{actual.Type}/{actual.Quality}");
 
                 // keep current chord in TempData while we display feedback
                 TempData.Keep(CurrentChordKey);
@@ -211,14 +290,12 @@ namespace RecogniseChord.Pages
                 RecogniseCorrect = "Немає збереженого акорду для перевірки.";
             }
 
-            // After showing feedback, generate a new chord and replace current
             var chordData = GenerateRandomChord();
-            ApplyChordData(chordData); // show new chord to user
+            ApplyChordData(chordData);
             TempData[CurrentChordKey] = JsonSerializer.Serialize(chordData);
 
-            // refresh lists
             PopulateTypes(SelectedCount);
-            PopulateQualities(SelectedCount, SelectedType);
+            PopulateQualities(SelectedCount);
             SyncLegacyLists();
 
             return Page();
@@ -226,16 +303,23 @@ namespace RecogniseChord.Pages
 
         public IActionResult OnPostGuess()
         {
-            // Map legacy binding if used
+            MessageL(14, "Index OnPostGuess: processing user guess");
+
             if (!string.IsNullOrEmpty(SelectedChord))
                 SelectedQuality = SelectedChord;
+
+            // Маппінг українських назв -> enum ключі
+            var typeKey = UkrainianToType.GetValueOrDefault(SelectedType, string.Empty);
+            var qualityMap = GetUkrainianToQuality(SelectedCount);
+            var qualityKey = qualityMap.GetValueOrDefault(SelectedQuality, string.Empty);
+
             PopulateTypes(SelectedCount);
-            PopulateQualities(SelectedCount, SelectedType);
+            PopulateQualities(SelectedCount);
             bool ok = SelectedCount == GeneratedCount &&
-                       string.Equals(SelectedType, GeneratedType, StringComparison.OrdinalIgnoreCase) &&
-                       string.Equals(SelectedQuality, GeneratedQuality, StringComparison.OrdinalIgnoreCase);
+             string.Equals(typeKey, GeneratedType, StringComparison.OrdinalIgnoreCase) &&
+   string.Equals(qualityKey, GeneratedQuality, StringComparison.OrdinalIgnoreCase);
             GuessResult = ok ? "вірно" : "невірно";
-            MessageL(ok ? COLORS.green : COLORS.red, $"Guess result: {GuessResult} (user: {SelectedCount}/{SelectedType}/{SelectedQuality} actual: {GeneratedCount}/{GeneratedType}/{GeneratedQuality})");
+            MessageL(ok ? COLORS.green : COLORS.red, $"Guess result: {GuessResult} (user: {SelectedCount}/{typeKey}/{qualityKey} actual: {GeneratedCount}/{GeneratedType}/{GeneratedQuality})");
             TempData.Keep(CurrentChordKey);
             SyncLegacyLists();
             return Page();
@@ -244,11 +328,11 @@ namespace RecogniseChord.Pages
         private ChordData GenerateRandomChord()
         {
             var rnd = new Random();
-            int count = rnd.Next(2,5); //2..5
+            int count = rnd.Next(2, 6); //2..5
             string typeKey = string.Empty;
             string qualityKey = string.Empty;
             string rootLetter = RootOptions[rnd.Next(RootOptions.Count)];
-            Note root = new(GetNoteByLetter(rootLetter), ALTER.NATURAL,1);
+            Note root = new(GetNoteByLetter(rootLetter), ALTER.NATURAL, 1);
             var chord = new ChordT();
 
             if (count == 2)
@@ -256,62 +340,57 @@ namespace RecogniseChord.Pages
                 var intervalTypes = new[] { "SECUNDA", "TERZIA", "QUARTA", "QUINTA", "SEKSTA", "SEPTYMA", "OCTAVA" };
                 typeKey = intervalTypes[rnd.Next(intervalTypes.Length)];
 
-                // parse interval enum
                 INTERVALS interval = Enum.TryParse<INTERVALS>(typeKey, out var intr) ? intr : INTERVALS.SECUNDA;
 
-                // choose quality set depending on whether interval is a "perfect" type
-                // perfect-type intervals: PRIMA, QUARTA, QUINTА, OCTAVA
                 var perfectSet = new[] { INTERVALS.PRIMA, INTERVALS.QUARTA, INTERVALS.QUINTA, INTERVALS.OCTAVA };
                 QUALITY qual;
                 if (perfectSet.Contains(interval))
-                {                    
+                {
                     qual = QUALITY.PERFECT;
                 }
                 else
                 {
-                    // for imperfect intervals (seconds, thirds, sixths, sevenths) choose sensible qualities
                     var qopts = new[] { "MAJ", "MIN" };
                     qualityKey = qopts[rnd.Next(qopts.Length)];
                     qual = qualityKey == "MIN" ? QUALITY.MIN : QUALITY.MAJ;
                 }
 
                 var note2 = (Note)root.Clone();
-                // transpose using resolved interval and quality upward
                 note2.Transpose(interval, qual, DIR.UP);
                 chord.AddNote(root);
                 chord.AddNote(note2);
             }
-            else if (count ==3)
+            else if (count == 3)
             {
-                // Allow triad types including SEXT/QSEXT, but do not generate augmented variants
                 var triTypes = new[] { "TRI", "SEXT", "QSEXT" };
-
                 typeKey = triTypes[rnd.Next(triTypes.Length)];
-                // If the type is SEXT or QSEXT, disallow the AUG quality for generation
                 string[] qualitiesForGen = (typeKey == "SEXT" || typeKey == "QSEXT")
-                 ? new[] { "MAJ", "MIN", "DIM" }
-                 : new[] { "MAJ", "MIN", "AUG", "DIM" };
+                   ? new[] { "MAJ", "MIN", "DIM" }
+                   : new[] { "MAJ", "MIN", "AUG", "DIM" };
                 qualityKey = qualitiesForGen[rnd.Next(qualitiesForGen.Length)];
                 TRIADS triadQuality = Enum.TryParse<TRIADS>(qualityKey, out var tq) ? tq : TRIADS.MAJ;
                 chord.TriadChord(root, triadQuality);
                 ApplyTriadInversion(chord, typeKey);
             }
-            else if (count ==4)
+            else if (count == 4)
             {
                 var septTypes = new[] { "SEPT", "QUINTS", "TERZQ", "SEC" };
                 typeKey = septTypes[rnd.Next(septTypes.Length)];
-                var septQualities = Enum.GetNames(typeof(SEPTS));
-                qualityKey = septQualities[rnd.Next(septQualities.Length)];
+                // Тимчасово вилучаємо ALTPRIM та ALTQUINT з генерації
+                var septQualities = Enum.GetNames(typeof(SEPTS))
+              .Where(q => q != "ALTPRIM" && q != "ALTQUINT")
+     .ToArray();
+             qualityKey = septQualities[rnd.Next(septQualities.Length)];
                 SEPTS septQuality = Enum.TryParse<SEPTS>(qualityKey, out var sq) ? sq : SEPTS.MAJMAJ;
                 chord.SeventhChord(root, septQuality);
                 ApplySeventhInversion(chord, typeKey);
             }
-            else if (count ==5)
+            else if (count == 5)
             {
                 var ninthTypes = new[] { "NONACORD", "NONACORD_1i", "NONACORD_2i", "NONACORD_3i", "NONACORD_4i", "CORD69" };
                 typeKey = ninthTypes[rnd.Next(ninthTypes.Length)];
                 var ninthQualities = Enum.GetNames(typeof(NINTHS)).Where(n => n != "OTHER").ToArray();
-                qualityKey = ninthQualities.Length >0 ? ninthQualities[rnd.Next(ninthQualities.Length)] : string.Empty;
+                qualityKey = ninthQualities.Length > 0 ? ninthQualities[rnd.Next(ninthQualities.Length)] : string.Empty;
                 if (!string.IsNullOrEmpty(qualityKey) && Enum.TryParse<NINTHS>(qualityKey, out var nq))
                     chord.NinthChord(root, nq);
                 ApplyNinthInversion(chord, typeKey);
@@ -320,39 +399,39 @@ namespace RecogniseChord.Pages
             string fullPath = chord.SaveWave();
             string rel = RelativeFromFull(fullPath);
             string notesDisplay = string.Join(", ", chord.Notes.Select(n => n.GetName()));
-            // Log generated notes and chord type/quality
+  // Log generated notes and chord type/quality
             MessageL(COLORS.gray, $"Generated chord ({typeKey}/{qualityKey}) notes: {notesDisplay}");
 
-            // Build JSON payload for client-side playback: { notes: [{frequency,duration}], type, quality, count, root, file }
-            var noteObjects = chord.Notes.Select(n => new
+    // Build JSON payload for client-side playback: { notes: [{frequency,duration}], type, quality, count, root, file }
+          var noteObjects = chord.Notes.Select(n => new
             {
-                frequency = n.AbsPitch() <0 ?0 : Pitch_to_hz(n.AbsPitch()),
-                duration = n.AbsDuration()
+        frequency = n.AbsPitch() < 0 ? 0 : Pitch_to_hz(n.AbsPitch()),
+    duration = n.AbsDuration()
             }).ToList();
 
-            var payload = new
-            {
+     var payload = new
+  {
                 notes = noteObjects,
                 type = typeKey,
-                quality = qualityKey,
-                count = count,
-                root = rootLetter,
-                file = rel
-            };
+           quality = qualityKey,
+       count = count,
+        root = rootLetter,
+      file = rel
+     };
 
-            string notesJson = JsonSerializer.Serialize(payload);
+      string notesJson = JsonSerializer.Serialize(payload);
 
             return new ChordData
-            {
-                Count = count,
-                Type = typeKey,
-                Quality = qualityKey,
-                Root = rootLetter,
-                FileRelative = rel,
-                NotesDisplay = notesDisplay,
+       {
+             Count = count,
+   Type = typeKey,
+              Quality = qualityKey,
+      Root = rootLetter,
+    FileRelative = rel,
+   NotesDisplay = notesDisplay,
                 NotesJson = notesJson
-            };
-        }
+ };
+     }
 
         private void ApplyChordData(ChordData data)
         {
@@ -369,9 +448,9 @@ namespace RecogniseChord.Pages
         private string RelativeFromFull(string path)
         {
             var idx = path.IndexOf("wwwroot", StringComparison.OrdinalIgnoreCase);
-            if (idx >=0)
+            if (idx >= 0)
             {
-                return "/" + path.Substring(idx +7).TrimStart('/', '\\').Replace('\\', '/');
+                return "/" + path.Substring(idx + 7).TrimStart('/', '\\').Replace('\\', '/');
             }
             return string.Empty;
         }
@@ -379,42 +458,39 @@ namespace RecogniseChord.Pages
         private void PopulateTypes(int count)
         {
             TypeOptions.Clear();
-            switch (count)
+            var keys = count switch
             {
-                case 2: TypeOptions.AddRange(new[] { "SECUNDA", "TERZIA", "QUARTA", "QUINTA", "SEKSTA", "SEPTYMA", "OCTAVA" }); break;
-                case 3: TypeOptions.AddRange(new[] { "TRI", "SEXT", "QSEXT" }); break;
-                case 4: TypeOptions.AddRange(new[] { "SEPT", "QUINTS", "TERZQ", "SEC" }); break;
-                case 5: TypeOptions.AddRange(new[] { "NONACORD", "NONACORD_1i", "NONACORD_2i", "NONACORD_3i", "NONACORD_4i", "CORD69" }); break;
+                2 => new[] { "SECUNDA", "TERZIA", "QUARTA", "QUINTA", "SEKSTA", "SEPTYMA", "OCTAVA" },
+                3 => new[] { "TRI", "SEXT", "QSEXT" },
+                4 => new[] { "SEPT", "QUINTS", "TERZQ", "SEC" },
+                5 => new[] { "NONACORD", "NONACORD_1i", "NONACORD_2i", "NONACORD_3i", "NONACORD_4i" },
+                _ => Array.Empty<string>()
+            };
+
+            foreach (var key in keys)
+            {
+                TypeOptions.Add(TypeToUkrainian.GetValueOrDefault(key, key));
             }
         }
         private void PopulateTypesForGenerated() => PopulateTypes(GeneratedCount);
 
-        private void PopulateQualities(int count, string type)
+        private void PopulateQualities(int count)
         {
             QualityOptions.Clear();
-            // Some handlers call PopulateQualities before SelectedType is set in binding.
-            // Only bail out when count is invalid; otherwise populate based on count.
-            if (count <=0) return;
-            switch (count)
-            {
-                case 2: QualityOptions.AddRange(new[] { "MAJ", "MIN" }); break;
-                case 3: QualityOptions.AddRange(new[] { "MAJ", "MIN", "AUG", "DIM" }); break;
-                case 4: QualityOptions.AddRange(Enum.GetNames(typeof(SEPTS))); break;
-                case 5: QualityOptions.AddRange(Enum.GetNames(typeof(NINTHS)).Where(n => n != "OTHER")); break;
-            }
+            if (count <= 0) return;
+
+            var map = GetQualityToUkrainian(count);
+            QualityOptions.AddRange(map.Values);
         }
-        private void PopulateQualitiesForGenerated() => PopulateQualities(GeneratedCount, GeneratedType);
+        private void PopulateQualitiesForGenerated() => PopulateQualities(GeneratedCount);
 
         private void SyncLegacyLists()
         {
-            // Mirror internal lists to legacy names expected by Razor (Options = qualities, Types = types)
             Options = QualityOptions.ToList();
             Types = TypeOptions.ToList();
-            // Ensure SelectedChord mirrors SelectedQuality if one of the lists updated
             if (!string.IsNullOrEmpty(SelectedQuality)) SelectedChord = SelectedQuality;
         }
 
-        // Inversion helpers
         private void ApplyTriadInversion(ChordT chord, string type)
         { if (type == "SEXT") chord.InvertUp(1); else if (type == "QSEXT") chord.InvertUp(2); }
         private void ApplySeventhInversion(ChordT chord, string type)
