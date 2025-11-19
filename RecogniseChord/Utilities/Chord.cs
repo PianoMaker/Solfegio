@@ -63,6 +63,18 @@ namespace Music
             return highest;
         }
 
+        public int GetHighestMidiNote()
+        {
+            int highest = -1;
+            foreach (Note note in notes)
+            {
+                int mn = note.MidiNote;
+                if (mn > highest)
+                    highest = mn;
+            }
+            return highest;
+        }
+
         public List<Chord> AllTonalities()
         {
             return Interval.AllTonalities(this);

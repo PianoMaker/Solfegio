@@ -329,6 +329,8 @@ namespace Music
             else return pitch + (oct - 1) * NotesInOctave;
         }
 
+        
+
 
         public bool CheckIfFlatable()
         {

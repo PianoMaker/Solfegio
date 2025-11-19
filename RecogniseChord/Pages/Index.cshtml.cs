@@ -397,10 +397,15 @@ namespace RecogniseChord.Pages
                     chord.NinthChord(root, nq);
                 ApplyNinthInversion(chord, typeKey);
             }
-            if (chord.GetHighestAbsPitch() > highestpitch)
+            if (chord.GetHighestMidiNote() > highestpitch)
             {
                 MessageL(COLORS.gray, "Adjusting chord octave down to fit pitch limit");
                 chord.OctDown();
+            }
+            else 
+            {
+                MessageL(COLORS.gray, $"no changes, highest = {chord.GetHighestMidiNote()}");
+
             }
 
             string fullPath = chord.SaveWave();
