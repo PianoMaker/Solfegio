@@ -14,10 +14,10 @@ namespace RecogniseChord.Pages
     {
         private readonly ILogger<IndexModel> _logger;
 
-        // User selections (guess) — тепер зберігають українські назви
+        // User selections (guess) вЂ” С‚РµРїРµСЂ Р·Р±РµСЂС–РіР°СЋС‚СЊ СѓРєСЂР°С—РЅСЃСЊРєС– РЅР°Р·РІРё
         [BindProperty] public int SelectedCount { get; set; } = 0; //2..5
-        [BindProperty] public string SelectedType { get; set; } = string.Empty; // українська назва
-        [BindProperty] public string SelectedQuality { get; set; } = string.Empty; // українська назва
+        [BindProperty] public string SelectedType { get; set; } = string.Empty; // СѓРєСЂР°С—РЅСЃСЊРєР° РЅР°Р·РІР°
+        [BindProperty] public string SelectedQuality { get; set; } = string.Empty; // СѓРєСЂР°С—РЅСЃСЊРєР° РЅР°Р·РІР°
         [BindProperty] public string RootNoteGuess { get; set; } = string.Empty;
         // Legacy / UI binding names (map to existing quality/type)
         [BindProperty] public string SelectedChord { get; set; } = string.Empty; // mapped to SelectedQuality
@@ -30,7 +30,7 @@ namespace RecogniseChord.Pages
         public string GeneratedRoot { get; private set; } = string.Empty;
         public string GeneratedNotesDisplay { get; private set; } = string.Empty;
         public bool CanPlay => !string.IsNullOrEmpty(GeneratedFileRelative);
-        public string? GuessResult { get; private set; } // "вірно" / "невірно"
+        public string? GuessResult { get; private set; } // "РІС–СЂРЅРѕ" / "РЅРµРІС–СЂРЅРѕ"
         public string? GeneratedChordJson { get; private set; } // JSON payload for client playback (notes + meta)
 
         // Feedback for recognise action
@@ -52,63 +52,63 @@ namespace RecogniseChord.Pages
         // TempData key for the current chord
         private const string CurrentChordKey = "__currentChord";
 
-        // Маппінг enum -> українська назва
+        // РњР°РїРїС–РЅРі enum -> СѓРєСЂР°С—РЅСЃСЊРєР° РЅР°Р·РІР°
         private static readonly Dictionary<string, string> TypeToUkrainian = new()
         {
-            ["SECUNDA"] = "секунда",
-            ["TERZIA"] = "терція",
-            ["QUARTA"] = "кварта",
-            ["QUINTA"] = "квінта",
-            ["SEKSTA"] = "секста",
-            ["SEPTYMA"] = "септима",
-            ["OCTAVA"] = "октава",
-            ["TRI"] = "тризвук",
-            ["SEXT"] = "сексакторд",
-            ["QSEXT"] = "квартсекстакорд",
-            ["SEPT"] = "септакорд",
-            ["QUINTS"] = "квінтсекстакорд",
-            ["TERZQ"] = "терцквартакорд",
-            ["SEC"] = "секундакорд",
-            ["NONACORD"] = "нонакорд",
-            ["NONACORD_1i"] = "нонакорд в 1 оберненні",
-            ["NONACORD_2i"] = "нонакорд в 2 оберненні",
-            ["NONACORD_3i"] = "нонакорд в 3 оберненні",
-            ["NONACORD_4i"] = "нонакорд в 4 оберненні",
+            ["SECUNDA"] = "СЃРµРєСѓРЅРґР°",
+            ["TERZIA"] = "С‚РµСЂС†С–СЏ",
+            ["QUARTA"] = "РєРІР°СЂС‚Р°",
+            ["QUINTA"] = "РєРІС–РЅС‚Р°",
+            ["SEKSTA"] = "СЃРµРєСЃС‚Р°",
+            ["SEPTYMA"] = "СЃРµРїС‚РёРјР°",
+            ["OCTAVA"] = "РѕРєС‚Р°РІР°",
+            ["TRI"] = "С‚СЂРёР·РІСѓРє",
+            ["SEXT"] = "СЃРµРєСЃР°РєС‚РѕСЂРґ",
+            ["QSEXT"] = "РєРІР°СЂС‚СЃРµРєСЃС‚Р°РєРѕСЂРґ",
+            ["SEPT"] = "СЃРµРїС‚Р°РєРѕСЂРґ",
+            ["QUINTS"] = "РєРІС–РЅС‚СЃРµРєСЃС‚Р°РєРѕСЂРґ",
+            ["TERZQ"] = "С‚РµСЂС†РєРІР°СЂС‚Р°РєРѕСЂРґ",
+            ["SEC"] = "СЃРµРєСѓРЅРґР°РєРѕСЂРґ",
+            ["NONACORD"] = "РЅРѕРЅР°РєРѕСЂРґ",
+            ["NONACORD_1i"] = "РЅРѕРЅР°РєРѕСЂРґ РІ 1 РѕР±РµСЂРЅРµРЅРЅС–",
+            ["NONACORD_2i"] = "РЅРѕРЅР°РєРѕСЂРґ РІ 2 РѕР±РµСЂРЅРµРЅРЅС–",
+            ["NONACORD_3i"] = "РЅРѕРЅР°РєРѕСЂРґ РІ 3 РѕР±РµСЂРЅРµРЅРЅС–",
+            ["NONACORD_4i"] = "РЅРѕРЅР°РєРѕСЂРґ РІ 4 РѕР±РµСЂРЅРµРЅРЅС–",
         };
 
         private static readonly Dictionary<string, string> UkrainianToType =
             TypeToUkrainian.ToDictionary(kv => kv.Value, kv => kv.Key);
 
-        // Маппінг для якостей (залежить від кількості нот)
+        // РњР°РїРїС–РЅРі РґР»СЏ СЏРєРѕСЃС‚РµР№ (Р·Р°Р»РµР¶РёС‚СЊ РІС–Рґ РєС–Р»СЊРєРѕСЃС‚С– РЅРѕС‚)
         private static Dictionary<string, string> GetQualityToUkrainian(int count) => count switch
         {
-            2 => new() { ["MAJ"] = "велика", ["MIN"] = "мала", ["PERFECT"] = "чиста" },
-            3 => new() { ["MAJ"] = "мажорний", ["MIN"] = "мінорний", ["AUG"] = "збільшений", ["DIM"] = "зменшений" },
+            2 => new() { ["MAJ"] = "РІРµР»РёРєР°", ["MIN"] = "РјР°Р»Р°", ["PERFECT"] = "С‡РёСЃС‚Р°" },
+            3 => new() { ["MAJ"] = "РјР°Р¶РѕСЂРЅРёР№", ["MIN"] = "РјС–РЅРѕСЂРЅРёР№", ["AUG"] = "Р·Р±С–Р»СЊС€РµРЅРёР№", ["DIM"] = "Р·РјРµРЅС€РµРЅРёР№" },
             4 => new()
             {
-                ["MAJAUG"] = "великий збільшений",
-                ["MAJMAJ"] = "великий мажорний",
-                ["MAJMIN"] = "малий мажорний",
-                ["MINMAJ"] = "великий мінорний",
-                ["MINMIN"] = "малий мінорний",
-                ["MINDIM"] = "малий зменшений",
-                ["DIMDIM"] = "зменшений",
-                ["ALTQUINT"] = "з понеженою квінтою",
-                ["ALTPRIM"] = "альт. прима"
+                ["MAJAUG"] = "РІРµР»РёРєРёР№ Р·Р±С–Р»СЊС€РµРЅРёР№",
+                ["MAJMAJ"] = "РІРµР»РёРєРёР№ РјР°Р¶РѕСЂРЅРёР№",
+                ["MAJMIN"] = "РјР°Р»РёР№ РјР°Р¶РѕСЂРЅРёР№",
+                ["MINMAJ"] = "РІРµР»РёРєРёР№ РјС–РЅРѕСЂРЅРёР№",
+                ["MINMIN"] = "РјР°Р»РёР№ РјС–РЅРѕСЂРЅРёР№",
+                ["MINDIM"] = "РјР°Р»РёР№ Р·РјРµРЅС€РµРЅРёР№",
+                ["DIMDIM"] = "Р·РјРµРЅС€РµРЅРёР№",
+                ["ALTQUINT"] = "Р· РїРѕРЅРµР¶РµРЅРѕСЋ РєРІС–РЅС‚РѕСЋ",
+                ["ALTPRIM"] = "Р°Р»СЊС‚. РїСЂРёРјР°"
             },
             5 => new()
             {
-                ["HAUG"] = "двічі збільшений",
-                ["HMAJ"] = "збільшений мажорний",
-                ["HDOM"] = "збільшений домінантовий",
-                ["NMJAUG"] = "великий збільшений",
-                ["NMAJ"] = "великий мажорний",
-                ["NDOM"] = "великий домінантовий",
-                ["NMIN"] = "великий мінорний",
-                ["NMDOM"] = "малий домінантовий",
-                ["NMMIN"] = "малий мінорний",
-                ["NMHALFDIM"] = "малий напівзменшений",
-                ["NMDIM"] = "малий зменшений"
+                ["HAUG"] = "РґРІС–С‡С– Р·Р±С–Р»СЊС€РµРЅРёР№",
+                ["HMAJ"] = "Р·Р±С–Р»СЊС€РµРЅРёР№ РјР°Р¶РѕСЂРЅРёР№",
+                ["HDOM"] = "Р·Р±С–Р»СЊС€РµРЅРёР№ РґРѕРјС–РЅР°РЅС‚РѕРІРёР№",
+                ["NMJAUG"] = "РІРµР»РёРєРёР№ Р·Р±С–Р»СЊС€РµРЅРёР№",
+                ["NMAJ"] = "РІРµР»РёРєРёР№ РјР°Р¶РѕСЂРЅРёР№",
+                ["NDOM"] = "РІРµР»РёРєРёР№ РґРѕРјС–РЅР°РЅС‚РѕРІРёР№",
+                ["NMIN"] = "РІРµР»РёРєРёР№ РјС–РЅРѕСЂРЅРёР№",
+                ["NMDOM"] = "РјР°Р»РёР№ РґРѕРјС–РЅР°РЅС‚РѕРІРёР№",
+                ["NMMIN"] = "РјР°Р»РёР№ РјС–РЅРѕСЂРЅРёР№",
+                ["NMHALFDIM"] = "РјР°Р»РёР№ РЅР°РїС–РІР·РјРµРЅС€РµРЅРёР№",
+                ["NMDIM"] = "РјР°Р»РёР№ Р·РјРµРЅС€РµРЅРёР№"
             },
             _ => new()
         };
@@ -255,11 +255,11 @@ namespace RecogniseChord.Pages
 
             if (actual != null)
             {
-                // Legacy support: якщо SelectedChord заповнено, копіюємо в SelectedQuality
+                // Legacy support: СЏРєС‰Рѕ SelectedChord Р·Р°РїРѕРІРЅРµРЅРѕ, РєРѕРїС–СЋС”РјРѕ РІ SelectedQuality
                 if (!string.IsNullOrEmpty(SelectedChord))
                     SelectedQuality = SelectedChord;
 
-                // Маппінг українських назв -> enum ключі
+                // РњР°РїРїС–РЅРі СѓРєСЂР°С—РЅСЃСЊРєРёС… РЅР°Р·РІ -> enum РєР»СЋС‡С–
                 var typeKey = UkrainianToType.GetValueOrDefault(SelectedType, string.Empty);
                 var qualityMap = GetUkrainianToQuality(SelectedCount > 0 ? SelectedCount : actual.Count);
                 var qualityKey = qualityMap.GetValueOrDefault(SelectedQuality, string.Empty);
@@ -269,14 +269,14 @@ namespace RecogniseChord.Pages
                    string.Equals(qualityKey, actual.Quality, StringComparison.OrdinalIgnoreCase);
 
                 RecogniseOk = ok;
-                GuessResult = ok ? "вірно" : "невірно";
+                GuessResult = ok ? "РІС–СЂРЅРѕ" : "РЅРµРІС–СЂРЅРѕ";
 
-                // Показуємо правильну відповідь українською
+                // РџРѕРєР°Р·СѓС”РјРѕ РїСЂР°РІРёР»СЊРЅСѓ РІС–РґРїРѕРІС–РґСЊ СѓРєСЂР°С—РЅСЃСЊРєРѕСЋ
                 var correctTypeUkr = TypeToUkrainian.GetValueOrDefault(actual.Type, actual.Type);
                 var correctQualMap = GetQualityToUkrainian(actual.Count);
                 var correctQualUkr = correctQualMap.GetValueOrDefault(actual.Quality, actual.Quality);
 
-                RecogniseCorrect = $"{correctTypeUkr} {correctQualUkr} (від ноти {actual.Root}) — ноти: {actual.NotesDisplay}";
+                RecogniseCorrect = $"{correctTypeUkr} {correctQualUkr} (РІС–Рґ РЅРѕС‚Рё {actual.Root}) вЂ” РЅРѕС‚Рё: {actual.NotesDisplay}";
 
                 MessageL(ok ? COLORS.green : COLORS.red,
                          $"Recognise: user={SelectedCount}/{typeKey}/{qualityKey} actual={actual.Count}/{actual.Type}/{actual.Quality}");
@@ -288,7 +288,7 @@ namespace RecogniseChord.Pages
             {
                 // If no stored current chord, set feedback accordingly
                 RecogniseOk = null;
-                RecogniseCorrect = "Немає збереженого акорду для перевірки.";
+                RecogniseCorrect = "РќРµРјР°С” Р·Р±РµСЂРµР¶РµРЅРѕРіРѕ Р°РєРѕСЂРґСѓ РґР»СЏ РїРµСЂРµРІС–СЂРєРё.";
             }
 
             var chordData = GenerateRandomChord();
@@ -309,7 +309,7 @@ namespace RecogniseChord.Pages
             if (!string.IsNullOrEmpty(SelectedChord))
                 SelectedQuality = SelectedChord;
 
-            // Маппінг українських назв -> enum ключі
+            // РњР°РїРїС–РЅРі СѓРєСЂР°С—РЅСЃСЊРєРёС… РЅР°Р·РІ -> enum РєР»СЋС‡С–
             var typeKey = UkrainianToType.GetValueOrDefault(SelectedType, string.Empty);
             var qualityMap = GetUkrainianToQuality(SelectedCount);
             var qualityKey = qualityMap.GetValueOrDefault(SelectedQuality, string.Empty);
@@ -319,7 +319,7 @@ namespace RecogniseChord.Pages
             bool ok = SelectedCount == GeneratedCount &&
              string.Equals(typeKey, GeneratedType, StringComparison.OrdinalIgnoreCase) &&
    string.Equals(qualityKey, GeneratedQuality, StringComparison.OrdinalIgnoreCase);
-            GuessResult = ok ? "вірно" : "невірно";
+            GuessResult = ok ? "РІС–СЂРЅРѕ" : "РЅРµРІС–СЂРЅРѕ";
             MessageL(ok ? COLORS.green : COLORS.red, $"Guess result: {GuessResult} (user: {SelectedCount}/{typeKey}/{qualityKey} actual: {GeneratedCount}/{GeneratedType}/{GeneratedQuality})");
             TempData.Keep(CurrentChordKey);
             SyncLegacyLists();
@@ -329,7 +329,7 @@ namespace RecogniseChord.Pages
         private ChordData GenerateRandomChord()
         {
             var rnd = new Random();
-            int count = rnd.Next(2, 5); //кількість звуків (2..5)
+            int count = rnd.Next(2, 5); //РєС–Р»СЊРєС–СЃС‚СЊ Р·РІСѓРєС–РІ (2..5)
             string typeKey = string.Empty;
             string qualityKey = string.Empty;
             string rootLetter = RootOptions[rnd.Next(RootOptions.Count)];
@@ -348,7 +348,7 @@ namespace RecogniseChord.Pages
                 if (perfectSet.Contains(interval))
                 {
                     qual = QUALITY.PERFECT;
-                    qualityKey = "PERFECT"; // <- додано, щоб actual.Quality містив ключ
+                    qualityKey = "PERFECT"; // <- РґРѕРґР°РЅРѕ, С‰РѕР± actual.Quality РјС–СЃС‚РёРІ РєР»СЋС‡
                 }
                 else
                 {
@@ -378,7 +378,7 @@ namespace RecogniseChord.Pages
             {
                 var septTypes = new[] { "SEPT", "QUINTS", "TERZQ", "SEC" };
                 typeKey = septTypes[rnd.Next(septTypes.Length)];
-                // Тимчасово вилучаємо ALTPRIM та ALTQUINT з генерації
+                // РўРёРјС‡Р°СЃРѕРІРѕ РІРёР»СѓС‡Р°С”РјРѕ ALTPRIM С‚Р° ALTQUINT Р· РіРµРЅРµСЂР°С†С–С—
                 var septQualities = Enum.GetNames(typeof(SEPTS))
               .Where(q => q != "ALTPRIM" && q != "ALTQUINT")
      .ToArray();
@@ -496,26 +496,26 @@ namespace RecogniseChord.Pages
         }
         private void PopulateTypesForGenerated() => PopulateTypes(GeneratedCount);
 
-        // Updated: PopulateQualities considers SelectedType (українська назва) so we can show "чиста" for perfect intervals
+        // Updated: PopulateQualities considers SelectedType (СѓРєСЂР°С—РЅСЃСЊРєР° РЅР°Р·РІР°) so we can show "С‡РёСЃС‚Р°" for perfect intervals
         private void PopulateQualities(int count, string? typeUkr = null)
         {
             QualityOptions.Clear();
             if (count <= 0) return;
 
             // If asking about intervals of two sounds (count==2) and the selected type is a perfect interval
-            // (кварта / квінта / октава) then only show "чиста"
+            // (РєРІР°СЂС‚Р° / РєРІС–РЅС‚Р° / РѕРєС‚Р°РІР°) then only show "С‡РёСЃС‚Р°"
             if (count == 2 && !string.IsNullOrWhiteSpace(typeUkr))
             {
                 var perfectNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
                 {
-                    TypeToUkrainian.GetValueOrDefault("QUARTA", "кварта"),
-                    TypeToUkrainian.GetValueOrDefault("QUINTA", "квінта"),
-                    TypeToUkrainian.GetValueOrDefault("OCTAVA", "октава")
+                    TypeToUkrainian.GetValueOrDefault("QUARTA", "РєРІР°СЂС‚Р°"),
+                    TypeToUkrainian.GetValueOrDefault("QUINTA", "РєРІС–РЅС‚Р°"),
+                    TypeToUkrainian.GetValueOrDefault("OCTAVA", "РѕРєС‚Р°РІР°")
                 };
 
                 if (perfectNames.Contains(typeUkr))
                 {
-                    QualityOptions.Add("чиста");
+                    QualityOptions.Add("С‡РёСЃС‚Р°");
                     return;
                 }
             }
