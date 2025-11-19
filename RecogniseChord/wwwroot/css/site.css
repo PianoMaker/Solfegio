@@ -3,6 +3,7 @@
     --header-height: 60px;
     --header-color: #371d77;
     --footer-color: #c6b246;
+    --correct-answer-color: #0d5a2b;
 }
 
 
@@ -170,6 +171,17 @@ footer {
 .select-root {
     width: 80px;
     max-width: 100%;
+}
+
+/* Стилізація для правильної відповіді - весь блок темно-зеленим */
+.answer-correct {
+    color: var(--correct-answer-color);
+ font-weight: 600;
+}
+
+.answer-correct p,
+.answer-correct code {
+    color: var(--correct-answer-color);
 }
 
 /* utility to force an element to take full width inside flex/flex-wrap containers */
