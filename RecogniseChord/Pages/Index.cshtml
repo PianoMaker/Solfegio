@@ -11,7 +11,7 @@
         <div id="rightcontainer" class="halfcontainer">    
             <p class="full-row">Акорд згенеровано! Спробуєш вгадати?</p>
             <form id="playform" class="full-row" method="post" asp-page-handler="Play">
-                <button id="playButton" type="button">Відтворити</button>
+                <button id="playBtn" type="button">Відтворити</button>
             </form>
 
             <audio id="chordAudio" preload="auto"></audio>
@@ -26,51 +26,58 @@
                 </form>
             </div>
 
-            <div class="innercontainer">
+            <div id="recognisebox" class="innercontainer">
+                
                 <form id="recogniseform" method="post" asp-page-handler="Recognise">
-                    <select asp-for="SelectedQuality" id="SelectedChord" class="select-quality">
-                        @foreach (var quality in Model.QualityOptions)
-                        {
-                            <option value="@quality">@quality</option>
-                        }
-                    </select>
-
-                    <select asp-for="SelectedType" id="SelectedType" class="select-chord">
+                    <!--ТИП АКОРДУ-->
+                    <div style="display:block; margin:5px">
+                        <select asp-for="SelectedType" id="SelectedType" class="select-quality">
                         <option value="">--</option>
                         @foreach (var type in Model.TypeOptions)
                         {
                             <option value="@type">@type</option>
                         }
                     </select>
-  
+                    </div>
+                    <!--РІЗНОВИД (якість)-->
+                    <div style="display:block; margin:5px">
+                    <select asp-for="SelectedQuality" id="SelectedQuality" class="select-quality">
+                        @foreach (var quality in Model.QualityOptions)
+                        {
+                            <option value="@quality">@quality</option>
+                        }
+                    </select>
+                    </div>
                     <input type="hidden" asp-for="SelectedCount" />
-                    <button type="submit">Розпізнати</button>
+                    <button id="recogniseButton" type="submit">Перевірити</button>
                 </form>
             </div>
         </div>
 
         <div id="leftcontainer" class="halfcontainer">
-            @if (Model.RecogniseOk is not null)
-            {
-                @if (Model.RecogniseOk == true)
+            <div id="resultBox">
+                @if (Model.RecogniseOk is not null)
                 {
-                    <div class="answer-correct">
-                        <p class="text-success">@Model.GuessResult</p>
-                        <p class="text-success">Правильна відповідь: <code>@Model.RecogniseCorrect</code></p>
-                    </div>
+                    @if (Model.RecogniseOk == true)
+                    {
+                        <div class="answer-correct">
+                            <p class="text-success">@Model.GuessResult</p>
+                            <p class="text-success">Правильна відповідь: <code>@Model.RecogniseCorrect</code></p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div>
+                            <p class="text-danger">@Model.GuessResult</p>
+                            <p class="text-danger">Правильна відповідь: <code>@Model.RecogniseCorrect</code></p>
+                        </div>
+                    }
                 }
                 else
                 {
-                    <div>
-                        <p class="text-danger">@Model.GuessResult</p>
-                        <p class="text-danger">Правильна відповідь: <code>@Model.RecogniseCorrect</code></p>
-                    </div>
+                    <p>Виберіть параметри акорду та натисніть "Перевірити"</p>
                 }
-            }
-            else
-            {
-                <p>Виберіть параметри акорду та натисніть "Розпізнати"</p>
-            }
+            </div>
         </div>
     </div>
 </div>

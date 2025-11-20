@@ -260,9 +260,9 @@ namespace RecogniseChord.Pages
                     SelectedQuality = SelectedChord;
 
                 // Маппінг українських назв -> enum ключі
-                var typeKey = UkrainianToType.GetValueOrDefault(SelectedType, string.Empty);
+                var typeKey = string.IsNullOrEmpty(SelectedType) ? string.Empty : UkrainianToType.GetValueOrDefault(SelectedType, string.Empty);
                 var qualityMap = GetUkrainianToQuality(SelectedCount > 0 ? SelectedCount : actual.Count);
-                var qualityKey = qualityMap.GetValueOrDefault(SelectedQuality, string.Empty);
+                var qualityKey = string.IsNullOrEmpty(SelectedQuality) ? string.Empty : qualityMap.GetValueOrDefault(SelectedQuality, string.Empty);
 
                 bool ok = SelectedCount == actual.Count &&
                          string.Equals(typeKey, actual.Type, StringComparison.OrdinalIgnoreCase) &&
@@ -310,9 +310,9 @@ namespace RecogniseChord.Pages
                 SelectedQuality = SelectedChord;
 
             // Маппінг українських назв -> enum ключі
-            var typeKey = UkrainianToType.GetValueOrDefault(SelectedType, string.Empty);
+            var typeKey = string.IsNullOrEmpty(SelectedType) ? string.Empty : UkrainianToType.GetValueOrDefault(SelectedType, string.Empty);
             var qualityMap = GetUkrainianToQuality(SelectedCount);
-            var qualityKey = qualityMap.GetValueOrDefault(SelectedQuality, string.Empty);
+            var qualityKey = string.IsNullOrEmpty(SelectedQuality) ? string.Empty : qualityMap.GetValueOrDefault(SelectedQuality, string.Empty);
 
             PopulateTypes(SelectedCount);
             PopulateQualities(SelectedCount, SelectedType);

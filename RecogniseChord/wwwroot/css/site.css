@@ -132,7 +132,7 @@ footer {
 /* Responsive: on narrow screens stack columns and ensure rightcontainer is above leftcontainer */
 @media (max-width: 768px) {
   /* Make the parent a normal flex column so children stack vertically */
-  .innercontainer {
+  .innercontainer:not(#recognisebox) {
     display: flex !important;
     flex-direction: column;
     align-items: stretch;
@@ -143,7 +143,7 @@ footer {
   .halfcontainer {
     width: 100% !important;
     flex: 0 0 auto;
-  }
+}
 
   /* Ensure rightcontainer is rendered above leftcontainer even if markup/order changes */
   #rightcontainer {
@@ -151,9 +151,9 @@ footer {
   }
 
   /* Optional: tighten borders/padding on small screens */
-  .innercontainer, .halfcontainer {
+  .innercontainer:not(#recognisebox), .halfcontainer {
     border-width: 1px;
- padding: 0.5rem;
+    padding: 0.5rem;
   }
 }
 
