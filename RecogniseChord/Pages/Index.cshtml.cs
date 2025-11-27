@@ -14,6 +14,8 @@ namespace RecogniseChord.Pages
     {
         private readonly ILogger<IndexModel> _logger;
 
+        public int RequestCount;
+
         // User selections (guess) — тепер зберігають українські назви
         [BindProperty] public int SelectedCount { get; set; } = 0; //2..5
         [BindProperty] public string SelectedType { get; set; } = string.Empty; // українська назва
@@ -118,12 +120,21 @@ namespace RecogniseChord.Pages
             var map = GetQualityToUkrainian(count);
             return map.ToDictionary(kv => kv.Value, kv => kv.Key);
         }
+        
+        public IWebHostEnvironment _environment;
+        public string FilePath => Path.Combine(_environment.WebRootPath, "info", "info.txt");
 
-        public IndexModel(ILogger<IndexModel> logger)
-        { _logger = logger; }
+        public IndexModel(ILogger<IndexModel> logger, IWebHostEnvironment environment)
+        { 
+            _logger = logger; 
+            _environment = environment;
+        
+        }
 
         public void OnGet()
         {
+            ReadInfo();
+
             MessageL(14, "Index OnGet: generating initial chord");
             var chordData = GenerateRandomChord();
             ApplyChordData(chordData); // show to user
@@ -135,6 +146,14 @@ namespace RecogniseChord.Pages
             PopulateQualitiesForGenerated();
             SyncLegacyLists();
             CleanOldFiles();
+
+
+        }
+
+        private void ReadInfo()
+        {
+            var attempts = System.IO.File.ReadAllText(FilePath);
+            RequestCount = int.Parse(attempts);
         }
 
         private void CleanOldFiles()
@@ -177,6 +196,7 @@ namespace RecogniseChord.Pages
         public IActionResult OnPostPlay()
         {
             MessageL(14, "Index OnPostPlay: processing user play request");
+            ReadInfo();
             // Play should use the current chord stored in TempData and must NOT generate a new chord
             if (TempData.TryGetValue(CurrentChordKey, out var curObj) && curObj is string curJson && !string.IsNullOrWhiteSpace(curJson))
             {
@@ -212,6 +232,7 @@ namespace RecogniseChord.Pages
         public IActionResult OnPostSelect()
         {
             MessageL(14, "Index OnPostSelect: processing user selection change");
+            ReadInfo();
             PopulateTypes(SelectedCount);
             PopulateQualities(SelectedCount, SelectedType);
             SyncLegacyLists();
@@ -240,6 +261,8 @@ namespace RecogniseChord.Pages
         public IActionResult OnPostRecognise()
         {
             MessageL(14, "Index OnPostRecognise: processing user recognise");
+            ReadInfo();
+            RequestCount++; 
             ChordData actual = null;
             if (TempData.TryGetValue(CurrentChordKey, out var curObj) && curObj is string curJson && !string.IsNullOrWhiteSpace(curJson))
             {
@@ -299,12 +322,16 @@ namespace RecogniseChord.Pages
             PopulateQualities(SelectedCount, SelectedType);
             SyncLegacyLists();
 
+            System.IO.File.WriteAllText(FilePath, RequestCount.ToString());
+
+
             return Page();
         }
 
         public IActionResult OnPostGuess()
         {
             MessageL(14, "Index OnPostGuess: processing user guess");
+            ReadInfo();
 
             if (!string.IsNullOrEmpty(SelectedChord))
                 SelectedQuality = SelectedChord;
