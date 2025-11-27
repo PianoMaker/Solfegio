@@ -197,3 +197,20 @@ footer {
 /* Make success/danger messages bold for better visibility */
 .text-success { font-weight:700; }
 .text-danger { font-weight:700; }
+
+.whitecontainer {
+    background-color: #ffffff;
+    padding: 15px;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+}
+
+/* stronger specificity in case other rules override .whitecontainer */
+main .whitecontainer {
+    background-color: #ffffff;
+    padding: 15px;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+}
