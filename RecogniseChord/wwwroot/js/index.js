@@ -1,13 +1,33 @@
-document.addEventListener('DOMContentLoaded', function () {
-	const chordSelector = document.querySelectorAll('#soundcount input[type=radio]');// радіокнопки
+document.addEventListener('DOMContentLoaded', function () {	
+
+	console.log('Document loaded, initializing chord recognizer UI.');
+
 	const selectform = document.getElementById('selectform');						// form for sound count selection
+	// radios in Index.cshtml use name="SelectedCount" (ids: sound2, sound3, sound4, sound5)
+	let radiobuttons = document.querySelectorAll('input[name="SelectedCount"]');
+	// fallback: if server template changed name, try the IDs rendered in the view
+	if (!radiobuttons || radiobuttons.length === 0) {
+		const fallbackIds = ['sound2', 'sound3', 'sound4', 'sound5'];
+		const list = [];
+		for (const id of fallbackIds) {
+			const el = document.getElementById(id);
+			if (el) list.push(el);
+		}
+		radiobuttons = list.length ? list : radiobuttons;
+	}
+	if (!radiobuttons || radiobuttons.length === 0) {
+		console.warn('No sound count radio buttons found with name "SelectedCount" or fallback IDs.');
+	} else {
+		console.log(`Found ${radiobuttons.length} sound count radio buttons.`);
+	}
+
 	const recogniseform = document.getElementById('recogniseform');					// form for chord recognition
 	const recognisebox = document.getElementById('recognisebox');					// box containing recogniseform
 	const recognisebutton = document.getElementById('recogniseButton');				// button to submit recogniseform
 	const SelectedQuality = document.getElementById('SelectedQuality');
 	const selectedType = document.getElementById('SelectedType');
 	const playBtn = document.getElementById('playBtn');								//play button
-	const radiobuttons = document.querySelectorAll('input[name="SelectedCount"]');
+	
 	const resultBox = document.getElementById('resultBox');
 
 	// Additional mappings (do not change existing triadTypes / ninthQualities)
@@ -20,7 +40,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	// restore saved radio
 	const savedSoundCount = localStorage.getItem('selectedSoundCount');
 	if (savedSoundCount) {
-		chordSelector.forEach(radio => {
+		radiobuttons.forEach(radio => {
 			if (radio.value === savedSoundCount) radio.checked = true;
 		});
 	}
@@ -44,12 +64,13 @@ document.addEventListener('DOMContentLoaded', function () {
 	if (savedQuality && SelectedQuality) SelectedQuality.value = savedQuality;
 	const savedType = localStorage.getItem('selectedType');
 	if (savedType && selectedType) selectedType.value = savedType;
-
-	logChord();
-
+	
 	const hasCheckedRadio = Array.from(radiobuttons).some(btn => btn.checked);
 
+	//=================================
 	// КОРОБКА РОЗПІЗНАВАННЯ
+	// за замовчуванням прихована, показується після вибору кількості звуків
+	//=================================
 	if (recognisebox) {
 		if (hasCheckedRadio) {
 			recognisebox.style.display = 'flex';
@@ -62,8 +83,10 @@ document.addEventListener('DOMContentLoaded', function () {
 	else {
 		console.warn('Recognise box element not found.');
 	}
-
+	//=================================
 	// КНОПКА РОЗПІЗНАННЯ
+	// натискання скидає всі прапорці в сесії та надсилає форму розпізнавання
+	//=================================
 	if (recognisebutton) {
 		recognisebutton.addEventListener('click', () => {
 				
@@ -87,33 +110,32 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			recogniseform.submit();
 
-			// After submit, uncheck all radio buttons and hide recognisebox
-			//setTimeout(() => {
-			//	radiobuttons.forEach(btn => {
-			//		btn.checked = false;
-			//	});
-
-			//	if (recognisebox) {
-			//		recognisebox.style.display = 'none';
-			//		console.log('Recognisebox hidden after recognise submit.');
-			//	}
-
-			//	localStorage.removeItem('selectedSoundCount');
-			//}, 100);
 		});
 	}
 	else {
 		console.warn('Recognise button or form element not found.');
 	}
 
-	// Обробник вибір кількості звуків
-	radiobuttons.forEach(btn => {
-		btn.addEventListener('change', function () {
-			console.log('Sound count radio changed, showing recognise box.');
-			if (recognisebox) recognisebox.style.display = 'flex';
+	// =================================
+	// Обробник вибору кількості звуків
+	// натискання показує коробку розпізнавання та надсилає форму вибору
+	// =================================
+	if (radiobuttons) {
+		radiobuttons.forEach(btn => {
+			btn.addEventListener('change', function () {
+				console.log('Sound count radio changed to value: ' + btn.value); // updated logging to include value
+				if (recognisebox) recognisebox.style.display = 'flex';
+				localStorage.setItem('selectedSoundCount', btn.value);
+				console.log('selected sounds value:', btn.value);
+				selectform?.submit();
+			});
 		});
-	});
+	}
+	else {
+		console.warn('No sound count radio buttons found.');
+	}
 
+	// Helper to set quality options
 	function setQualityOptions(options, preserveSelection = false) {
 		if (!SelectedQuality) return;
 		const prev = SelectedQuality.value;
@@ -127,11 +149,11 @@ document.addEventListener('DOMContentLoaded', function () {
 		if (preserveSelection && options.includes(prev)) SelectedQuality.value = prev;
 	}
 
+	// =================================
+	// Обробник зміни типу інтервалу
+	// автоматично налаштовує якість для інтервалів
+	// =================================
 
-
-
-	// When user changes SelectedType, update qualities client-side ONLY for intervals (SelectedCount == 2).
-	// Do NOT alter or handle chords (SelectedCount != 2) on the client side — server continues to manage chord lists.
 	if (selectedType) {
 		selectedType.addEventListener('change', (e) => {
 			const val = (e.target.value || '').trim();
@@ -157,16 +179,11 @@ document.addEventListener('DOMContentLoaded', function () {
 		});
 	}
 
-	// ОБРОБНИК ВИБОРУ АКОРДІВ
-	chordSelector.forEach(input => {
-		input.addEventListener('change', () => {
-			localStorage.setItem('selectedSoundCount', input.value);
-			selectform?.submit();
-			console.log('selected sounds value:', input.value);
-		});
-	});
-
-
+	
+	// =================================
+	// Обробник зміни select-елементів
+	// зберігає вибрані значення в localStorage
+	// =================================
 	document.addEventListener('change', (e) => {
 		const t = e.target;
 		if (!(t instanceof HTMLSelectElement)) return;
@@ -182,12 +199,16 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 	});
 
-	// Play button handler
+	// =================================
+	// ОБРОБНИК КНОПКИ ВІДТВОРЕННЯ
+	// натискання відтворює збережений WAV-файл або синтезує тони з payload
+	// =================================
 
 	if (playBtn) {
 		playBtn.addEventListener('click', async () => {
-			// Hide result box when user plays the chord again
 			const resultBox = document.getElementById('resultBox');
+			console.log('Play button clicked.');
+			logChord();
 			if (resultBox) {
 				resultBox.style.display = 'none';
 				console.log('Result box hidden on play button click.');
@@ -245,8 +266,8 @@ document.addEventListener('DOMContentLoaded', function () {
 					const stopTime = start + durSec + release;
 					g.gain.setValueAtTime(0.0, start);
 					g.gain.linearRampToValueAtTime(1.0 / toneCount, start + attack);
-					g.gain.linearRampToValueAtTime((sustain * (1.0 / toneCount)), sustainStart);
-					g.gain.setValueAtTime((sustain * (1.0 / toneCount)), start + durSec);
+					g.gain.linearRampToValueAtTime((sustain * 1.0 / toneCount), sustainStart);
+					g.gain.setValueAtTime((sustain * 1.0 / toneCount), start + durSec);
 					g.gain.linearRampToValueAtTime(0.0, stopTime);
 					osc.start(start);
 					osc.stop(stopTime + 0.01);
@@ -264,6 +285,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 });
 
+// Helper to log generated chord and file info
 function logChord() {
 	try {
 		if (window.generatedChord) {
