@@ -234,6 +234,8 @@ namespace RecogniseChord.Pages
             MessageL(14, "Index OnPostSelect: processing user selection change");
             ReadInfo();
             PopulateTypes(SelectedCount);
+            if (SelectedCount == 0) 
+                _logger.LogWarning("SelectedCount is 0 in OnPostSelect");
             PopulateQualities(SelectedCount, SelectedType);
             SyncLegacyLists();
             // restore current chord info from TempData so UI keeps the ability to play it
@@ -323,6 +325,10 @@ namespace RecogniseChord.Pages
             SyncLegacyLists();
 
             System.IO.File.WriteAllText(FilePath, RequestCount.ToString());
+            
+            SelectedCount = 0;
+            SelectedType = string.Empty;
+            SelectedQuality = string.Empty;
 
 
             return Page();
@@ -388,6 +394,7 @@ namespace RecogniseChord.Pages
                 note2.Transpose(interval, qual, DIR.UP);
                 chord.AddNote(root);
                 chord.AddNote(note2);
+                
             }
             else if (count == 3)
             {

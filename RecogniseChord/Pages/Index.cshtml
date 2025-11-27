@@ -6,8 +6,9 @@
 
 <div class="text-center">
     <h1 class="display-4">Інтервали та акорди</h1>
-
+    
     <div class="innercontainer">
+        <!--КОНТЕЙНЕР ПРАВОРУЧ (ВГОРІ)-->
         <div id="rightcontainer" class="halfcontainer">    
             <p class="full-row">Акорд згенеровано! Спробуєш вгадати?</p>
             <form id="playform" class="full-row" method="post" asp-page-handler="Play">
@@ -16,16 +17,17 @@
 
             <audio id="chordAudio" preload="auto"></audio>
 
-            <div id="soundcount" class="innercontainer">
+            <!-- ПЕРЕМИКАЧ КІЛЬКОСТІ ЗВУКІВ-->
+            <div id="numberOfSoundsSelector" class="innercontainer">
                 <p>Скільки звуків?</p>
                 <form id="selectform" method="post" asp-page-handler="Select">
-                    <input type="radio" name="SelectedCount" value="2">2
-                    <input type="radio" name="SelectedCount" value="3">3
-                    <input type="radio" name="SelectedCount" value="4">4
-                    <input type="radio" name="SelectedCount" value="5">5
+                    <input id="sound2" type="radio" name="SelectedCount" value="2" @(Model.SelectedCount == 2 ? "checked" : "")>2
+                    <input id="sound3" type="radio" name="SelectedCount" value="3" @(Model.SelectedCount == 3 ? "checked" : "")>3
+                    <input id="sound4" type="radio" name="SelectedCount" value="4" @(Model.SelectedCount == 4 ? "checked" : "")>4
+                    <input id="sound5" type="radio" name="SelectedCount" value="5" @(Model.SelectedCount == 5 ? "checked" : "")>5
                 </form>
             </div>
-
+            
             <div id="recognisebox" class="innercontainer">
                 
                 <form id="recogniseform" method="post" asp-page-handler="Recognise">
@@ -35,7 +37,7 @@
                         <option value="">--</option>
                         @foreach (var type in Model.TypeOptions)
                         {
-                            <option value="@type">@type</option>
+                            <option value="@type" selected="@(Model.SelectedType == type)">@type</option>
                         }
                     </select>
                     </div>
@@ -44,7 +46,7 @@
                     <select asp-for="SelectedQuality" id="SelectedQuality" class="select-quality">
                         @foreach (var quality in Model.QualityOptions)
                         {
-                            <option value="@quality">@quality</option>
+                            <option value="@quality" selected="@(Model.SelectedQuality == quality)">@quality</option>
                         }
                     </select>
                     </div>
@@ -53,7 +55,8 @@
                 </form>
             </div>
         </div>
-
+        
+        <!--КОНТЕЙНЕР ЛІВОРУЧ (ЗНИЗУ)-->
         <div id="leftcontainer" class="halfcontainer">
             <div id="resultBox">
                 @if (Model.RecogniseOk is not null)
@@ -78,7 +81,9 @@
                     <p>Виберіть параметри акорду та натисніть "Перевірити"</p>
                 }
             </div>
+            
         </div>
+        <p> @Model.RequestCount attempts have been made</p>
     </div>
 </div>
 
@@ -87,5 +92,5 @@
         window.generatedChord = @Html.Raw(Model.GeneratedChordJson ?? "null");
         window.generatedFile = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.GeneratedFileRelative ?? string.Empty));
     </script>
-    <script src="~/js/index.js"></script>
+    <script src="~/js/index.js" asp-append-version="true"></script>
 }

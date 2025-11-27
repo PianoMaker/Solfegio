@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Radio Button Test</title>
+    <style>
+        body {
+        font-family: Arial, sans-serif;
+     padding: 20px;
+        }
+        .test-container {
+       border: 2px solid #333;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        #log {
+   background: #f0f0f0;
+      border: 1px solid #ccc;
+            padding: 10px;
+            height: 300px;
+     overflow-y: auto;
+   font-family: monospace;
+   font-size: 12px;
+        }
+        .log-entry {
+            margin: 5px 0;
+         padding: 3px;
+        }
+        .log-success {
+      color: green;
+        }
+        .log-error {
+ color: red;
+        }
+        .log-info {
+        color: blue;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test Radio Buttons Event Handlers</h1>
+    
+    <div class="test-container">
+        <h2>Radio Buttons</h2>
+        <form id="selectform" method="post">
+      <input id="sound2" type="radio" name="SelectedCount" value="2"><label for="sound2">2 sounds</label><br>
+            <input id="sound3" type="radio" name="SelectedCount" value="3"><label for="sound3">3 sounds</label><br>
+        <input id="sound4" type="radio" name="SelectedCount" value="4"><label for="sound4">4 sounds</label><br>
+            <input id="sound5" type="radio" name="SelectedCount" value="5"><label for="sound5">5 sounds</label><br>
+        </form>
+        
+        <p>Selected value: <strong id="selectedValue">None</strong></p>
+        <p>Event count: <strong id="eventCount">0</strong></p>
+    </div>
+    
+    <div class="test-container">
+        <h2>Event Log</h2>
+  <button onclick="clearLog()">Clear Log</button>
+        <div id="log"></div>
+    </div>
+
+    <script>
+     let eventCounter = 0;
+        
+        function addLog(message, type = 'info') {
+   const logDiv = document.getElementById('log');
+ const entry = document.createElement('div');
+  entry.className = `log-entry log-${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+          logDiv.appendChild(entry);
+     logDiv.scrollTop = logDiv.scrollHeight;
+        }
+   
+   function clearLog() {
+            document.getElementById('log').innerHTML = '';
+        eventCounter = 0;
+ document.getElementById('eventCount').textContent = '0';
+        }
+  
+ document.addEventListener('DOMContentLoaded', function() {
+   addLog('DOM Content Loaded', 'success');
+      
+       const radioButtons = document.querySelectorAll('#selectform input[name="SelectedCount"]');
+            addLog(`Found ${radioButtons.length} radio buttons`, 'info');
+            
+  radioButtons.forEach((radio, index) => {
+   addLog(`Attaching listener to: ${radio.id} (value: ${radio.value})`, 'info');
+             
+     radio.addEventListener('change', function(event) {
+      eventCounter++;
+      document.getElementById('eventCount').textContent = eventCounter;
+               document.getElementById('selectedValue').textContent = this.value;
+          
+            addLog('???????????????????????????????????????', 'success');
+          addLog(`CHANGE EVENT FIRED!`, 'success');
+addLog(`Radio ID: ${this.id}`, 'success');
+        addLog(`Selected value: ${this.value}`, 'success');
+           addLog(`Event type: ${event.type}`, 'success');
+      addLog('???????????????????????????????????????', 'success');
+       });
+       });
+        
+    addLog(`Successfully attached ${radioButtons.length} event listeners`, 'success');
+        });
+    </script>
+</body>
+</html>

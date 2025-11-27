@@ -407,19 +407,21 @@ namespace Music
                     var n = Note.GenerateRandomNote(octaves);
                     rndChord.AddNote(n);
                 }
- rndChord.Adjust(); // привести ноти в корректний порядок/октави
- // log generated notes
- try {
- var names = string.Join(", ", rndChord.Notes.Select(n => n.GetName()));
- MessageL(COLORS.gray, "CreateRandom generated: " + names);
- } catch { }
- }
- catch (Exception ex)
- {
- // зберегти існуючу поведінку логування у проекті
- Music.Messages.MessageL(12, "CreateRandom chord error: " + ex.Message);
- }
- return rndChord;
+                rndChord.Adjust(); // привести ноти в корректний порядок/октави
+                                   // log generated notes
+                try
+                {
+                    var names = string.Join(", ", rndChord.Notes.Select(n => n.GetName()));
+                    MessageL(COLORS.gray, "CreateRandom generated: " + names);
+                }
+                catch { }
+            }
+            catch (Exception ex)
+            {
+                // зберегти існуючу поведінку логування у проекті
+                Music.Messages.MessageL(12, "CreateRandom chord error: " + ex.Message);
+            }
+            return rndChord;
         }
 
         public static Chord CreateRandomFrom(Note root, CHORDS chordType, Random? rnd = null, bool randomVoicing = true)
@@ -569,14 +571,16 @@ namespace Music
             if (randomVoicing)
             {
                 int inversions = rnd.Next(0, Math.Max(1, chord.Size()));
-                for (int i =0; i < inversions; i++)
-                chord.Inversion();
+                for (int i = 0; i < inversions; i++)
+                    chord.Inversion();
             }
             // log generated notes
-            try {
-            var names = string.Join(", ", chord.Notes.Select(n => n.GetName()));
-            MessageL(COLORS.gray, "CreateRandomFrom generated: " + names);
-            } catch { }
+            try
+            {
+                var names = string.Join(", ", chord.Notes.Select(n => n.GetName()));
+                MessageL(COLORS.gray, "CreateRandomFrom generated: " + names);
+            }
+            catch { }
 
             return chord;
         }

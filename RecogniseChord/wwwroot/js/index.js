@@ -37,32 +37,37 @@ document.addEventListener('DOMContentLoaded', function () {
 	const intervalImperfectKeys = ['SECUNDA', 'TERZIA', 'SEKSTA', 'SEPTYMA'];
 	const intervalImperfectUkr = ['секунда', 'терція', 'секста', 'септима'];
 
-	// restore saved radio
-	const savedSoundCount = localStorage.getItem('selectedSoundCount');
+	//=================================
+	// Відновлюємо збережені значення з sessionStorage
+	//=================================
+	// значення радіокнопок кількості звуків
+	const savedSoundCount = sessionStorage.getItem('selectedSoundCount');
+	console.log('Restoring saved sound count from sessionStorage:', savedSoundCount);
 	if (savedSoundCount) {
 		radiobuttons.forEach(radio => {
-			if (radio.value === savedSoundCount) radio.checked = true;
+			if (radio.value === savedSoundCount) {
+				radio.checked = true;
+				console.log('Restored sound count radio button:', radio.value);
+			}
 		});
 	}
+	else {
+		console.log('No saved sound count found in sessionStorage.');
+	}
 
+	// значення прапорця приховування коробки розпізнавання
 	const hidebox = sessionStorage.getItem('hidebox');
 	if (hidebox === 'true') {
 		if (recognisebox) {
 			recognisebox.style.display = 'none';
-			radiobuttons.forEach(btn => {
-				btn.addEventListener('change', function () {
-					btn.checked = false; // prevent double submission
-					sessionStorage.removeItem('hidebox'); // set flag
-					console.log('Hiding recognise box based on session storage flag.');
-				})
-			})
+			sessionStorage.removeItem('hidebox'); 			
 		}
 	}
 
 	// restore saved selects
-	const savedQuality = localStorage.getItem('SelectedQuality');
+	const savedQuality = sessionStorage.getItem('SelectedQuality');
 	if (savedQuality && SelectedQuality) SelectedQuality.value = savedQuality;
-	const savedType = localStorage.getItem('selectedType');
+	const savedType = sessionStorage.getItem('selectedType');
 	if (savedType && selectedType) selectedType.value = savedType;
 	
 	const hasCheckedRadio = Array.from(radiobuttons).some(btn => btn.checked);
@@ -84,30 +89,36 @@ document.addEventListener('DOMContentLoaded', function () {
 		console.warn('Recognise box element not found.');
 	}
 	//=================================
-	// КНОПКА РОЗПІЗНАННЯ
+	// КНОПКА "ПЕРЕВІРИТИ"
 	// натискання скидає всі прапорці в сесії та надсилає форму розпізнавання
 	//=================================
 	if (recognisebutton) {
 		recognisebutton.addEventListener('click', () => {
-				
-			radiobuttons.forEach(btn => {
-				btn.addEventListener('change', function () {
-					btn.checked = false;
-					recognisebox.style.display = 'none';
-					console.log('Sound count radio changed, resetting session storage flags and re-enabling button.');
-				});
+			console.log('Recognise button clicked.');
+			
+			radiobuttons.forEach(btn => {				
+				btn.checked = false;					
+				console.log('reset radiobuttons');				
 			});
 
 			if (resultBox) {
 				resultBox.style.display = 'none';
-				console.log('Result box hidden on recognise button click.');
+				console.log('hide result boxs');
 			}
 
-			sessionStorage.removeItem('selectedSoundCount');
+			if (recognisebox) {
+				recognisebox.style.display = 'none';
+				console.log('hide recognise box');
+			}
+
+			sessionStorage.removeItem('selectedSoundCount'); // 
 			sessionStorage.removeItem('SelectedQuality');
 			sessionStorage.removeItem('selectedType');
-			sessionStorage.setItem('hidebox', 'true'); // preserve intent if needed	
+			sessionStorage.setItem('hidebox', 'true'); 
+			console.warn('selectedSoundCount erased');
 
+			
+			
 			recogniseform.submit();
 
 		});
@@ -125,7 +136,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			btn.addEventListener('change', function () {
 				console.log('Sound count radio changed to value: ' + btn.value); // updated logging to include value
 				if (recognisebox) recognisebox.style.display = 'flex';
-				localStorage.setItem('selectedSoundCount', btn.value);
+				sessionStorage.setItem('selectedSoundCount', btn.value);
 				console.log('selected sounds value:', btn.value);
 				selectform?.submit();
 			});
@@ -157,7 +168,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	if (selectedType) {
 		selectedType.addEventListener('change', (e) => {
 			const val = (e.target.value || '').trim();
-			localStorage.setItem('selectedType', val);
+			sessionStorage.setItem('selectedType', val);
 
 			const countRadio = document.querySelector('input[name="SelectedCount"]:checked');
 			const currentCount = countRadio ? countRadio.value : null;
@@ -182,19 +193,19 @@ document.addEventListener('DOMContentLoaded', function () {
 	
 	// =================================
 	// Обробник зміни select-елементів
-	// зберігає вибрані значення в localStorage
+	// зберігає вибрані значення в sessionStorage
 	// =================================
 	document.addEventListener('change', (e) => {
 		const t = e.target;
 		if (!(t instanceof HTMLSelectElement)) return;
 		if (t.id === 'SelectedQuality') {
-			localStorage.setItem('SelectedQuality', t.value);
+			sessionStorage.setItem('SelectedQuality', t.value);
 			// do not submit the form here; user must click "Розпізнати"
 			return;
 		}
 		if (t.id === 'SelectedType') {
 			// already handled above; ensure stored
-			localStorage.setItem('selectedType', t.value);
+			sessionStorage.setItem('selectedType', t.value);
 			// do not submit the form here; user must click "Розпізнати"
 		}
 	});
