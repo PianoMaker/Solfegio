@@ -1,3 +1,5 @@
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
 @{
     var appName = "Тренувальник сольфеджіо";
 }
@@ -16,7 +18,7 @@
     <header>
         <nav class="navbar navbar-expand-md navbar-dark navbar-colored">
             <div class="container">
-                <a class="navbar-brand ms-lg-5" asp-page="/Index">@appName</a>
+                <a class="navbar-brand ms-lg-5" asp-page="/Index">@Localizer["Title"]</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse"
                         aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -24,13 +26,23 @@
                 <div class="collapse navbar-collapse" id="navbarCollapse">
                     <ul class="navbar-nav me-auto mb-2 mb-md-0">
                         <li class="nav-item">
-                            <a class="nav-link" asp-page="/Create">Побудувати акорд</a>
+                            <a class="nav-link" asp-page="/Create">>@Localizer["Build"]</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" asp-page="/Index">Вгадай акорд</a>
+                            <a class="nav-link" asp-page="/Index">>@Localizer["Recognise"]</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" asp-page="/Privacy">Про сайт</a>
+                            <a class="nav-link" asp-page="/Privacy">@Localizer["About"]</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="langMenu" role="button"
+                               data-bs-toggle="dropdown" aria-expanded="false">
+                                Мова
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="langMenu">
+                                <li><a class="dropdown-item" href='@Url.Page("/SetLanguage", new { culture = "uk", returnUrl = Context.Request.Path + Context.Request.QueryString })'>UK</a></li>
+                                <li><a class="dropdown-item" href='@Url.Page("/SetLanguage", new { culture = "en", returnUrl = Context.Request.Path + Context.Request.QueryString })'>EN</a></li>
+                            </ul>
                         </li>
                     </ul>
                 </div>

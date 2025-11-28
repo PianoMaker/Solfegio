@@ -34,6 +34,8 @@ namespace RecogniseChord.Pages
         public bool CanPlay => !string.IsNullOrEmpty(GeneratedFileRelative);
         public string? GuessResult { get; private set; } // "вірно" / "невірно"
         public string? GeneratedChordJson { get; private set; } // JSON payload for client playback (notes + meta)
+        [BindProperty]
+        public int MaxCount { get; set; } = 4;
 
         // Feedback for recognise action
         public bool? RecogniseOk { get; private set; }
@@ -359,10 +361,40 @@ namespace RecogniseChord.Pages
             return Page();
         }
 
+        public IActionResult OnPostMax()
+        {
+            MessageL(14, $"Index OnPostMax: processing user max count change to {MaxCount}");
+            ReadInfo();
+
+            // Try restore shown chord from TempData; if absent, generate a new one as fallback.
+            if (TempData.Peek(CurrentChordKey) is string curJson && !string.IsNullOrWhiteSpace(curJson))
+            {
+                var data = JsonSerializer.Deserialize<ChordData>(curJson);
+                if (data != null)
+                {
+                    ApplyChordData(data);
+                    TempData.Keep(CurrentChordKey);
+                }
+            }
+            else
+            {
+                var chordData = GenerateRandomChord();
+                ApplyChordData(chordData);
+                TempData[CurrentChordKey] = JsonSerializer.Serialize(chordData);
+            }
+
+            // Refresh UI lists
+            PopulateTypesForGenerated();
+            PopulateQualitiesForGenerated();
+            SyncLegacyLists();
+
+            return Page();
+        }
+
         private ChordData GenerateRandomChord()
         {
             var rnd = new Random();
-            int count = rnd.Next(2, 5); //кількість звуків (2..5)
+            int count = rnd.Next(2, MaxCount); //кількість звуків (2..5)
             string typeKey = string.Empty;
             string qualityKey = string.Empty;
             string rootLetter = RootOptions[rnd.Next(RootOptions.Count)];
@@ -488,7 +520,7 @@ namespace RecogniseChord.Pages
                 NotesJson = notesJson
             };
         }
-
+        // Apply generated chord data to properties for UI display
         private void ApplyChordData(ChordData data)
         {
             GeneratedCount = data.Count;

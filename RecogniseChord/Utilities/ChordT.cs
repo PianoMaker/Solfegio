@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿using System;
+using System.Security.Cryptography;
 using static Music.ChordPermutation;
 using static Music.Engine;
 using static Music.Globals;
@@ -404,6 +405,15 @@ namespace Music
             Write(ChordSymbols(tonality));
         }
 
+        public string DisplayString(Tonalities tonality, bool octtriger = true, int color = 14)
+        {
+            return string.Join(", ", Notes.Select(n => n.GetName()));            
+        }
+
+        public override string ToString()
+        {
+            return string.Join(", ", Notes.Select(n => n.GetName()));
+        }
 
         public int? If_note_in_Chord(INTERVALS interval) // перевіряє наявність в акорді заданого інтервалу. Якщо не знаходить, повертає null
         {

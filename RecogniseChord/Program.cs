@@ -1,25 +1,50 @@
-var builder = WebApplication.CreateBuilder(args);
+using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Mvc.Razor;
+using System.Globalization;
 
-// Add services to the container.
-builder.Services.AddRazorPages();
-
-var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
+public class Program
 {
-    app.UseExceptionHandler("/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
+    public static void Main(string[] args)
+    {
+        var builder = WebApplication.CreateBuilder(args);
+
+        // 1. Додаємо сервіси локалізації та вказуємо шлях до ресурсів.
+        builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+
+        // 2. Додаємо Razor Pages та підтримку локалізації для них.
+        builder.Services.AddRazorPages()
+            .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
+            .AddDataAnnotationsLocalization();
+
+        var app = builder.Build();
+
+        // 3. Налаштовуємо підтримувані культури.
+        var supportedCultures = new[] { "uk", "en"};
+        var localizationOptions = new RequestLocalizationOptions().SetDefaultCulture(supportedCultures[0])
+            .AddSupportedCultures(supportedCultures)
+            .AddSupportedUICultures(supportedCultures);
+
+        app.UseRequestLocalization(localizationOptions);
+
+        if (!app.Environment.IsDevelopment())
+        {
+            app.UseExceptionHandler("/Error");
+            app.UseHsts();
+        }
+
+        app.UseStaticFiles();
+        app.UseRouting();
+        app.UseAuthorization();
+        app.MapRazorPages();
+        app.Use(async (context, next) =>
+        {
+            await next();
+            var ct = context.Response.ContentType;
+            if (!string.IsNullOrEmpty(ct) && ct.StartsWith("text/", StringComparison.OrdinalIgnoreCase) && !ct.Contains("charset", StringComparison.OrdinalIgnoreCase))
+            {
+                context.Response.ContentType = ct + "; charset=utf-8";
+            }
+        });
+        app.Run();
+    }
 }
-
-app.UseHttpsRedirection();
-app.UseStaticFiles();
-
-app.UseRouting();
-
-app.UseAuthorization();
-
-app.MapRazorPages();
-
-app.Run();

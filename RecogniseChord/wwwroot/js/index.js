@@ -1,11 +1,16 @@
-document.addEventListener('DOMContentLoaded', function () {	
+document.addEventListener('DOMContentLoaded', function () { 
 
 	console.log('Document loaded, initializing chord recognizer UI.');
 
-	const selectform = document.getElementById('selectform');						// form for sound count selection
-	// radios in Index.cshtml use name="SelectedCount" (ids: sound2, sound3, sound4, sound5)
+	//ФОРМИ ТА ЕЛЕМЕНТИ
+
+	const selectform = document.getElementById('selectform'); 		// форма для вибору кількості звуків під час відповіді користувача
+	const maxsoundsform = document.getElementById('maxsoundsform');		// форма для вибору максимальної кількрості звуків 
+	const recogniseform = document.getElementById('recogniseform');		// форма для кнопки "Перевірити"
+
+
 	let radiobuttons = document.querySelectorAll('input[name="SelectedCount"]');
-	// fallback: if server template changed name, try the IDs rendered in the view
+
 	if (!radiobuttons || radiobuttons.length === 0) {
 		const fallbackIds = ['sound2', 'sound3', 'sound4', 'sound5'];
 		const list = [];
@@ -21,7 +26,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		console.log(`Found ${radiobuttons.length} sound count radio buttons.`);
 	}
 
-	const recogniseform = document.getElementById('recogniseform');					// form for chord recognition
+	
 	const recognisebox = document.getElementById('recognisebox');					// box containing recogniseform
 	const recognisebutton = document.getElementById('recogniseButton');				// button to submit recogniseform
 	const SelectedQuality = document.getElementById('SelectedQuality');
@@ -29,6 +34,8 @@ document.addEventListener('DOMContentLoaded', function () {
 	const playBtn = document.getElementById('playBtn');								//play button
 	
 	const resultBox = document.getElementById('resultBox');
+	const maxsoundsinput = document.getElementById('maxsoundsinput');
+	
 
 	// Additional mappings (do not change existing triadTypes / ninthQualities)
 	// These arrays are used only to recognize SelectedType values rendered in UI
@@ -69,7 +76,11 @@ document.addEventListener('DOMContentLoaded', function () {
 	if (savedQuality && SelectedQuality) SelectedQuality.value = savedQuality;
 	const savedType = sessionStorage.getItem('selectedType');
 	if (savedType && selectedType) selectedType.value = savedType;
-	
+	const maxsounds = sessionStorage.getItem('maxSounds');
+	if (maxsounds && maxsoundsform) {
+		maxsoundsform.value = maxsounds;
+		maxsoundsinput.value = maxsounds;
+	}
 	const hasCheckedRadio = Array.from(radiobuttons).some(btn => btn.checked);
 
 	//=================================
@@ -93,12 +104,13 @@ document.addEventListener('DOMContentLoaded', function () {
 	// натискання скидає всі прапорці в сесії та надсилає форму розпізнавання
 	//=================================
 	if (recognisebutton) {
-		recognisebutton.addEventListener('click', () => {
+		recognisebutton.addEventListener('click', (e) => {
+			if (!e.isTrusted) return;
 			console.log('Recognise button clicked.');
 			
-			radiobuttons.forEach(btn => {				
-				btn.checked = false;					
-				console.log('reset radiobuttons');				
+			radiobuttons.forEach(btn => { 			
+				btn.checked = false; 				
+				console.log('reset radiobuttons'); 			
 			});
 
 			if (resultBox) {
@@ -117,8 +129,6 @@ document.addEventListener('DOMContentLoaded', function () {
 			sessionStorage.setItem('hidebox', 'true'); 
 			console.warn('selectedSoundCount erased');
 
-			
-			
 			recogniseform.submit();
 
 		});
@@ -133,7 +143,8 @@ document.addEventListener('DOMContentLoaded', function () {
 	// =================================
 	if (radiobuttons) {
 		radiobuttons.forEach(btn => {
-			btn.addEventListener('change', function () {
+			btn.addEventListener('change', function (e) {
+				if (!e.isTrusted) return;
 				console.log('Sound count radio changed to value: ' + btn.value); // updated logging to include value
 				if (recognisebox) recognisebox.style.display = 'flex';
 				sessionStorage.setItem('selectedSoundCount', btn.value);
@@ -167,6 +178,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 	if (selectedType) {
 		selectedType.addEventListener('change', (e) => {
+			if (!e.isTrusted) return;
 			const val = (e.target.value || '').trim();
 			sessionStorage.setItem('selectedType', val);
 
@@ -181,10 +193,10 @@ document.addEventListener('DOMContentLoaded', function () {
 				const isImperfect = intervalImperfectKeys.some(k => k.toLowerCase() === valLower) || intervalImperfectUkr.includes(valLower);
 
 				if (isPerfect) {
-					setQualityOptions(['чиста'], true);					
+					setQualityOptions(['чиста'], true); 				
 				}
 				else if (isImperfect) {
-					setQualityOptions(['велика', 'мала'], true);					
+					setQualityOptions(['велика', 'мала'], true); 				
 				}
 			}
 		});
@@ -196,6 +208,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	// зберігає вибрані значення в sessionStorage
 	// =================================
 	document.addEventListener('change', (e) => {
+		if (!e.isTrusted) return;
 		const t = e.target;
 		if (!(t instanceof HTMLSelectElement)) return;
 		if (t.id === 'SelectedQuality') {
@@ -292,6 +305,21 @@ document.addEventListener('DOMContentLoaded', function () {
 	}
 	else {
 		console.warn('no play button found')
+	}
+
+	// =================================
+	// ОБРОБНИК ВИБОРУ МАКСИМАЛЬНОЇ КІЛЬКОСТІ ЗВУКІВ
+	// змінює значення в sessionStorage та надсилає форму
+	// =================================
+
+	if (maxsoundsinput) {
+		maxsoundsinput.addEventListener('change', (e) => {
+			if (!e.isTrusted) return;
+			const val = e.target?.value;
+			console.log('Max sounds input changed to:', val);
+			sessionStorage.setItem('maxSounds', val);
+			maxsoundsform?.submit();
+		});
 	}
 
 });

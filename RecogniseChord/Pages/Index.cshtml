@@ -5,7 +5,7 @@
 }
 
 <div class="text-center">
-    <h1 class="display-4">Інтервали та акорди</h1>
+    <h1 class="display-4">@Localizer["ChordsIntervals"]</h1>
     
     <div class="innercontainer">
         <!--КОНТЕЙНЕР ПРАВОРУЧ (ВГОРІ)-->
@@ -83,7 +83,14 @@
             </div>
             
         </div>
-        <p> @Model.RequestCount attempts have been made</p>
+        <p> @Model.RequestCount спроб на сайті</p>
+    </div>
+    <div>
+        <form id="maxsoundsform" method="post" asp-page-handler="max">
+            <p>Максимальна кількість звуків: </p>
+            <input id="maxsoundsinput" type="range" name="maxCount" min="2" max="5" value="@Model.MaxCount" />
+            <label for="maxsoundsinput">@Model.MaxCount</label>
+        </form>
     </div>
 </div>
 
