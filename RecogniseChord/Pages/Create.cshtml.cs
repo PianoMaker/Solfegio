@@ -22,6 +22,8 @@ namespace RecogniseChord.Pages
         public string? GeneratedFileRelative { get; private set; }
         public bool CanPlay => !string.IsNullOrEmpty(GeneratedFileRelative);
 
+        public FORMULA Formula { get; set; }
+
         // Маппінг enum -> українська назва (копія з Index)
         private static readonly Dictionary<string, string> TypeToUkrainian = new()
         {
@@ -140,7 +142,7 @@ namespace RecogniseChord.Pages
                     var chord = BuildChord();
                     if (chord != null)
                     {
-                        var path = chord.SaveWave();
+                        var path = chord.SaveWave(Formula);
                         var idx = path.IndexOf("wwwroot", StringComparison.OrdinalIgnoreCase);
                         if (idx >= 0)
                         {

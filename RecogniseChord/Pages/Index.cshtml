@@ -21,6 +21,7 @@
             <div id="numberOfSoundsSelector" class="innercontainer">
                 <p>Скільки звуків?</p>
                 <form id="selectform" method="post" asp-page-handler="Select">
+                    <input type="hidden" asp-for="MaxCount" />
                     <input id="sound2" type="radio" name="SelectedCount" value="2" @(Model.SelectedCount == 2 ? "checked" : "")>2
                     <input id="sound3" type="radio" name="SelectedCount" value="3" @(Model.SelectedCount == 3 ? "checked" : "")>3
                     <input id="sound4" type="radio" name="SelectedCount" value="4" @(Model.SelectedCount == 4 ? "checked" : "")>4
@@ -31,6 +32,7 @@
             <div id="recognisebox" class="innercontainer">
                 
                 <form id="recogniseform" method="post" asp-page-handler="Recognise">
+                    <input type="hidden" asp-for="MaxCount" />
                     <!--ТИП АКОРДУ-->
                     <div style="display:block; margin:5px">
                         <select asp-for="SelectedType" id="SelectedType" class="select-quality">
@@ -72,6 +74,8 @@
                     {
                         <div>
                             <p class="text-danger">@Model.GuessResult</p>
+                            <p>Введено: <code>@Model.UserAnswer</code></p>
+
                             <p class="text-danger">Правильна відповідь: <code>@Model.RecogniseCorrect</code></p>
                         </div>
                     }

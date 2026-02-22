@@ -14,6 +14,8 @@ namespace RecogniseChord.Pages
     {
         private readonly ILogger<IndexModel> _logger;
 
+        private const string MaxCountTempKey = "__MaxCount";
+
         public int RequestCount;
 
         // User selections (guess) — тепер зберігають українські назви
@@ -23,6 +25,8 @@ namespace RecogniseChord.Pages
         [BindProperty] public string RootNoteGuess { get; set; } = string.Empty;
         // Legacy / UI binding names (map to existing quality/type)
         [BindProperty] public string SelectedChord { get; set; } = string.Empty; // mapped to SelectedQuality
+
+        public string UserAnswer { get; set; } = string.Empty;
 
         // Generated chord info (current one to play / guess)
         public string? GeneratedFileRelative { get; private set; }
@@ -137,6 +141,12 @@ namespace RecogniseChord.Pages
         {
             ReadInfo();
 
+            if (TempData.Peek(MaxCountTempKey) is string maxVal && int.TryParse(maxVal, out var mc))
+            {
+                MaxCount = Math.Max(2, Math.Min(5, mc));
+                MessageL(7, $"MaxCo1unt set to {MaxCount}");
+            }
+
             MessageL(14, "Index OnGet: generating initial chord");
             var chordData = GenerateRandomChord();
             ApplyChordData(chordData); // show to user
@@ -235,6 +245,9 @@ namespace RecogniseChord.Pages
         {
             MessageL(14, "Index OnPostSelect: processing user selection change");
             ReadInfo();
+            if (Request.Form.TryGetValue(nameof(MaxCount), out var mc) && int.TryParse(mc, out int mcvalue))
+                MaxCount = Math.Clamp(mcvalue, 2, 5);
+
             PopulateTypes(SelectedCount);
             if (SelectedCount == 0) 
                 _logger.LogWarning("SelectedCount is 0 in OnPostSelect");
@@ -298,6 +311,9 @@ namespace RecogniseChord.Pages
                 RecogniseOk = ok;
                 GuessResult = ok ? "вірно" : "невірно";
 
+                TempData[MaxCountTempKey] = MaxCount.ToString();
+
+
                 // Показуємо правильну відповідь українською
                 var correctTypeUkr = TypeToUkrainian.GetValueOrDefault(actual.Type, actual.Type);
                 var correctQualMap = GetQualityToUkrainian(actual.Count);
@@ -307,6 +323,10 @@ namespace RecogniseChord.Pages
 
                 MessageL(ok ? COLORS.green : COLORS.red,
                          $"Recognise: user={SelectedCount}/{typeKey}/{qualityKey} actual={actual.Count}/{actual.Type}/{actual.Quality}");
+
+                // генеруємо відображення введеної користувачем відповіді
+
+                UserAnswer = string.Join(SelectedQuality + " " + SelectedChord);
 
                 // keep current chord in TempData while we display feedback
                 TempData.Keep(CurrentChordKey);
@@ -367,21 +387,21 @@ namespace RecogniseChord.Pages
             ReadInfo();
 
             // Try restore shown chord from TempData; if absent, generate a new one as fallback.
-            if (TempData.Peek(CurrentChordKey) is string curJson && !string.IsNullOrWhiteSpace(curJson))
-            {
-                var data = JsonSerializer.Deserialize<ChordData>(curJson);
-                if (data != null)
-                {
-                    ApplyChordData(data);
-                    TempData.Keep(CurrentChordKey);
-                }
-            }
-            else
-            {
+            //if (TempData.Peek(CurrentChordKey) is string curJson && !string.IsNullOrWhiteSpace(curJson))
+            //{
+            //    var data = JsonSerializer.Deserialize<ChordData>(curJson);
+            //    if (data != null)
+            //    {
+            //        ApplyChordData(data);
+            //        TempData.Keep(CurrentChordKey);
+            //    }
+            //}
+            //else
+            //{
                 var chordData = GenerateRandomChord();
                 ApplyChordData(chordData);
                 TempData[CurrentChordKey] = JsonSerializer.Serialize(chordData);
-            }
+            //}
 
             // Refresh UI lists
             PopulateTypesForGenerated();
@@ -391,6 +411,7 @@ namespace RecogniseChord.Pages
             return Page();
         }
 
+        //генереує випадкове співзвуччя
         private ChordData GenerateRandomChord()
         {
             var rnd = new Random();
@@ -426,7 +447,11 @@ namespace RecogniseChord.Pages
                 note2.Transpose(interval, qual, DIR.UP);
                 chord.AddNote(root);
                 chord.AddNote(note2);
-                
+                if (chord.Notes[0].AbsPitch() == chord.Notes[1].AbsPitch())
+                {
+                    chord.Notes[1].OctUp();
+                    MessageL(12, "perform oct up");
+                }
             }
             else if (count == 3)
             {
@@ -487,8 +512,10 @@ namespace RecogniseChord.Pages
 
             string rel = RelativeFromFull(fullPath);
             string notesDisplay = string.Join(", ", chord.Notes.Select(n => n.GetName()));
+            string pitchesdisplay = string.Join(", ", chord.Notes.Select(n => n.AbsPitch()));
+            
             // Log generated notes and chord type/quality
-            MessageL(COLORS.gray, $"Generated chord ({typeKey}/{qualityKey}) notes: {notesDisplay}");
+            MessageL(COLORS.gray, $"Generated chord ({typeKey}/{qualityKey}) notes: {notesDisplay} pitches: {pitchesdisplay}");
 
             // Build JSON payload for client-side playback: { notes: [{frequency,duration}], type, quality, count, root, file }
             var noteObjects = chord.Notes.Select(n => new
@@ -562,7 +589,7 @@ namespace RecogniseChord.Pages
         }
         private void PopulateTypesForGenerated() => PopulateTypes(GeneratedCount);
 
-        // Updated: PopulateQualities considers SelectedType (українська назва) so we can show "чиста" for perfect intervals
+        // заповнює спадний список якостей інтервалів
         private void PopulateQualities(int count, string? typeUkr = null)
         {
             QualityOptions.Clear();
