@@ -247,7 +247,7 @@ namespace Music
         private const string thank_en = "\nThank you for using our program!";
         private const string thank_uk = "\nДякуємо за використання програми!";
         private const string timbres_uk = "0 - синусоїда, 1 - трикутник, 2 - пила, 3 - прямокутник";
-        private const string timbres_en = "0 - sin, 1 - triangle, 2 - sawtooth, 3 - square";
+        private const string timbres_en = "0 - sin, 1 - triangle, 2 - saw, 3 - square";
         private const string tonetable_en = "\t\t\tPitches\t\t| range\n \t\t\t\t\t|degree | halftones\n";
         private const string tonetable_uk = "\t\t\tЗвуки\t\t| діапазон\n \t\t\t\t\t|ступенів | півтонів\n";
         private const string toomuchnotes_uk = "Забагто нот в акорді, фільтрацію скасовано";

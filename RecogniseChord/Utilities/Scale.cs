@@ -1,5 +1,6 @@
 ﻿using static Music.Engine;
 using static Music.Messages;
+using static Music.Globals;
 using System.Linq;
 using System.Collections;
 
@@ -65,18 +66,28 @@ namespace Music
 
         public Scale(string input)
         {
+            MessageL(7, $"create scale input: {input}");
             string[] parts = input.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
             if (input is null || input == "0" || (input.All(char.IsWhiteSpace))) throw new IncorrectNote(note_error());
             else
                 foreach (string i in parts)
                 {
+                    MessageL(8, $"part: {i}");
                     try
-                    {
+                    {                        
                         Note note = new(i);
                         AddNote(note);
+                        MessageL(8, $"note added: {i}");
                     }
-                    catch (IncorrectNote) { Console.WriteLine("skip adding " + i); }
-                };
+                    catch (IncorrectNote) { 
+                        Console.WriteLine("(Scale.cs) skip adding " + i); 
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine($"{e.Message} " + i);
+                    }
+                }
+            ;
         }
 
         public Note this[int index]

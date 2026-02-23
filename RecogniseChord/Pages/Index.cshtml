@@ -36,12 +36,12 @@
                     <!--ТИП АКОРДУ-->
                     <div style="display:block; margin:5px">
                         <select asp-for="SelectedType" id="SelectedType" class="select-quality">
-                        <option value="">--</option>
-                        @foreach (var type in Model.TypeOptions)
-                        {
-                            <option value="@type" selected="@(Model.SelectedType == type)">@type</option>
-                        }
-                    </select>
+                            <option value="">--</option>
+                            @foreach (var type in Model.TypeOptions)
+                            {
+                                <option value="@type" selected="@(Model.SelectedType == type)">@type</option>
+                            }
+                        </select>
                     </div>
                     <!--РІЗНОВИД (якість)-->
                     <div style="display:block; margin:5px">
@@ -94,6 +94,20 @@
             <p>Максимальна кількість звуків: </p>
             <input id="maxsoundsinput" type="range" name="maxCount" min="2" max="5" value="@Model.MaxCount" />
             <label for="maxsoundsinput">@Model.MaxCount</label>
+        </form>
+    </div>
+    <div>
+        <form id="timbreform" method="post" asp-page-handler="timbre">
+            <p>Обрати тембр: </p>
+            <div style="display:block; margin:5px">                
+                <select asp-for="Timbre" id="SelectedTimbre">                    
+                    @foreach (var timbre in Model.AllTimbres)
+                    {
+                        <option value="@timbre" selected="@(Model.Timbre == timbre)">@timbre</option>
+                    }
+                </select>
+                <input type="hidden" asp-for="MaxCount" />
+            </div>
         </form>
     </div>
 </div>

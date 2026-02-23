@@ -1,12 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Music;
-using static Music.Messages;
-using static Music.Engine;
-using System.Text.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System;
+using System.Text.Json;
+using System.Text.RegularExpressions;
+using static Music.Engine;
+using static Music.Messages;
 
 namespace RecogniseChord.Pages
 {
@@ -18,6 +19,8 @@ namespace RecogniseChord.Pages
 
         public int RequestCount;
 
+        public List<string> AllTimbres { get; set; } = Enum.GetNames(typeof(TIMBRE)).ToList();
+
         // User selections (guess) — тепер зберігають українські назви
         [BindProperty] public int SelectedCount { get; set; } = 0; //2..5
         [BindProperty] public string SelectedType { get; set; } = string.Empty; // українська назва
@@ -25,6 +28,8 @@ namespace RecogniseChord.Pages
         [BindProperty] public string RootNoteGuess { get; set; } = string.Empty;
         // Legacy / UI binding names (map to existing quality/type)
         [BindProperty] public string SelectedChord { get; set; } = string.Empty; // mapped to SelectedQuality
+
+        [BindProperty] public string Timbre { get; set; }
 
         public string UserAnswer { get; set; } = string.Empty;
 
@@ -139,7 +144,7 @@ namespace RecogniseChord.Pages
 
         public void OnGet()
         {
-            ReadInfo();
+            ReadInfo();            
 
             if (TempData.Peek(MaxCountTempKey) is string maxVal && int.TryParse(maxVal, out var mc))
             {
@@ -165,7 +170,7 @@ namespace RecogniseChord.Pages
         private void ReadInfo()
         {
             var attempts = System.IO.File.ReadAllText(FilePath);
-            RequestCount = int.Parse(attempts);
+            RequestCount = int.Parse(attempts);           
         }
 
         private void CleanOldFiles()
@@ -210,22 +215,21 @@ namespace RecogniseChord.Pages
             MessageL(14, "Index OnPostPlay: processing user play request");
             ReadInfo();
             // Play should use the current chord stored in TempData and must NOT generate a new chord
-            if (TempData.TryGetValue(CurrentChordKey, out var curObj) && curObj is string curJson && !string.IsNullOrWhiteSpace(curJson))
+            RestoreOrGenerateChord();
+
+            PopulateTypesForGenerated();
+            PopulateQualitiesForGenerated();
+            SyncLegacyLists();
+            return Page();
+        }
+
+        private void RestoreOrGenerateChord()
+        {
+            var data = TryGetCurrentChord(keep: true);
+            if (data != null)
             {
-                try
-                {
-                    var data = JsonSerializer.Deserialize<ChordData>(curJson);
-                    if (data != null)
-                    {
-                        ApplyChordData(data);
-                        TempData.Keep(CurrentChordKey);
-                        MessageL(COLORS.gray, $"Play chord notes: {data.NotesDisplay}");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    ErrorMessageL("Chord play deserialize error: " + ex.Message);
-                }
+                ApplyChordData(data);
+                MessageL(COLORS.gray, $"Play chord notes: {data.NotesDisplay}");
             }
             else
             {
@@ -233,11 +237,6 @@ namespace RecogniseChord.Pages
                 ApplyChordData(generated);
                 TempData[CurrentChordKey] = JsonSerializer.Serialize(generated);
             }
-
-            PopulateTypesForGenerated();
-            PopulateQualitiesForGenerated();
-            SyncLegacyLists();
-            return Page();
         }
 
         // Handler when user changes count of notes (radio buttons) -> refresh type/quality lists
@@ -249,27 +248,15 @@ namespace RecogniseChord.Pages
                 MaxCount = Math.Clamp(mcvalue, 2, 5);
 
             PopulateTypes(SelectedCount);
-            if (SelectedCount == 0) 
+            if (SelectedCount == 0)
                 _logger.LogWarning("SelectedCount is 0 in OnPostSelect");
             PopulateQualities(SelectedCount, SelectedType);
             SyncLegacyLists();
             // restore current chord info from TempData so UI keeps the ability to play it
-            if (TempData.TryGetValue(CurrentChordKey, out var curObj) && curObj is string curJson && !string.IsNullOrWhiteSpace(curJson))
+            var restored = TryGetCurrentChord(keep: true);
+            if (restored != null)
             {
-                try
-                {
-                    var data = JsonSerializer.Deserialize<ChordData>(curJson);
-                    if (data != null)
-                    {
-                        ApplyChordData(data);
-                        // keep current chord available for subsequent actions
-                        TempData.Keep(CurrentChordKey);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    ErrorMessageL("Restore current chord error: " + ex.Message);
-                }
+                ApplyChordData(restored);
             }
             return Page();
         }
@@ -279,19 +266,8 @@ namespace RecogniseChord.Pages
         {
             MessageL(14, "Index OnPostRecognise: processing user recognise");
             ReadInfo();
-            RequestCount++; 
-            ChordData actual = null;
-            if (TempData.TryGetValue(CurrentChordKey, out var curObj) && curObj is string curJson && !string.IsNullOrWhiteSpace(curJson))
-            {
-                try
-                {
-                    actual = JsonSerializer.Deserialize<ChordData>(curJson);
-                }
-                catch (Exception ex)
-                {
-                    ErrorMessageL("Recognise deserialize error: " + ex.Message);
-                }
-            }
+            RequestCount++;
+            ChordData actual = RestoreChordData();
 
             if (actual != null)
             {
@@ -347,7 +323,7 @@ namespace RecogniseChord.Pages
             SyncLegacyLists();
 
             System.IO.File.WriteAllText(FilePath, RequestCount.ToString());
-            
+
             SelectedCount = 0;
             SelectedType = string.Empty;
             SelectedQuality = string.Empty;
@@ -356,6 +332,7 @@ namespace RecogniseChord.Pages
             return Page();
         }
 
+        
         public IActionResult OnPostGuess()
         {
             MessageL(14, "Index OnPostGuess: processing user guess");
@@ -386,22 +363,9 @@ namespace RecogniseChord.Pages
             MessageL(14, $"Index OnPostMax: processing user max count change to {MaxCount}");
             ReadInfo();
 
-            // Try restore shown chord from TempData; if absent, generate a new one as fallback.
-            //if (TempData.Peek(CurrentChordKey) is string curJson && !string.IsNullOrWhiteSpace(curJson))
-            //{
-            //    var data = JsonSerializer.Deserialize<ChordData>(curJson);
-            //    if (data != null)
-            //    {
-            //        ApplyChordData(data);
-            //        TempData.Keep(CurrentChordKey);
-            //    }
-            //}
-            //else
-            //{
-                var chordData = GenerateRandomChord();
-                ApplyChordData(chordData);
-                TempData[CurrentChordKey] = JsonSerializer.Serialize(chordData);
-            //}
+            var chordData = GenerateRandomChord();
+            ApplyChordData(chordData);
+            TempData[CurrentChordKey] = JsonSerializer.Serialize(chordData);
 
             // Refresh UI lists
             PopulateTypesForGenerated();
@@ -411,7 +375,50 @@ namespace RecogniseChord.Pages
             return Page();
         }
 
-        //генереує випадкове співзвуччя
+
+        public IActionResult OnPostTimbre()
+        {
+            MessageL(14, $"Index OnPostTimbre: set to {Timbre}");
+            ReadInfo();
+
+            // Refresh UI lists
+            PopulateTypesForGenerated();
+            PopulateQualitiesForGenerated();
+            SyncLegacyLists();
+
+            var restored = TryGetCurrentChord(keep: true);
+            if (restored == null)
+            {
+                MessageL(4, "OnPostTimbre: no chord in TempData to restore");
+                return Page();
+            }
+
+            MessageL(8, "start restoring");
+            var chord = RestoreChord(restored);
+            if (chord is null)
+            {
+                MessageL(4, "OnPostTimbre: RestoreChord returned null");
+                return Page();
+            }
+
+            // Save WAV using selected timbre and update stored metadata
+            TIMBRE timbreEnum = GetTimbre();
+            MessageL(8, $"save wave with timbre {timbreEnum}");
+            string fullPath = GetFullPath();
+            chord.SaveWave(fullPath, timbreEnum);
+            string rel = RelativeFromFull(fullPath);
+            MessageL(8, $"WAV saved to {rel}");
+
+            // Update stored chord metadata and TempData, then apply to page via ApplyChordData
+            restored.FileRelative = rel;
+            TempData[CurrentChordKey] = JsonSerializer.Serialize(restored);
+
+            // Use ApplyChordData to set Generated* properties consistently
+            ApplyChordData(restored);
+
+            return Page();
+        }
+        //генереує випадкове співзвуччя та записує аудіофайл
         private ChordData GenerateRandomChord()
         {
             var rnd = new Random();
@@ -493,13 +500,15 @@ namespace RecogniseChord.Pages
                 MessageL(COLORS.gray, "Adjusting chord octave down to fit pitch limit");
                 chord.OctDown();
             }
-            else 
+            else
             {
                 MessageL(COLORS.gray, $"no changes, highest = {chord.GetHighestMidiNote()}");
 
             }
+            TIMBRE timbreEnum = GetTimbre();
+            string fullPath = GetFullPath();
 
-            string fullPath = chord.SaveWave();
+            chord.SaveWave(fullPath, timbreEnum);
             try
             {
                 var analysis = Music.AudioDiagnostics.AnalyzeWav(fullPath);
@@ -513,7 +522,7 @@ namespace RecogniseChord.Pages
             string rel = RelativeFromFull(fullPath);
             string notesDisplay = string.Join(", ", chord.Notes.Select(n => n.GetName()));
             string pitchesdisplay = string.Join(", ", chord.Notes.Select(n => n.AbsPitch()));
-            
+
             // Log generated notes and chord type/quality
             MessageL(COLORS.gray, $"Generated chord ({typeKey}/{qualityKey}) notes: {notesDisplay} pitches: {pitchesdisplay}");
 
@@ -547,6 +556,65 @@ namespace RecogniseChord.Pages
                 NotesJson = notesJson
             };
         }
+
+        private static string GetFullPath()
+        {
+            string directory = Path.Combine("wwwroot", "sound");
+            Directory.CreateDirectory(directory);
+
+            // find next sequential filename exampleN.wav
+            int nextIndex = GetNextIndex(directory);
+
+            string filename = $"example{nextIndex}.wav";
+            string fullPath = System.IO.Path.Combine(directory, filename);
+            return fullPath;
+        }
+
+        private static int GetNextIndex(string directory)
+        {
+            int nextIndex = 1;
+            try
+            {
+                var files = Directory.GetFiles(directory, "example*.wav");
+                var rx = new Regex(@"example(\d+)\.wav$", RegexOptions.IgnoreCase);
+                int max = 0;
+                foreach (var f in files)
+                {
+                    var name = System.IO.Path.GetFileName(f);
+                    var m = rx.Match(name);
+                    if (m.Success && int.TryParse(m.Groups[1].Value, out var val))
+                    {
+                        if (val > max) max = val;
+                    }
+                }
+                nextIndex = max + 1;
+            }
+            catch (Exception ex)
+            {
+                // if directory read fails, fallback to1
+                GrayMessageL("Failed to enumerate existing files: " + ex.Message);
+                nextIndex = 1;
+            }
+
+            return nextIndex;
+        }
+
+        private TIMBRE GetTimbre()
+        {
+            TIMBRE timbreEnum;
+            if (string.IsNullOrWhiteSpace(Timbre) || !Enum.TryParse<TIMBRE>(Timbre, ignoreCase: true, out timbreEnum))
+            {
+                timbreEnum = TIMBRE.sin;
+                MessageL(COLORS.gray, $"Timbre parse failed or empty ('{Timbre}'), defaulting to {timbreEnum}");
+            }
+            else
+            {
+                MessageL(COLORS.gray, $"Timbre parsed: {timbreEnum}");
+            }
+
+            return timbreEnum;
+        }
+
         // Apply generated chord data to properties for UI display
         private void ApplyChordData(ChordData data)
         {
@@ -659,6 +727,65 @@ namespace RecogniseChord.Pages
             public string FileRelative { get; set; } = string.Empty;
             public string NotesDisplay { get; set; } = string.Empty;
             public string NotesJson { get; set; } = string.Empty; // serialized notes + meta
+        }
+
+        private ChordData RestoreChordData()
+        {
+            ChordData actual = null;
+            if (TempData.TryGetValue(CurrentChordKey, out var curObj) && curObj is string curJson && !string.IsNullOrWhiteSpace(curJson))
+            {
+                try
+                {
+                    actual = JsonSerializer.Deserialize<ChordData>(curJson);
+                }
+                catch (Exception ex)
+                {
+                    ErrorMessageL("Recognise deserialize error: " + ex.Message);
+                }
+            }
+
+            return actual;
+        }
+
+        private ChordData TryGetCurrentChord(bool keep = false)
+        {
+            if (TempData.TryGetValue(CurrentChordKey, out var curObj) && curObj is string curJson && !string.IsNullOrWhiteSpace(curJson))
+            {
+                try
+                {
+                    var data = JsonSerializer.Deserialize<ChordData>(curJson);
+                    if (data != null && keep)
+                    {
+                        TempData.Keep(CurrentChordKey);
+                    }
+                    return data;
+                }
+                catch (Exception ex)
+                {
+                    ErrorMessageL("Recognise deserialize error: " + ex.Message);
+                }
+            }
+
+            return null;
+        }
+
+
+        private ChordT RestoreChord(ChordData cd)
+        {
+            MessageL(8, $"start RestoreChord method");
+            try
+            {
+                var notesDisplay = cd.NotesDisplay;
+                string normalized = NotationHelpers.NormalizeNotesDisplay(notesDisplay, Notation.eu);
+                
+                MessageL(8, $"sent to chord: {normalized}");
+                return new ChordT(normalized);
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogDebug("RestoreChord failed: {Message}", ex.Message);
+                return null;
+            }
         }
     }
 }

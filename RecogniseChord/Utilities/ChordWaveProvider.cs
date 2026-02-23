@@ -25,6 +25,7 @@ namespace Music
         private float _decay = 0.12f;
         private float _sustain = 0.7f;
         private float _release = 0.18f;
+        private TIMBRE _timbre;
 
         public float AttackSeconds
         {
@@ -66,7 +67,7 @@ namespace Music
         /// <summary>
         /// frequencies: list of Hz values; use0 for rests. durationMs: total active (gate on) duration excluding release tail.
         /// </summary>
-        public ChordWaveProvider(List<double> frequencies, int durationMs, int sampleRate = 44100)
+        public ChordWaveProvider(List<double> frequencies, int durationMs, TIMBRE timbre = TIMBRE.sin, int sampleRate = 44100)
         : base(sampleRate, 1)
         {
             _sampleRate = sampleRate;
@@ -74,6 +75,7 @@ namespace Music
             _phase = new double[_numTones];
             _phaseInc = new double[_numTones];
             _envs = new EnvelopeGenerator[_numTones];
+            _timbre = timbre;
 
             for (int i = 0; i < _numTones; i++)
             {
@@ -126,7 +128,7 @@ namespace Music
                     {
                         if (_phaseInc[t] == 0.0) continue;
                         float amp = _envs[t].Process();
-                        mixed += WaveSample(_phase[t], Globals.timbre) * amp;
+                        mixed += WaveSample(_phase[t], _timbre) * amp;
                         _phase[t] += _phaseInc[t];
                         if (_phase[t] > 2.0 * Math.PI) _phase[t] -= 2.0 * Math.PI;
                     }
@@ -152,7 +154,7 @@ namespace Music
                 {
                     if (_phaseInc[t] == 0.0) continue; // silent tone
                     float amp = _envs[t].Process();
-                    mixed += WaveSample(_phase[t], Globals.timbre) * amp;
+                    mixed += WaveSample(_phase[t], _timbre) * amp;
                     _phase[t] += _phaseInc[t];
                     if (_phase[t] > 2.0 * Math.PI) _phase[t] -= 2.0 * Math.PI;
                 }
@@ -171,7 +173,7 @@ namespace Music
                 case TIMBRE.tri:
                     // triangle from -1..1
                     return 2.0 * Math.Asin(Math.Sin(phase)) / Math.PI;
-                case TIMBRE.sawtooth:
+                case TIMBRE.saw:
                     // naive saw: map phase 0..2π -> -1..1
                     return 2.0 * (phase / (2.0 * Math.PI)) - 1.0;
                 case TIMBRE.square:

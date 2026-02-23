@@ -52,7 +52,7 @@ namespace Music
                 default:
                 case 0: timbre = TIMBRE.sin; break;
                 case 1: timbre = TIMBRE.tri; break;
-                case 2: timbre = TIMBRE.sawtooth; break;
+                case 2: timbre = TIMBRE.saw; break;
                 case 3: timbre = TIMBRE.square; break;
             }
         }        

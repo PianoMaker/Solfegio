@@ -718,9 +718,10 @@ namespace Music
 
         // Save chord to WAV file with optional explicit musical duration (Duration).
         // Files named sequentially: example1.wav, example2.wav, ...
-        public string SaveWave(string Path = null, Duration duration = null)
+        public string SaveWave(string path, TIMBRE timbre = TIMBRE.sin, Duration duration = null)
         {
             MessageL(COLORS.olive, $"Saving chord to WAV...");
+            MessageL(COLORS.gray, $"timbre = {timbre}...");
 
             var freqs = new List<double>();
             int maxDur = 0;
@@ -740,38 +741,14 @@ namespace Music
             if (activeMs > MaxMs) activeMs = MaxMs;
             if (activeMs <= 0) activeMs = 200;
 
-            string directory = Path ?? System.IO.Path.Combine("wwwroot", "sound");
-            Directory.CreateDirectory(directory);
+            //string fullPath = GetFullPath(Path);
 
-            // find next sequential filename exampleN.wav
-            int nextIndex = 1;
-            try
-            {
-                var files = Directory.GetFiles(directory, "example*.wav");
-                var rx = new Regex(@"example(\d+)\.wav$", RegexOptions.IgnoreCase);
-                int max = 0;
-                foreach (var f in files)
-                {
-                    var name = System.IO.Path.GetFileName(f);
-                    var m = rx.Match(name);
-                    if (m.Success && int.TryParse(m.Groups[1].Value, out var val))
-                    {
-                        if (val > max) max = val;
-                    }
-                }
-                nextIndex = max + 1;
-            }
-            catch (Exception ex)
-            {
-                // if directory read fails, fallback to1
-                GrayMessageL("Failed to enumerate existing files: " + ex.Message);
-                nextIndex = 1;
-            }
+            return SaveWave(timbre, freqs, activeMs, path);
+        }
 
-            string filename = $"example{nextIndex}.wav";
-            string fullPath = System.IO.Path.Combine(directory, filename);
-
-            var provider = new ChordWaveProvider(freqs, activeMs);
+        private static string SaveWave(TIMBRE timbre, List<double> freqs, int activeMs, string fullPath)
+        {
+            var provider = new ChordWaveProvider(freqs, activeMs, timbre);
 
             using (var writer = new WaveFileWriter(fullPath, provider.WaveFormat))
             {
@@ -787,5 +764,9 @@ namespace Music
             MessageL(COLORS.olive, $"WAV saved to {fullPath}");
             return fullPath;
         }
+
+        
+
+       
     }
 }

@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	const maxsoundsform = document.getElementById('maxsoundsform');		// форма для вибору максимальної кількрості звуків 
 	const recogniseform = document.getElementById('recogniseform');		// форма для кнопки "Перевірити"
 
+	const timbreform = document.getElementById('timbreform')			// форма встановлення тембру
 
 	let radiobuttons = document.querySelectorAll('input[name="SelectedCount"]');
 
@@ -30,6 +31,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	const recognisebox = document.getElementById('recognisebox');					// box containing recogniseform
 	const recognisebutton = document.getElementById('recogniseButton');				// button to submit recogniseform
 	const SelectedQuality = document.getElementById('SelectedQuality');
+	const SelectedTimbre = document.getElementById('SelectedTimbre');
 	const selectedType = document.getElementById('SelectedType');
 	const playBtn = document.getElementById('playBtn');								//play button
 	
@@ -49,6 +51,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	//=================================
 	// значення радіокнопок кількості звуків
 	const savedSoundCount = sessionStorage.getItem('selectedSoundCount');
+	const savedTimbre = sessionStorage.getItem('savedTimbre')
 	console.log('Restoring saved sound count from sessionStorage:', savedSoundCount);
 	if (savedSoundCount) {
 		radiobuttons.forEach(radio => {
@@ -57,6 +60,10 @@ document.addEventListener('DOMContentLoaded', function () {
 				console.log('Restored sound count radio button:', radio.value);
 			}
 		});
+	}
+	if (savedTimbre) {
+		SelectedTimbre.value = savedTimbre;
+		console.log('Restored timbre:', savedTimbre.value);
 	}
 	else {
 		console.log('No saved sound count found in sessionStorage.');
@@ -201,6 +208,23 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 		});
 	}
+	// =================================
+	// Обробник зміни тембру
+	// =================================
+
+	if (SelectedTimbre) {
+		SelectedTimbre.addEventListener('change', (e) => {
+			if (!e.isTrusted) return;
+			if (!timbreform) {
+				console.warn('timbreform not found, cannot submit.');
+				return;
+			}
+			console.debug(`timbre changed to ${e.value}`)
+			sessionStorage.setItem('savedTimbre', e.value)
+			timbreform.submit();
+		});
+	}
+
 
 	
 	// =================================
@@ -222,6 +246,10 @@ document.addEventListener('DOMContentLoaded', function () {
 			// do not submit the form here; user must click "Розпізнати"
 		}
 	});
+
+
+	
+
 
 	// =================================
 	// ОБРОБНИК КНОПКИ ВІДТВОРЕННЯ

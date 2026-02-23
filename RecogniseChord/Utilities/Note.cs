@@ -285,18 +285,25 @@ namespace Music
         }
 
 
-        public Note(string input)        {            
-
+        public Note(string input)        {
+            MessageL(8, $"Note constructor runs with input {input}");
             if (input is null) throw new IncorrectNote("Impossible to initialize note");
             input = CutSlash(input); // при пошуку типу cis/des
             stringdivider(input, out string key, out int octave, out int duration, out string? durmodifier);
             if (key == "r") MakeRest();
             else
             {
-
-                pitch = key_to_pitch(key, true);
-                step = key_to_step(key);
-                oct = octave;
+                try
+                {
+                    pitch = key_to_pitch(key, true);
+                    step = key_to_step(key);
+                    oct = octave;
+                }
+                catch (IncorrectNote ex)
+                {
+                    MessageL(12, ex.Message);    
+                    throw new Exception($"impossible to create note from {input}");
+                }
             }
             try
             {

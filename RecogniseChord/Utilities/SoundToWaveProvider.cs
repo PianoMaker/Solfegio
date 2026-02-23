@@ -15,7 +15,6 @@ namespace RecogunzeChord.Utilities
         private int _sampleRate;
         private int _noteIndex = 0; // Відстежуємо поточну ноту
 
-
         private EnvelopeGenerator _adsr;
         private float attackSeconds;
         new public WaveFormat WaveFormat { get; }
@@ -158,10 +157,25 @@ namespace RecogunzeChord.Utilities
             return index;
         }
 
-        private float SynthFormula(double phase)
+        private float SynthFormula(double phase, TIMBRE timbre = TIMBRE.sin)
         {
-            return (float)Math.Sin(_phase); // Синусоїда. 
-                                            //Згодом слід додати інші!                                            
+            // Use the passed-in phase (not the instance field) and generate normalized -1..1 waveforms.
+            switch (timbre)
+            {
+                case TIMBRE.sin:
+                    return (float)Math.Sin(phase);
+
+                case TIMBRE.square:
+                    // simple hard square: +1 for positive half-cycle, -1 for negative
+                    return (float)(Math.Sin(phase) >= 0.0 ? 1.0 : -1.0);
+
+                case TIMBRE.tri:
+                    // triangle wave: can be produced by 2/PI * asin(sin(phase)) -> range [-1,1]
+                    return (float)(2.0 / Math.PI * Math.Asin(Math.Sin(phase)));
+
+                default:
+                    return (float)Math.Sin(phase);
+            }
         }
 
     }

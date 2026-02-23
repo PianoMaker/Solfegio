@@ -1,11 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Music;
-using static Music.Messages;
-using static Music.Engine;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System;
+using System.Text.RegularExpressions;
+using static Music.Engine;
+using static Music.Messages;
 
 namespace RecogniseChord.Pages
 {
@@ -14,7 +15,8 @@ namespace RecogniseChord.Pages
         [BindProperty] public int SelectedCount { get; set; } = 0; //2..5
         [BindProperty] public string SelectedType { get; set; } = string.Empty; // українська назва
         [BindProperty] public string SelectedQuality { get; set; } = string.Empty; // українська назва
-        [BindProperty] public string RootNote { get; set; } = "C"; // корінь
+        [BindProperty] public string RootNote { get; set; } = "C"; // основний тон
+        [BindProperty] public TIMBRE Timbre { get; set; }
 
         public List<string> CountOptions { get; } = new() { "2", "3", "4", "5" };
         public List<string> TypeOptions { get; private set; } = new();
@@ -142,12 +144,7 @@ namespace RecogniseChord.Pages
                     var chord = BuildChord();
                     if (chord != null)
                     {
-                        var path = chord.SaveWave(Formula);
-                        var idx = path.IndexOf("wwwroot", StringComparison.OrdinalIgnoreCase);
-                        if (idx >= 0)
-                        {
-                            GeneratedFileRelative = "/" + path.Substring(idx + 7).TrimStart('/', '\\').Replace('\\', '/');
-                        }
+                        string path = GetFullPath();                        
                         MessageL(14, $"Generated chord saved to: {path}");
                     }
                 }
@@ -281,5 +278,50 @@ namespace RecogniseChord.Pages
             else if (type == "NONACORD_3i") chord.InvertUp(3);
             else if (type == "NONACORD_4i") chord.InvertUp(4);
         }
+
+        private static string GetFullPath()
+        {
+            string directory = Path.Combine("wwwroot", "sound");
+            Directory.CreateDirectory(directory);
+
+            // find next sequential filename exampleN.wav
+            int nextIndex = GetNextIndex(directory);
+
+            string filename = $"example{nextIndex}.wav";
+            string fullPath = System.IO.Path.Combine(directory, filename);
+            return fullPath;
+        }
+
+        private static int GetNextIndex(string directory)
+        {
+            int nextIndex = 1;
+            try
+            {
+                var files = Directory.GetFiles(directory, "example*.wav");
+                var rx = new Regex(@"example(\d+)\.wav$", RegexOptions.IgnoreCase);
+                int max = 0;
+                foreach (var f in files)
+                {
+                    var name = System.IO.Path.GetFileName(f);
+                    var m = rx.Match(name);
+                    if (m.Success && int.TryParse(m.Groups[1].Value, out var val))
+                    {
+                        if (val > max) max = val;
+                    }
+                }
+                nextIndex = max + 1;
+            }
+            catch (Exception ex)
+            {
+                // if directory read fails, fallback to1
+                GrayMessageL("Failed to enumerate existing files: " + ex.Message);
+                nextIndex = 1;
+            }
+
+            return nextIndex;
+        }
+
     }
+
+
 }

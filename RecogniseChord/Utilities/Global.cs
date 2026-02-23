@@ -8,7 +8,7 @@ namespace Music
     public enum LNG { uk = 1, en = 2 } // мова інтерфейсу
     public enum PLAYER { beeper, naudio, midiplayer }; // вибір присторїв відтворення
 
-    public enum TIMBRE { sin, tri, sawtooth, square }; // вибір тембрів відтворення
+    public enum TIMBRE { sin, tri, saw, square }; // вибір тембрів відтворення
     public enum COLORS { blue = 1, darkred = 4, olive = 6, standart = 7, gray = 8, green = 10, cyan = 11, red = 12, purple = 13, yellow = 14, white = 15 }
     public enum DIR { UP, DOWN }; // транспорт вгору/вниз
     public enum ALTER { SHARP = 1, DOUBLESHARP = 2, TRIPLESHARP = 3, FLAT = -1, DOUBLEFLAT = -2, FLATFLAT = -2, TREPLEFLAT = -3, NATURAL = 0 }; // знаки альтерації
@@ -34,6 +34,7 @@ namespace Music
     enum MINTONALITIES { amoll, emoll, hmoll, fismoll, cismoll, gismoll, dismoll, aismoll, eismoll, dmoll, gmoll, cmoll, fmoll, bmoll, esmoll, asmoll, desmoll };
     enum TRIPOSITIONS { open1, open3, open5, closed1, closed3, closed5 };
 
+    public enum FORMULA { SIN, TRI, SQUARE}
     
     public static class Globals
     {
