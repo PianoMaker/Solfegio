@@ -72,12 +72,12 @@ namespace Music
             else
                 foreach (string i in parts)
                 {
-                    MessageL(8, $"part: {i}");
+                    //MessageL(8, $"part: {i}");
                     try
                     {                        
                         Note note = new(i);
                         AddNote(note);
-                        MessageL(8, $"note added: {i}");
+                        //MessageL(8, $"note added: {i}");
                     }
                     catch (IncorrectNote) { 
                         Console.WriteLine("(Scale.cs) skip adding " + i); 

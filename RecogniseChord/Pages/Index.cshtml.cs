@@ -406,8 +406,9 @@ namespace RecogniseChord.Pages
             MessageL(8, $"save wave with timbre {timbreEnum}");
             string fullPath = GetFullPath();
             chord.SaveWave(fullPath, timbreEnum);
-            string rel = RelativeFromFull(fullPath);
+            string rel = RelativeFromFull(fullPath);            
             MessageL(8, $"WAV saved to {rel}");
+            AudioAnalysis(fullPath);
 
             // Update stored chord metadata and TempData, then apply to page via ApplyChordData
             restored.FileRelative = rel;
@@ -509,15 +510,7 @@ namespace RecogniseChord.Pages
             string fullPath = GetFullPath();
 
             chord.SaveWave(fullPath, timbreEnum);
-            try
-            {
-                var analysis = Music.AudioDiagnostics.AnalyzeWav(fullPath);
-                MessageL(COLORS.cyan, $"Audio analysis: peak={analysis.Peak:F3} ( {analysis.PeakDb:F1} dBFS ), rms={analysis.Rms:F3} ( {analysis.RmsDb:F1} dBFS )");
-            }
-            catch (Exception ex)
-            {
-                ErrorMessageL($"Audio analysis failed: {ex.Message}");
-            }
+            AudioAnalysis(fullPath);
 
             string rel = RelativeFromFull(fullPath);
             string notesDisplay = string.Join(", ", chord.Notes.Select(n => n.GetName()));
@@ -551,10 +544,23 @@ namespace RecogniseChord.Pages
                 Type = typeKey,
                 Quality = qualityKey,
                 Root = rootLetter,
-                FileRelative = rel,                
+                FileRelative = rel,
                 NotesDisplay = notesDisplay,
-                NotesJson = notesJson,                
+                NotesJson = notesJson,
             };
+        }
+
+        private static void AudioAnalysis(string fullPath)
+        {
+            try
+            {
+                var analysis = Music.AudioDiagnostics.AnalyzeWav(fullPath);
+                MessageL(COLORS.cyan, $"Audio analysis: peak={analysis.Peak:F3} ( {analysis.PeakDb:F1} dBFS ), rms={analysis.Rms:F3} ( {analysis.RmsDb:F1} dBFS )");
+            }
+            catch (Exception ex)
+            {
+                ErrorMessageL($"Audio analysis failed: {ex.Message}");
+            }
         }
 
         private static string GetFullPath()

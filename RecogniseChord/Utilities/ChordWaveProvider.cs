@@ -97,7 +97,13 @@ namespace Music
             }
 
             _samplesRemaining = Math.Max(0, durationMs * sampleRate / 1000);
+
+            float loudness = CalculateLoudness();
+
+            Console.WriteLine($"RMS = {loudness} db");
+
         }
+
 
         public override int Read(float[] buffer, int offset, int count)
         {
@@ -168,20 +174,29 @@ namespace Music
 
         private static double WaveSample(double phase, TIMBRE timbre)
         {
-            switch (timbre)
+            double baseSample = timbre switch
             {
-                case TIMBRE.tri:
-                    // triangle from -1..1
-                    return 2.0 * Math.Asin(Math.Sin(phase)) / Math.PI;
-                case TIMBRE.saw:
-                    // naive saw: map phase 0..2π -> -1..1
-                    return 2.0 * (phase / (2.0 * Math.PI)) - 1.0;
-                case TIMBRE.square:
-                    return Math.Sin(phase) >= 0 ? 1.0 : -1.0;
-                default: // TIMBRE.sin
-                    return Math.Sin(phase);
-            }
+                TIMBRE.tri => 2.0 * Math.Asin(Math.Sin(phase)) / Math.PI,
+                TIMBRE.saw => 2.0 * (phase / (2.0 * Math.PI)) - 1.0,
+                TIMBRE.square => Math.Sin(phase) >= 0 ? 1.0 : -1.0,
+                _ => Math.Sin(phase),
+            };
+            double inputGain = GetTimbreInputGain(timbre);
+
+            return baseSample * inputGain;
         }
+
+        private static double GetTimbreInputGain(TIMBRE timbre)
+        {
+            return timbre switch
+            {
+                TIMBRE.square => 0.20,
+                TIMBRE.saw => 0.25,
+                TIMBRE.tri => 0.90,
+                _ => 1.0, // sin
+            };
+        }
+
 
         internal static string SaveWave(TIMBRE timbre, List<double> freqs, int activeMs, string fullPath)
         {
@@ -200,6 +215,138 @@ namespace Music
 
             Console.WriteLine($"WAV saved to {fullPath}");
             return fullPath;
+        }
+
+        private float CalculateLoudness()
+        {
+            // Estimate RMS (dBFS) of the generated chord given current settings.
+            // Calculation reflects current mixing implementation:
+            //  - per-waveform sample values are in [-1..1] (WaveSample)
+            //  - envelope multiplies per-sample amplitude (0..1)
+            //  - mixing sums tone samples, then multiplies by scale = 1.0 / N and fixed headroom 0.9
+            //
+            // Strategy:
+            //  - compute waveform RMS for selected TIMBRE
+            //  - numerically integrate envelope^2 over active + release seconds to get envelopeRms
+            //  - singleToneRms = waveformRms * envelopeRms
+            //  - combinedRms = singleToneRms * sqrt(N) * scale  (assuming uncorrelated phases)
+            //  - convert to dBFS: 20*log10(rms). If rms == 0 -> return very low dB.
+            if (_numTones <= 0) return -200f;
+
+            // waveform RMS for full-scale (-1..1) wave
+            double waveformRms = _timbre switch
+            {
+                TIMBRE.square => 1.0,
+                TIMBRE.tri => 1.0 / Math.Sqrt(3.0),
+                TIMBRE.saw => 1.0 / Math.Sqrt(3.0),
+                _ => 1.0 / Math.Sqrt(2.0) // sin
+            };
+
+            // active seconds derived from samplesRemaining at constructor time
+            double activeSeconds = (double)_samplesRemaining / _sampleRate;
+            double attack = Math.Max(0.0, _attack);
+            double decay = Math.Max(0.0, _decay);
+            double sustain = Math.Clamp(_sustain, 0.0f, 1.0f);
+            double release = Math.Max(0.0, _release);
+
+            // total time to integrate: active + release (release tail contributes to energy)
+            double totalSeconds = activeSeconds + release;
+            int totalSamples = Math.Max(1, (int)Math.Round(totalSeconds * _sampleRate));
+
+            // helper to compute envelope level at time t (seconds)
+            double LevelAt(double t)
+            {
+                if (t < 0) return 0.0;
+
+                // attack phase
+                if (attack > 0 && t < attack)
+                {
+                    return t / attack;
+                }
+                else if (attack == 0 && t < 0.0) // unreachable, keep for safety
+                {
+                    return 1.0;
+                }
+
+                double tAfterAttack = t - attack;
+                // decay phase
+                if (tAfterAttack >= 0 && decay > 0 && tAfterAttack < decay)
+                {
+                    double frac = tAfterAttack / decay;
+                    return 1.0 - frac * (1.0 - sustain);
+                }
+
+                // time within active (sustain) region
+                double activeEnd = activeSeconds;
+                if (t < activeEnd)
+                {
+                    // if activeEnds occurs during attack or decay, compute appropriate level
+                    double tActive = t;
+                    if (tActive <= attack)
+                    {
+                        return attack > 0 ? tActive / attack : 1.0;
+                    }
+                    else if (tActive <= attack + decay)
+                    {
+                        double td = tActive - attack;
+                        return decay > 0 ? 1.0 - (td / decay) * (1.0 - sustain) : sustain;
+                    }
+                    else
+                    {
+                        return sustain;
+                    }
+                }
+
+                // release phase (t >= activeEnd)
+                if (release <= 0) return 0.0;
+
+                // compute level at release start
+                double levelAtRelease;
+                if (activeSeconds <= attack)
+                {
+                    levelAtRelease = attack > 0 ? activeSeconds / attack : 1.0;
+                }
+                else if (activeSeconds <= attack + decay)
+                {
+                    double td = activeSeconds - attack;
+                    levelAtRelease = decay > 0 ? 1.0 - (td / decay) * (1.0 - sustain) : sustain;
+                }
+                else
+                {
+                    levelAtRelease = sustain;
+                }
+
+                double tRel = t - activeSeconds;
+                if (tRel >= release) return 0.0;
+                // simple linear release to zero
+                return levelAtRelease * (1.0 - (tRel / release));
+            }
+
+            // integrate envelope^2
+            double sumSq = 0.0;
+            for (int i = 0; i < totalSamples; i++)
+            {
+                double t = (double)i / _sampleRate;
+                double lev = LevelAt(t);
+                sumSq += lev * lev;
+            }
+            double envelopeRms = Math.Sqrt(sumSq / totalSamples);
+
+            // single tone RMS after envelope and waveform shape
+            double singleToneRms = waveformRms * envelopeRms;
+
+            // mixing: code uses scale = 1.0 / N and sums N tones.
+            // assuming uncorrelated phases, sum RMS scales by sqrt(N)
+            double scale = 1.0 / Math.Max(1, _numTones);
+            double combinedRms = singleToneRms * Math.Sqrt(_numTones) * scale;
+
+            // account for fixed headroom multiplier 0.9 used in writes
+            combinedRms *= 0.9;
+
+            if (combinedRms <= 0) return -200f;
+
+            double db = 20.0 * Math.Log10(combinedRms);
+            return (float)db;
         }
 
     }
