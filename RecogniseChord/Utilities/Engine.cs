@@ -701,7 +701,7 @@ namespace Music
             }
         }
 
-
+        // повертає різницю у півтонах між заданою ступінню і "до"
         public static int standartpitch_from_step(int step)
         {            
             try

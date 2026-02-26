@@ -551,9 +551,9 @@ namespace RecogniseChord.Pages
                 Type = typeKey,
                 Quality = qualityKey,
                 Root = rootLetter,
-                FileRelative = rel,
+                FileRelative = rel,                
                 NotesDisplay = notesDisplay,
-                NotesJson = notesJson
+                NotesJson = notesJson,                
             };
         }
 
@@ -726,7 +726,7 @@ namespace RecogniseChord.Pages
             public string Root { get; set; } = string.Empty;
             public string FileRelative { get; set; } = string.Empty;
             public string NotesDisplay { get; set; } = string.Empty;
-            public string NotesJson { get; set; } = string.Empty; // serialized notes + meta
+            public string NotesJson { get; set; } = string.Empty;
         }
 
         private ChordData RestoreChordData()
@@ -776,7 +776,7 @@ namespace RecogniseChord.Pages
             try
             {
                 var notesDisplay = cd.NotesDisplay;
-                string normalized = NotationHelpers.NormalizeNotesDisplay(notesDisplay, Notation.eu);
+                string normalized = NotationHelpers.NormalizeNotesDisplay(notesDisplay, Notation.us);
                 
                 MessageL(8, $"sent to chord: {normalized}");
                 return new ChordT(normalized);

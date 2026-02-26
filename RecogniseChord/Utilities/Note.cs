@@ -328,15 +328,14 @@ namespace Music
         public int GetAlter() { return pitch_to_alter(step, pitch); }
 
         public int AbsDuration() { return duration.AbsDuration(); }
+
         public int AbsPitch()
         {
             if (rest == true) return -1; 
             if (pitch - step > 10) return pitch + (oct - 2) * NotesInOctave; // для до-бемоля і іншої дубль-бемольної екзотики
             if (step - pitch > 5) return pitch + oct * NotesInOctave;
             else return pitch + (oct - 1) * NotesInOctave;
-        }
-
-        
+        }             
 
 
         public bool CheckIfFlatable()

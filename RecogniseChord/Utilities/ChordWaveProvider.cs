@@ -182,5 +182,25 @@ namespace Music
                     return Math.Sin(phase);
             }
         }
+
+        internal static string SaveWave(TIMBRE timbre, List<double> freqs, int activeMs, string fullPath)
+        {
+            var provider = new ChordWaveProvider(freqs, activeMs, timbre);
+
+            using (var writer = new WaveFileWriter(fullPath, provider.WaveFormat))
+            {
+                int bufferSamples = provider.WaveFormat.SampleRate / 10; //0.1s buffer
+                float[] buffer = new float[bufferSamples];
+                int samplesRead;
+                while ((samplesRead = provider.Read(buffer, 0, buffer.Length)) > 0)
+                {
+                    writer.WriteSamples(buffer, 0, samplesRead);
+                }
+            }
+
+            Console.WriteLine($"WAV saved to {fullPath}");
+            return fullPath;
+        }
+
     }
 }

@@ -2,6 +2,7 @@
 using static Music.ChordPermutation;
 using static Music.Engine;
 using static Music.Messages;
+using static Music.ChordWaveProvider;
 using System.Numerics;
 using System.Xml.Linq;
 using NAudio.Wave;
@@ -721,18 +722,18 @@ namespace Music
         public string SaveWave(string path, TIMBRE timbre = TIMBRE.sin, Duration duration = null)
         {
             MessageL(COLORS.olive, $"Saving chord to WAV...");
-            MessageL(COLORS.gray, $"timbre = {timbre}...");
+            MessageL(COLORS.gray, $"timbre = {timbre}, chord = {this}...");
 
             var freqs = new List<double>();
             int maxDur = 0;
             foreach (var n in Notes)
             {
+                
                 int ap = n.AbsPitch();
-                if (ap >= 0)
-                {
-                    freqs.Add(Pitch_to_hz(ap));
-                    maxDur = Math.Max(maxDur, n.AbsDuration());
-                }
+                Message(COLORS.gray, $"note {n.Name} oct = {n.Oct}  ap = {ap}\n");
+                freqs.Add(Pitch_to_hz(ap));
+                maxDur = Math.Max(maxDur, n.AbsDuration());
+
             }
 
             // Determine active duration from parameter, falling back to notes' max duration
@@ -742,28 +743,17 @@ namespace Music
             if (activeMs <= 0) activeMs = 200;
 
             //string fullPath = GetFullPath(Path);
-
-            return SaveWave(timbre, freqs, activeMs, path);
-        }
-
-        private static string SaveWave(TIMBRE timbre, List<double> freqs, int activeMs, string fullPath)
-        {
-            var provider = new ChordWaveProvider(freqs, activeMs, timbre);
-
-            using (var writer = new WaveFileWriter(fullPath, provider.WaveFormat))
+            Message(COLORS.gray, $"freqs = ");
+            freqs.ForEach(freq =>
             {
-                int bufferSamples = provider.WaveFormat.SampleRate / 10; //0.1s buffer
-                float[] buffer = new float[bufferSamples];
-                int samplesRead;
-                while ((samplesRead = provider.Read(buffer, 0, buffer.Length)) > 0)
-                {
-                    writer.WriteSamples(buffer, 0, samplesRead);
-                }
-            }
+                Message(COLORS.gray, $"{freq} ");
+            });
+            MessageL(COLORS.gray, $"");
 
-            MessageL(COLORS.olive, $"WAV saved to {fullPath}");
-            return fullPath;
+            return ChordWaveProvider.SaveWave(timbre, freqs, activeMs, path);
         }
+
+        
 
         
 
