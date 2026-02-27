@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	//ФОРМИ ТА ЕЛЕМЕНТИ
 
 	const selectform = document.getElementById('selectform'); 		// форма для вибору кількості звуків під час відповіді користувача
-	const maxsoundsform = document.getElementById('maxsoundsform');		// форма для вибору максимальної кількрості звуків 
+	const maxsoundsform = document.getElementById('maxsoundsform');		// форма для вибору максимальної кількості звуків 
 	const recogniseform = document.getElementById('recogniseform');		// форма для кнопки "Перевірити"
 
 	const timbreform = document.getElementById('timbreform')			// форма встановлення тембру
@@ -28,12 +28,12 @@ document.addEventListener('DOMContentLoaded', function () {
 	}
 
 	
-	const recognisebox = document.getElementById('recognisebox');					// box containing recogniseform
-	const recognisebutton = document.getElementById('recogniseButton');				// button to submit recogniseform
+	const recognisebox = document.getElementById('recognisebox');						// box containing recogniseform
+	const recognisebutton = document.getElementById('recogniseButton');					// button to submit recogniseform
 	const SelectedQuality = document.getElementById('SelectedQuality');
 	const SelectedTimbre = document.getElementById('SelectedTimbre');
 	const selectedType = document.getElementById('SelectedType');
-	const playBtn = document.getElementById('playBtn');								//play button
+	const playBtn = document.getElementById('playBtn');						//play button
 	
 	const resultBox = document.getElementById('resultBox');
 	const maxsoundsinput = document.getElementById('maxsoundsinput');
@@ -49,10 +49,24 @@ document.addEventListener('DOMContentLoaded', function () {
 	//=================================
 	// Відновлюємо збережені значення з sessionStorage
 	//=================================
-	// значення радіокнопок кількості звуків
-	const savedSoundCount = sessionStorage.getItem('selectedSoundCount');
-	const savedTimbre = sessionStorage.getItem('savedTimbre')
-	console.log('Restoring saved sound count from sessionStorage:', savedSoundCount);
+
+	const savedSoundCount = sessionStorage.getItem('selectedSoundCount');  // кількість звуків
+	console.log('Restoring session current sound count:', savedSoundCount);
+	const savedTimbre = sessionStorage.getItem('savedTimbre')				//тембр
+	console.log('restoring session timbre:', savedTimbre);
+	const savedQuality = sessionStorage.getItem('SelectedQuality');		// якість інтервалу
+	console.log('restoring session quality:', savedQuality);
+	const savedType = sessionStorage.getItem('selectedType');			// тип акорду
+	console.log('restoring session max sound count:', savedType);
+	const maxsounds = sessionStorage.getItem('maxSounds');				// макс. кількість звуків
+	console.log('restoring session max sound count:', maxsounds);
+
+
+	//====================================
+	// Застосовуємо відновлені значення
+	// ===================================
+	// поточна кількість звуків
+	
 	if (savedSoundCount) {
 		radiobuttons.forEach(radio => {
 			if (radio.value === savedSoundCount) {
@@ -61,39 +75,71 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 		});
 	}
-	if (savedTimbre) {
-		SelectedTimbre.value = savedTimbre;
-		console.log('Restored timbre:', savedTimbre.value);
-	}
-	else {
-		console.log('No saved sound count found in sessionStorage.');
+
+	//=========================
+	// значення обраного тембру
+	//=========================
+
+	if (SelectedTimbre) {
+		;
+		if (savedTimbre)
+			SelectedTimbre.value = savedTimbre;
+		else SelectedTimbre.value = 'sin';
 	}
 
+
+	// =====================================================
 	// значення прапорця приховування коробки розпізнавання
+	// ====================================================
 	const hidebox = sessionStorage.getItem('hidebox');
 	if (hidebox === 'true') {
 		if (recognisebox) {
 			recognisebox.style.display = 'none';
-			sessionStorage.removeItem('hidebox'); 			
+			sessionStorage.removeItem('hidebox'); 		
 		}
 	}
 
-	// restore saved selects
-	const savedQuality = sessionStorage.getItem('SelectedQuality');
+	// ============================
+	// значення якості і типу інтервалів
+	// ============================
 	if (savedQuality && SelectedQuality) SelectedQuality.value = savedQuality;
-	const savedType = sessionStorage.getItem('selectedType');
+
+
 	if (savedType && selectedType) selectedType.value = savedType;
-	const maxsounds = sessionStorage.getItem('maxSounds');
+
+	//=================================
+	//значення макс кількості звуків
+	//=================================
+	
 	if (maxsounds && maxsoundsform) {
 		maxsoundsform.value = maxsounds;
 		maxsoundsinput.value = maxsounds;
 	}
 	const hasCheckedRadio = Array.from(radiobuttons).some(btn => btn.checked);
 
-	//=================================
-	// КОРОБКА РОЗПІЗНАВАННЯ
+
+	//======================================
+	//Обробник переммикання тембрів
+	//=====================================
+	SelectedTimbre.addEventListener('change', (e) => {
+		if (!e.isTrusted) return;
+		if (!timbreform) {
+			console.warn('timbreform not found, cannot submit.');
+			return;
+		}
+		const newVal = (e.target && e.target.value) ? e.target.value : (SelectedTimbre.value || '');
+		console.debug(`timbre changed to ${newVal}`)
+		sessionStorage.setItem('savedTimbre', newVal);
+		// submit the timbre form so server can generate WAV with new timbre
+		timbreform.submit();
+	});
+
+
+
+	//==============================================
+	// КОРОБКА РОЗПІЗНАВАННЯ АКОРДІВ КОРИСТУВАЧЕМ
 	// за замовчуванням прихована, показується після вибору кількості звуків
-	//=================================
+	//==============================================
 	if (recognisebox) {
 		if (hasCheckedRadio) {
 			recognisebox.style.display = 'flex';
@@ -115,9 +161,9 @@ document.addEventListener('DOMContentLoaded', function () {
 			if (!e.isTrusted) return;
 			console.log('Recognise button clicked.');
 			
-			radiobuttons.forEach(btn => { 			
-				btn.checked = false; 				
-				console.log('reset radiobuttons'); 			
+			radiobuttons.forEach(btn => { 		
+				btn.checked = false; 			
+				console.log('reset radiobuttons'); 		
 			});
 
 			if (resultBox) {
@@ -200,10 +246,10 @@ document.addEventListener('DOMContentLoaded', function () {
 				const isImperfect = intervalImperfectKeys.some(k => k.toLowerCase() === valLower) || intervalImperfectUkr.includes(valLower);
 
 				if (isPerfect) {
-					setQualityOptions(['чиста'], true); 				
+					setQualityOptions(['чиста'], true); 			
 				}
 				else if (isImperfect) {
-					setQualityOptions(['велика', 'мала'], true); 				
+					setQualityOptions(['велика', 'мала'], true); 			
 				}
 			}
 		});
@@ -219,14 +265,15 @@ document.addEventListener('DOMContentLoaded', function () {
 				console.warn('timbreform not found, cannot submit.');
 				return;
 			}
-			console.debug(`timbre changed to ${e.value}`)
-			sessionStorage.setItem('savedTimbre', e.value)
+			const newVal = (e.target && e.target.value) ? e.target.value : (SelectedTimbre.value || '');
+			console.debug(`timbre changed to ${newVal}`)
+			sessionStorage.setItem('savedTimbre', newVal);
+			// submit the timbre form so server can generate WAV with new timbre
 			timbreform.submit();
 		});
 	}
-
-
 	
+
 	// =================================
 	// Обробник зміни select-елементів
 	// зберігає вибрані значення в sessionStorage
@@ -350,6 +397,19 @@ document.addEventListener('DOMContentLoaded', function () {
 		});
 	}
 
+	// expose helper to set timbre select from other scripts
+	window.setTimbreSelect = function(val) {
+		if (!val) return;
+		if (!SelectedTimbre) return;
+		let opt = Array.from(SelectedTimbre.options).find(o => o.value === val);
+		if (!opt) {
+			opt = new Option(val, val);
+			SelectedTimbre.add(opt);
+		}
+		SelectedTimbre.value = val;
+		sessionStorage.setItem('savedTimbre', val);
+	};
+
 });
 
 // Helper to log generated chord and file info
@@ -369,3 +429,4 @@ function logChord() {
 		// ignore logging errors
 	}
 }
+

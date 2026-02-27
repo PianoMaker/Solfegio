@@ -33,7 +33,7 @@ namespace RecogniseChord.Pages
 
         public string UserAnswer { get; set; } = string.Empty;
 
-        // Generated chord info (current one to play / guess)
+        // Generated rchord info (current one to play / guess)
         public string? GeneratedFileRelative { get; private set; }
         public int GeneratedCount { get; private set; }
         public string GeneratedType { get; private set; } = string.Empty; // internal key from generator
@@ -58,11 +58,11 @@ namespace RecogniseChord.Pages
         public List<string> QualityOptions { get; private set; } = new();
         public List<string> RootOptions { get; } = new() { "C", "D", "E", "F", "G", "A", "B" };
 
-        // Current chord object
+        // Current rchord object
         public ChordT currentChord = new();
         private const int highestpitch = 80;
 
-        // TempData key for the current chord
+        // TempData key for the current rchord
         private const string CurrentChordKey = "__currentChord";
 
         // Маппінг enum -> українська назва
@@ -152,13 +152,13 @@ namespace RecogniseChord.Pages
                 MessageL(7, $"MaxCo1unt set to {MaxCount}");
             }
 
-            MessageL(14, "Index OnGet: generating initial chord");
+            MessageL(14, "Index OnGet: generating initial rchord");
             var chordData = GenerateRandomChord();
             ApplyChordData(chordData); // show to user
-                                       // store current shown chord so recognise can validate
+                                       // store current shown rchord so recognise can validate
             TempData[CurrentChordKey] = JsonSerializer.Serialize(chordData);
 
-            // Prepare UI option lists for initial generated chord (display strings)
+            // Prepare UI option lists for initial generated rchord (display strings)
             PopulateTypesForGenerated();
             PopulateQualitiesForGenerated();
             SyncLegacyLists();
@@ -214,7 +214,7 @@ namespace RecogniseChord.Pages
         {
             MessageL(14, "Index OnPostPlay: processing user play request");
             ReadInfo();
-            // Play should use the current chord stored in TempData and must NOT generate a new chord
+            // Play should use the current rchord stored in TempData and must NOT generate a new rchord
             RestoreOrGenerateChord();
 
             PopulateTypesForGenerated();
@@ -229,7 +229,7 @@ namespace RecogniseChord.Pages
             if (data != null)
             {
                 ApplyChordData(data);
-                MessageL(COLORS.gray, $"Play chord notes: {data.NotesDisplay}");
+                MessageL(COLORS.gray, $"Play rchord notes: {data.NotesDisplay}");
             }
             else
             {
@@ -252,7 +252,7 @@ namespace RecogniseChord.Pages
                 _logger.LogWarning("SelectedCount is 0 in OnPostSelect");
             PopulateQualities(SelectedCount, SelectedType);
             SyncLegacyLists();
-            // restore current chord info from TempData so UI keeps the ability to play it
+            // restore current rchord info from TempData so UI keeps the ability to play it
             var restored = TryGetCurrentChord(keep: true);
             if (restored != null)
             {
@@ -304,12 +304,12 @@ namespace RecogniseChord.Pages
 
                 UserAnswer = string.Join(SelectedQuality + " " + SelectedChord);
 
-                // keep current chord in TempData while we display feedback
+                // keep current rchord in TempData while we display feedback
                 TempData.Keep(CurrentChordKey);
             }
             else
             {
-                // If no stored current chord, set feedback accordingly
+                // If no stored current rchord, set feedback accordingly
                 RecogniseOk = null;
                 RecogniseCorrect = "Немає збереженого акорду для перевірки.";
             }
@@ -389,12 +389,12 @@ namespace RecogniseChord.Pages
             var restored = TryGetCurrentChord(keep: true);
             if (restored == null)
             {
-                MessageL(4, "OnPostTimbre: no chord in TempData to restore");
+                MessageL(4, "OnPostTimbre: no rchord in TempData to restore");
                 return Page();
             }
 
             MessageL(8, "start restoring");
-            var chord = RestoreChord(restored);
+            var chord = RestoreChord(restored);            
             if (chord is null)
             {
                 MessageL(4, "OnPostTimbre: RestoreChord returned null");
@@ -410,7 +410,7 @@ namespace RecogniseChord.Pages
             MessageL(8, $"WAV saved to {rel}");
             AudioAnalysis(fullPath);
 
-            // Update stored chord metadata and TempData, then apply to page via ApplyChordData
+            // Update stored rchord metadata and TempData, then apply to page via ApplyChordData
             restored.FileRelative = rel;
             TempData[CurrentChordKey] = JsonSerializer.Serialize(restored);
 
@@ -498,7 +498,7 @@ namespace RecogniseChord.Pages
             }
             if (chord.GetHighestMidiNote() > highestpitch)
             {
-                MessageL(COLORS.gray, "Adjusting chord octave down to fit pitch limit");
+                MessageL(COLORS.gray, "Adjusting rchord octave down to fit pitch limit");
                 chord.OctDown();
             }
             else
@@ -516,8 +516,8 @@ namespace RecogniseChord.Pages
             string notesDisplay = string.Join(", ", chord.Notes.Select(n => n.GetName()));
             string pitchesdisplay = string.Join(", ", chord.Notes.Select(n => n.AbsPitch()));
 
-            // Log generated notes and chord type/quality
-            MessageL(COLORS.gray, $"Generated chord ({typeKey}/{qualityKey}) notes: {notesDisplay} pitches: {pitchesdisplay}");
+            // Log generated notes and rchord type/quality
+            MessageL(COLORS.gray, $"Generated rchord ({typeKey}/{qualityKey}) notes: {notesDisplay} pitches: {pitchesdisplay}");
 
             // Build JSON payload for client-side playback: { notes: [{frequency,duration}], type, quality, count, root, file }
             var noteObjects = chord.Notes.Select(n => new
@@ -538,6 +538,8 @@ namespace RecogniseChord.Pages
 
             string notesJson = JsonSerializer.Serialize(payload);
 
+            var absPitches = chord.Notes.Select(n => n.AbsPitch()).ToList();
+
             return new ChordData
             {
                 Count = count,
@@ -547,6 +549,7 @@ namespace RecogniseChord.Pages
                 FileRelative = rel,
                 NotesDisplay = notesDisplay,
                 NotesJson = notesJson,
+                AbsPitches = absPitches
             };
         }
 
@@ -621,7 +624,7 @@ namespace RecogniseChord.Pages
             return timbreEnum;
         }
 
-        // Apply generated chord data to properties for UI display
+        // Apply generated rchord data to properties for UI display
         private void ApplyChordData(ChordData data)
         {
             GeneratedCount = data.Count;
@@ -733,6 +736,7 @@ namespace RecogniseChord.Pages
             public string FileRelative { get; set; } = string.Empty;
             public string NotesDisplay { get; set; } = string.Empty;
             public string NotesJson { get; set; } = string.Empty;
+            public List<int> AbsPitches { get; set; } = new();
         }
 
         private ChordData RestoreChordData()
@@ -781,11 +785,32 @@ namespace RecogniseChord.Pages
             MessageL(8, $"start RestoreChord method");
             try
             {
-                var notesDisplay = cd.NotesDisplay;
-                string normalized = NotationHelpers.NormalizeNotesDisplay(notesDisplay, Notation.us);
-                
-                MessageL(8, $"sent to chord: {normalized}");
-                return new ChordT(normalized);
+                if (cd?.AbsPitches != null && cd.AbsPitches.Count > 0)
+                {
+                    var rchord = new ChordT();
+                    foreach (var ap in cd.AbsPitches)
+                    {
+                        var note = new Note(ap);
+                        rchord.AddNote(note);
+                    }
+
+                    try { rchord.OctUp(); } catch { /* ignore if ChordT doesn't support it */ }
+
+                    MessageL(8, $"Restored rchord from AbsPitches: {string.Join(',', cd.AbsPitches)}");
+                    return rchord;
+                }
+                else
+                {
+                    // Fallback:
+
+                    var notesDisplay = cd.NotesDisplay;
+                    string normalized = NotationHelpers.NormalizeNotesDisplay(notesDisplay, Notation.us);
+
+                    MessageL(8, $"sent to rchord: {normalized}");
+                    var chord = new ChordT(normalized);
+                    chord.OctUp();
+                    return chord;
+                }
             }
             catch (Exception ex)
             {

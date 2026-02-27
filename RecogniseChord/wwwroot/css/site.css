@@ -1,11 +1,10 @@
 :root {
     --margin-bottom: 10px;
     --header-height: 60px;
-    --header-color: #371d77;
+    --header-color: #a67c00;
     --footer-color: #c6b246;
     --correct-answer-color: #0d5a2b;
 }
-
 
 html {
     font-size: 14px;
