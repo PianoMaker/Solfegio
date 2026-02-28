@@ -244,14 +244,16 @@ namespace RecogniseChord.Pages
         {
             MessageL(14, "Index OnPostSelect: processing user selection change");
             ReadInfo();
-            if (Request.Form.TryGetValue(nameof(MaxCount), out var mc) && int.TryParse(mc, out int mcvalue))
-                MaxCount = Math.Clamp(mcvalue, 2, 5);
+            RestoreMaxCount();
+            RestoreTimbre();
 
             PopulateTypes(SelectedCount);
             if (SelectedCount == 0)
                 _logger.LogWarning("SelectedCount is 0 in OnPostSelect");
             PopulateQualities(SelectedCount, SelectedType);
             SyncLegacyLists();
+
+
             // restore current rchord info from TempData so UI keeps the ability to play it
             var restored = TryGetCurrentChord(keep: true);
             if (restored != null)
@@ -261,11 +263,14 @@ namespace RecogniseChord.Pages
             return Page();
         }
 
+
+
         // When user posts recognise, convert displayed strings back to internal keys before comparing
         public IActionResult OnPostRecognise()
         {
             MessageL(14, "Index OnPostRecognise: processing user recognise");
             ReadInfo();
+            RestoreTimbre();
             RequestCount++;
             ChordData actual = RestoreChordData();
 
@@ -362,7 +367,7 @@ namespace RecogniseChord.Pages
         {
             MessageL(14, $"Index OnPostMax: processing user max count change to {MaxCount}");
             ReadInfo();
-
+            RestoreTimbre();
             var chordData = GenerateRandomChord();
             ApplyChordData(chordData);
             TempData[CurrentChordKey] = JsonSerializer.Serialize(chordData);
@@ -779,7 +784,24 @@ namespace RecogniseChord.Pages
             return null;
         }
 
+        private void RestoreMaxCount()
+        {
+            if (Request.Form.TryGetValue(nameof(MaxCount), out var mc) && int.TryParse(mc, out int mcvalue))
+                MaxCount = Math.Clamp(mcvalue, 2, 5);
+        }
 
+        private void RestoreTimbre()
+        {
+            if (Request.Form.TryGetValue(nameof(Timbre), out var timbre) && !string.IsNullOrEmpty(timbre))
+            {
+                Timbre = timbre;
+                MessageL(8, $"restore timbre {timbre}");
+            }
+            else
+            {
+                MessageL(8, "impossible to restore timbre");
+            }
+        }
         private ChordT RestoreChord(ChordData cd)
         {
             MessageL(8, $"start RestoreChord method");

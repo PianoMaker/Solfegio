@@ -28,8 +28,8 @@ document.addEventListener('DOMContentLoaded', function () {
 	}
 
 	
-	const recognisebox = document.getElementById('recognisebox');						// box containing recogniseform
-	const recognisebutton = document.getElementById('recogniseButton');					// button to submit recogniseform
+	const recognisebox = document.getElementById('recognisebox');			// поле для вгадування
+	const recognisebutton = document.getElementById('recogniseButton');		// кнопка ""
 	const SelectedQuality = document.getElementById('SelectedQuality');
 	const SelectedTimbre = document.getElementById('SelectedTimbre');
 	const selectedType = document.getElementById('SelectedType');
@@ -172,7 +172,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 
 			if (recognisebox) {
-				recognisebox.style.display = 'none';
+				recognisebox.style.display = 'hidden';
 				console.log('hide recognise box');
 			}
 
@@ -310,6 +310,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			logChord();
 			if (resultBox) {
 				resultBox.style.display = 'none';
+				recognisebox.style.display = 'flex';
 				console.log('Result box hidden on play button click.');
 			}
 
