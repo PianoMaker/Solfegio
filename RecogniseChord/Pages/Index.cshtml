@@ -7,10 +7,10 @@
 <div class="text-center">
     <h1 class="display-4">@Localizer["ChordsIntervals"]</h1>
     
-    <div class="innercontainer">
+    <div id="mainbox" class="innercontainer">
         <!--КОНТЕЙНЕР ЛІВОРУЧ (ВГОРІ)-->
         <div id="rightcontainer" class="halfcontainer">    
-            <p class="full-row">Акорд згенеровано! Спробуєш вгадати?</p>
+            <p class="full-row">Спробувати новий акорд?</p>
             <form id="playform" class="full-row" method="post" asp-page-handler="Play">
                 <button id="playBtn" type="button">Відтворити</button>
             </form>
@@ -68,6 +68,7 @@
             <div id="resultBox">
                 @if (Model.RecogniseOk is not null)
                 {
+
                     @if (Model.RecogniseOk == true)
                     {
                         <div class="answer-correct">
@@ -87,10 +88,10 @@
                 }
                 else
                 {
-                    <p>Виберіть параметри акорду та натисніть "Перевірити"</p>
+                    <p id="choosemessage">Виберіть параметри акорду та натисніть "Перевірити"</p>
                 }
             </div>
-            
+
         </div>
         <p> @Model.RequestCount спроб на сайті</p>
     </div>

@@ -12,6 +12,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
 	let radiobuttons = document.querySelectorAll('input[name="SelectedCount"]');
 
+	const choosemessage = document.getElementById('choosemessage')		// надпис "виберіть параметри"
+
 	if (!radiobuttons || radiobuttons.length === 0) {
 		const fallbackIds = ['sound2', 'sound3', 'sound4', 'sound5'];
 		const list = [];
@@ -293,10 +295,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			// do not submit the form here; user must click "Розпізнати"
 		}
 	});
-
-
 	
-
 
 	// =================================
 	// ОБРОБНИК КНОПКИ ВІДТВОРЕННЯ
@@ -308,10 +307,20 @@ document.addEventListener('DOMContentLoaded', function () {
 			const resultBox = document.getElementById('resultBox');
 			console.log('Play button clicked.');
 			logChord();
+
 			if (resultBox) {
-				resultBox.style.display = 'none';
-				recognisebox.style.display = 'flex';
+				resultBox.style.display = 'none';			
 				console.log('Result box hidden on play button click.');
+			}
+			
+			const choosemessage = document.getElementById('choosemessage');
+			if (choosemessage) {
+				choosemessage.style.display = 'block';
+			}
+
+			if (recognisebox) {
+				recognisebox.style.display = 'flex';
+				console.log('Recognisebox shown on play button click.');
 			}
 
 			try {

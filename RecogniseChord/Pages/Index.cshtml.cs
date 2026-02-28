@@ -368,6 +368,8 @@ namespace RecogniseChord.Pages
             MessageL(14, $"Index OnPostMax: processing user max count change to {MaxCount}");
             ReadInfo();
             RestoreTimbre();
+            TempData[MaxCountTempKey] = MaxCount.ToString();
+
             var chordData = GenerateRandomChord();
             ApplyChordData(chordData);
             TempData[CurrentChordKey] = JsonSerializer.Serialize(chordData);
@@ -428,7 +430,7 @@ namespace RecogniseChord.Pages
         private ChordData GenerateRandomChord()
         {
             var rnd = new Random();
-            int count = rnd.Next(2, MaxCount); //кількість звуків (2..5)
+            int count = rnd.Next(2, MaxCount + 1); //кількість звуків (2..5)
             string typeKey = string.Empty;
             string qualityKey = string.Empty;
             string rootLetter = RootOptions[rnd.Next(RootOptions.Count)];
@@ -499,7 +501,8 @@ namespace RecogniseChord.Pages
                 qualityKey = ninthQualities.Length > 0 ? ninthQualities[rnd.Next(ninthQualities.Length)] : string.Empty;
                 if (!string.IsNullOrEmpty(qualityKey) && Enum.TryParse<NINTHS>(qualityKey, out var nq))
                     chord.NinthChord(root, nq);
-                ApplyNinthInversion(chord, typeKey);
+                // ІНВЕРСІЇ НОНАКОРДІВ
+                //ApplyNinthInversion(chord, typeKey);
             }
             if (chord.GetHighestMidiNote() > highestpitch)
             {
