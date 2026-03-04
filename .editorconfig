@@ -1,0 +1,26 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = crlf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.cs]
+indent_style = space
+indent_size = 4
+dotnet_sort_system_directives_first = true
+
+[*.cshtml]
+indent_style = space
+indent_size = 4
+charset = utf-8
+
+[*.resx]
+charset = utf-8
+
+[*.json]
+charset = utf-8
+
+[*.xml]
+charset = utf-8
