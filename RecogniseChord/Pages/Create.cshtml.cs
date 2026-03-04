@@ -144,8 +144,18 @@ namespace RecogniseChord.Pages
                     var chord = BuildChord();
                     if (chord != null)
                     {
-                        string path = GetFullPath();                        
-                        MessageL(14, $"Generated chord saved to: {path}");
+                        // compute filesystem path and ensure directory exists
+                        string fullPath = GetFullPath();
+
+                        // build sequence (frequency, durationMs) from chord notes
+                        chord.SaveWave(fullPath);
+
+                        // set web-relative path for client JS (relative to wwwroot)
+                        var wwwroot = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+                        var relative = Path.GetRelativePath(wwwroot, fullPath).Replace('\\', '/');
+                        GeneratedFileRelative = relative;
+
+                        MessageL(14, $"Generated chord saved to: {fullPath} (relative: {GeneratedFileRelative})");
                     }
                 }
             }
