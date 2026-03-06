@@ -8,11 +8,16 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Сольфеджіо - перевірте слух та побудуйте акорди онлайн.">
+    <link rel="canonical" href="https://solfegio.azurewebsites.net@(Context.Request.Path)" />
+    <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml" />
     <title>@ViewData["Title"] - @appName</title>
 
     <!-- Bootstrap & site css (adjust paths if you don't use libman/npm) -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
+
+
 </head>
 <body>
     <header>
@@ -49,6 +54,21 @@
             </div>
         </nav>
     </header>
+
+    <!-- Schema.org JSON-LD -->
+    <script type="application/ld+json">
+        {
+          "@@context": "https://schema.org",
+          "@@type": "WebSite",
+          "url": "https://solfegio.azurewebsites.net/",
+          "name": "Solfegio",
+          "potentialAction": {
+            "@@type": "SearchAction",
+            "target": "https://solfegio.azurewebsites.net/?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
+        }
+    </script>
 
     <div class="container-fluid">
         <main role="main" class="main">
