@@ -223,33 +223,24 @@ namespace Music
             };
         }
 
+        internal static void SampleWave(TIMBRE timbre, List<double> freqs, int activeMs, string fullPath, string sampleroot)
+        {
+            SamplePiano sampleplayer = new SamplePiano(sampleroot);
+
+            if (sampleplayer.TryRenderChordToWav(freqs, activeMs, fullPath))
+            {
+                Console.WriteLine($"WAV (sample-based piano) saved to {fullPath}");
+            }
+            else
+            {
+                Console.WriteLine($"WAV saveing failed");
+            }
+        }
+
 
         internal static string SaveWave(TIMBRE timbre, List<double> freqs, int activeMs, string fullPath)
-        {
-            // If piano, try sample-based rendering
-            if (timbre == TIMBRE.piano)
-            {
-                try
-                {
-                    // ensure loader knows webroot path (Program.cs will set it)
-                    // RemoteSamplePiano.EnsureBaseSampleLoaded(WebRootPath) should be called once at startup;
-                    RemoteSamplePiano rsp = new RemoteSamplePiano();
+        {           
 
-
-                    if (rsp.TryRenderChordToWav(freqs, activeMs, fullPath))
-                    {
-                        Console.WriteLine($"WAV (sample-based piano) saved to {fullPath}");
-                        return fullPath;
-                    }
-                    Console.WriteLine("Sample-based rendering failed, falling back to synth.");
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Sample-based rendering exception: {ex.Message}. Falling back to synth.");
-                }
-            }
-
-            // Fallback: existing synth-based rendering
             var provider = new ChordWaveProvider(freqs, activeMs, timbre);
             if (timbre == TIMBRE.piano)
             {

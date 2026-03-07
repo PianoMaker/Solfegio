@@ -1,4 +1,4 @@
-﻿using Music;
+using Music;
 using static Music.ChordPermutation;
 using static Music.Engine;
 using static Music.Messages;
@@ -107,6 +107,17 @@ namespace Music
         public new int Octaves()
         { return Range() / 12; }
 
+
+        public void SetDuration(Duration dur)
+        {            
+            Notes.ForEach(note => { note.Duration = dur; });
+        }
+
+        public void SetDuration(DURATION dur)
+        {
+            Duration duration = new Duration(dur);
+            Notes.ForEach(note => { note.Duration = duration; });
+        }
 
         public List<Chord> PermuteList(int octave = 0) // генерування усіх можливих розташувань
         {
@@ -586,7 +597,9 @@ namespace Music
             return chord;
         }
 
+        // =======================================================================
         // Overload: create chord from root, chord type and exact number of voices
+        // =======================================================================
         public static Chord CreateRandomFrom(Note root, CHORDS chordType, int voices, Random? rnd = null, bool randomVoicing = true)
         {
             rnd ??= new Random();
@@ -682,7 +695,9 @@ namespace Music
             return chord;
         }
 
+        // =======================================================================
         // Play chord: sound all notes simultaneously. Duration chosen as max of notes' durations.
+        // =======================================================================
         public void Play()
         {
             // collect frequencies for notes that are not rests
@@ -717,46 +732,77 @@ namespace Music
             waveOut.Stop();
         }
 
-        // Save chord to WAV file with optional explicit musical duration (Duration).
-        // Files named sequentially: example1.wav, example2.wav, ...
-        public string SaveWave(string path, TIMBRE timbre = TIMBRE.sin, Duration duration = null)
+        // =======================================================================
+        // Save chord to WAV file through synth with optional explicit musical duration (Duration).
+        // =======================================================================
+
+        public void SaveWave(string path, TIMBRE timbre = TIMBRE.sin, Duration duration = null)
         {
             MessageL(COLORS.olive, $"Saving chord to WAV...");
             MessageL(COLORS.gray, $"timbre = {timbre}, chord = {this}...");
 
-            var freqs = new List<double>();
-            int maxDur = 0;
-            foreach (var n in Notes)
-            {
-                
-                int ap = n.AbsPitch();
-                Message(COLORS.gray, $"note {n.Name} oct = {n.Oct}  ap = {ap}\n");
-                freqs.Add(Pitch_to_hz(ap));
-                maxDur = Math.Max(maxDur, n.AbsDuration());
+            List<double> freqs;
+            int activeMs;
+            GetFeqs(out freqs, out activeMs);
 
-            }
+            LogInfo(freqs);
 
-            // Determine active duration from parameter, falling back to notes' max duration
-            int activeMs = duration != null ? duration.AbsDuration() : maxDur;
-            const int MaxMs = 5000;
-            if (activeMs > MaxMs) activeMs = MaxMs;
-            if (activeMs <= 0) activeMs = 200;
+            ChordWaveProvider.SaveWave(timbre, freqs, activeMs, path);
+        }
 
-            //string fullPath = GetFullPath(Path);
+        // =======================================================================
+        // Save chord to WAV file through sampling with optional explicit musical duration (Duration).
+        // =======================================================================
+        public void SaveSampleWave(string path, string samplepath, TIMBRE timbre = TIMBRE.piano)
+        {
+            MessageL(COLORS.olive, $"Saving chord through sample {samplepath}...");
+            var sp = new SamplePiano(samplepath);
+            List<double> freqs;
+            int activeMs;
+            GetFeqs(out freqs, out activeMs);
+            if (sp.TryRenderChordToWav(freqs, activeMs, path))
+                return;
+            else
+                SaveWave(path, timbre);
+            
+        }
+
+
+        // =======
+        // HELPERS
+        // =======
+
+        private static void LogInfo(List<double> freqs)
+        {
             Message(COLORS.gray, $"freqs = ");
             freqs.ForEach(freq =>
             {
                 Message(COLORS.gray, $"{freq} ");
             });
             MessageL(COLORS.gray, $"");
-
-            return ChordWaveProvider.SaveWave(timbre, freqs, activeMs, path);
         }
 
-        
 
-        
+        private void GetFeqs(out List<double> freqs, out int activeMs)
+        {
+            freqs = new List<double>();
+            int maxDur = 0;
+            foreach (var n in Notes)
+            {
 
-       
+                int ap = n.AbsPitch();
+                Message(COLORS.gray, $"note {n.Name} oct = {n.Oct}  ap = {ap} dur = {n.AbsDuration().ToString()}ms \n");
+                freqs.Add(Pitch_to_hz(ap));
+                maxDur = Math.Max(maxDur, n.AbsDuration());
+            }
+
+            activeMs = Math.Clamp(maxDur, 100, 5000);
+            MessageL(8, $"dur = {activeMs} ms");
+            
+        }
+
+
+
+
     }
 }

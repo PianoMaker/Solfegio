@@ -135,16 +135,28 @@ namespace RecogniseChord.Pages
         public IWebHostEnvironment _environment;
         public string FilePath => Path.Combine(_environment.WebRootPath, "info", "info.txt");
 
+        public string SoundDir => Path.Combine(_environment.WebRootPath, "sound");
+
+        public string SamplePath => Path.Combine(_environment.WebRootPath, "samplesound", "a4sample.wav");
+
+        public bool SamplePathExist => System.IO.File.Exists(SamplePath);
+
         public IndexModel(ILogger<IndexModel> logger, IWebHostEnvironment environment)
         { 
             _logger = logger; 
             _environment = environment;
+            Console.WriteLine($"index constructor environment = {environment}");
         
         }
 
         public void OnGet()
         {
-            ReadInfo();            
+            ReadInfo();
+            if (SamplePathExist)
+                MessageL(COLORS.green, $"sample {SamplePath} is OK!"); 
+            else
+                MessageL(COLORS.red, $"sample {SamplePath} is missing!");
+
 
             if (TempData.Peek(MaxCountTempKey) is string maxVal && int.TryParse(maxVal, out var mc))
             {
@@ -177,20 +189,19 @@ namespace RecogniseChord.Pages
         {
             try
             {
-                // sound directory under the app root
-                var soundDir = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "wwwroot", "sound");
-                if (!System.IO.Directory.Exists(soundDir))
+                // sound directory under the app root                
+                if (!System.IO.Directory.Exists(SoundDir))
                 {
-                    MessageL(COLORS.gray, $"CleanOldFiles: directory not found: {soundDir}");
+                    MessageL(COLORS.gray, $"CleanOldFiles: directory not found: {SoundDir}");
                     return;
                 }
 
                 var threshold = DateTime.UtcNow.AddHours(-1);
 
-                foreach (var file in System.IO.Directory.EnumerateFiles(soundDir))
+                foreach (var file in System.IO.Directory.EnumerateFiles(SoundDir))
                 {
                     try
-                    {
+                    {                        
                         var lastWriteUtc = System.IO.File.GetLastWriteTimeUtc(file);
                         if (lastWriteUtc < threshold)
                         {
@@ -385,7 +396,7 @@ namespace RecogniseChord.Pages
 
         public IActionResult OnPostTimbre()
         {
-            MessageL(14, $"Index OnPostTimbre: set to {Timbre}");
+            MessageL(14, $"Index OnPostTimbre: set to {Timbre}, sample exist {SamplePathExist}");
             ReadInfo();
 
             // Refresh UI lists
@@ -409,10 +420,15 @@ namespace RecogniseChord.Pages
             }
 
             // Save WAV using selected timbre and update stored metadata
-            TIMBRE timbreEnum = GetTimbre();
-            MessageL(8, $"save wave with timbre {timbreEnum}");
+            TIMBRE timbre = GetTimbre();
+            MessageL(8, $"save wave with timbre {timbre}");
             string fullPath = GetFullPath();
-            chord.SaveWave(fullPath, timbreEnum);
+
+            
+            if (timbre == TIMBRE.piano && SamplePathExist)                            
+                chord.SaveSampleWave(fullPath, SamplePath);            
+            else
+                chord.SaveWave(fullPath, timbre);
             string rel = RelativeFromFull(fullPath);            
             MessageL(8, $"WAV saved to {rel}");
             AudioAnalysis(fullPath);
@@ -435,7 +451,8 @@ namespace RecogniseChord.Pages
             string qualityKey = string.Empty;
             string rootLetter = RootOptions[rnd.Next(RootOptions.Count)];
             Note root = new(GetNoteByLetter(rootLetter), ALTER.NATURAL, 1);
-            var chord = new ChordT();
+            var chord = new ChordT();            
+
 
             if (count == 2)
             {
@@ -514,10 +531,14 @@ namespace RecogniseChord.Pages
                 MessageL(COLORS.gray, $"no changes, highest = {chord.GetHighestMidiNote()}");
 
             }
-            TIMBRE timbreEnum = GetTimbre();
-            string fullPath = GetFullPath();
 
-            chord.SaveWave(fullPath, timbreEnum);
+            chord.SetDuration(DURATION.whole);
+            TIMBRE timbre = GetTimbre();
+            string fullPath = GetFullPath();
+            if (timbre == TIMBRE.piano && SamplePathExist)
+                chord.SaveSampleWave(fullPath, SamplePath);
+            else
+                chord.SaveWave(fullPath, timbre);
             AudioAnalysis(fullPath);
 
             string rel = RelativeFromFull(fullPath);
@@ -574,16 +595,16 @@ namespace RecogniseChord.Pages
             }
         }
 
-        private static string GetFullPath()
+
+        private string GetFullPath()
         {
-            string directory = Path.Combine("wwwroot", "sound");
-            Directory.CreateDirectory(directory);
+            Directory.CreateDirectory(SoundDir);
 
             // find next sequential filename exampleN.wav
-            int nextIndex = GetNextIndex(directory);
+            int nextIndex = GetNextIndex(SoundDir);
 
             string filename = $"example{nextIndex}.wav";
-            string fullPath = System.IO.Path.Combine(directory, filename);
+            string fullPath = System.IO.Path.Combine(SoundDir, filename);
             return fullPath;
         }
 
@@ -820,6 +841,7 @@ namespace RecogniseChord.Pages
                     }
 
                     try { rchord.OctUp(); } catch { /* ignore if ChordT doesn't support it */ }
+                    rchord.SetDuration(DURATION.whole);
 
                     MessageL(8, $"Restored rchord from AbsPitches: {string.Join(',', cd.AbsPitches)}");
                     return rchord;
