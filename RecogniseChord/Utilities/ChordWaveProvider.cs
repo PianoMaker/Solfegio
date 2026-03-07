@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using NAudio.Wave;
 using NAudio.Dsp;
@@ -176,14 +176,39 @@ namespace Music
         {
             double baseSample = timbre switch
             {
+                TIMBRE.square => Math.Sin(phase) >= 0 ? 1.0 : -1.0,
                 TIMBRE.tri => 2.0 * Math.Asin(Math.Sin(phase)) / Math.PI,
                 TIMBRE.saw => 2.0 * (phase / (2.0 * Math.PI)) - 1.0,
-                TIMBRE.square => Math.Sin(phase) >= 0 ? 1.0 : -1.0,
+                TIMBRE.piano => PianoHarmonic(phase),
                 _ => Math.Sin(phase),
             };
             double inputGain = GetTimbreInputGain(timbre);
 
             return baseSample * inputGain;
+        }
+
+        // synthesized piano-like harmonic content (simple approximation)
+        private static double PianoHarmonic(double phase)
+        {
+            // harmonic weights roughly emulate a piano's initial partial strengths
+            double[] weights = { 1.00, 0.45, 0.25, 0.12, 0.06, 0.03, 0.015 };
+            // smaller detune values to reduce beating/brightness
+            double[] detune = { 0.0, 0.0003, -0.0005, 0.0006, -0.0007, 0.0004, -0.0002 };
+            double sum = 0.0;
+            double wsum = 0.0;
+            for (int h = 0; h < weights.Length; h++)
+            {
+                double w = weights[h];
+                double freqPhase = phase * (h + 1) * (1.0 + detune[h]);
+                sum += w * Math.Sin(freqPhase);
+                wsum += w;
+            }
+            if (wsum == 0) return 0.0;
+            // apply a mild non-linear shaping to add piano-like brightness
+            double normalized = sum / wsum;
+            // soft clipping / brightness
+            double shaped = Math.Sign(normalized) * (1.0 - Math.Exp(-Math.Abs(normalized) * 1.8));
+            return shaped;
         }
 
         private static double GetTimbreInputGain(TIMBRE timbre)
@@ -193,6 +218,7 @@ namespace Music
                 TIMBRE.square => 0.20,
                 TIMBRE.saw => 0.25,
                 TIMBRE.tri => 0.90,
+                TIMBRE.piano => 0.85,
                 _ => 1.0, // sin
             };
         }
@@ -200,11 +226,42 @@ namespace Music
 
         internal static string SaveWave(TIMBRE timbre, List<double> freqs, int activeMs, string fullPath)
         {
+            // If piano, try sample-based rendering
+            if (timbre == TIMBRE.piano)
+            {
+                try
+                {
+                    // ensure loader knows webroot path (Program.cs will set it)
+                    // RemoteSamplePiano.EnsureBaseSampleLoaded(WebRootPath) should be called once at startup;
+                    RemoteSamplePiano rsp = new RemoteSamplePiano();
+
+
+                    if (rsp.TryRenderChordToWav(freqs, activeMs, fullPath))
+                    {
+                        Console.WriteLine($"WAV (sample-based piano) saved to {fullPath}");
+                        return fullPath;
+                    }
+                    Console.WriteLine("Sample-based rendering failed, falling back to synth.");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Sample-based rendering exception: {ex.Message}. Falling back to synth.");
+                }
+            }
+
+            // Fallback: existing synth-based rendering
             var provider = new ChordWaveProvider(freqs, activeMs, timbre);
+            if (timbre == TIMBRE.piano)
+            {
+                provider.AttackSeconds = 0.003f;
+                provider.DecaySeconds = 0.12f;
+                provider.SustainLevel = 0.25f;
+                provider.ReleaseSeconds = 0.45f;
+            }
 
             using (var writer = new WaveFileWriter(fullPath, provider.WaveFormat))
             {
-                int bufferSamples = provider.WaveFormat.SampleRate / 10; //0.1s buffer
+                int bufferSamples = provider.WaveFormat.SampleRate / 10;
                 float[] buffer = new float[bufferSamples];
                 int samplesRead;
                 while ((samplesRead = provider.Read(buffer, 0, buffer.Length)) > 0)
@@ -239,6 +296,7 @@ namespace Music
                 TIMBRE.square => 1.0,
                 TIMBRE.tri => 1.0 / Math.Sqrt(3.0),
                 TIMBRE.saw => 1.0 / Math.Sqrt(3.0),
+                TIMBRE.piano => 0.6, // approximate for synthesized harmonic blend
                 _ => 1.0 / Math.Sqrt(2.0) // sin
             };
 
