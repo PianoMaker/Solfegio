@@ -78,7 +78,7 @@
                     @{
                         var displayCount = Model.SelectedCount;
                     }
-                    <select asp-for="SelectedQuality" class="select-quality" onchange="document.getElementById('qualityForm')?.submit();">
+                    <select asp-for="SelectedQuality" class="select-chord" onchange="document.getElementById('qualityForm')?.submit();">
                         <option value="">--</option>
                         @foreach (var q in Model.QualityOptions)
                         {
@@ -116,7 +116,7 @@
                 <form id="timbreform" method="post" asp-page-handler="timbre">
                     <p>Обрати тембр: </p>
                     <div style="display:block; margin:5px">
-                        <select asp-for="Timbre" id="SelectedTimbre">
+                        <select asp-for="Timbre" id="SelectedTimbre" class="select-chord">
                             @foreach (var timbre in Model.AllTimbres)
                             {
                                 <option value="@timbre" selected="@(Model.Timbre == timbre)">@timbre</option>
@@ -136,7 +136,7 @@
         <div id="leftcontainer" class="halfcontainer">
             @if (Model.CanPlay)
             {
-                <p>Файл створено: <code>@Model.GeneratedFileRelative</code></p>
+                <!--<p>Файл створено: <code>@Model.GeneratedFileRelative</code></p>-->
                 <p>Акорд: @Model.SelectedType @Model.SelectedQuality (@Model.RootNote)</p>
             }
         </div>
