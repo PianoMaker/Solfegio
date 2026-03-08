@@ -430,12 +430,12 @@ namespace RecogniseChord.Pages
                 chord.SaveSampleWave(fullPath, SamplePath);            
             else
                 chord.SaveWave(fullPath, timbre);
-            string rel = RelativeFromFull(fullPath);            
-            MessageL(8, $"WAV saved to {rel}");
+            //string rel = RelativeFromFull(fullPath);            
+            //MessageL(8, $"WAV saved to {rel}");
             AudioAnalysis(fullPath);
 
             // Update stored rchord metadata and TempData, then apply to page via ApplyChordData
-            restored.FileRelative = rel;
+            restored.FileRelative = fullPath;
             TempData[CurrentChordKey] = JsonSerializer.Serialize(restored);
 
             // Use ApplyChordData to set Generated* properties consistently
