@@ -670,12 +670,8 @@ namespace RecogniseChord.Pages
 
         private string RelativeFromFull(string path)
         {
-            var idx = path.IndexOf("wwwroot", StringComparison.OrdinalIgnoreCase);
-            if (idx >= 0)
-            {
-                return "/" + path.Substring(idx + 7).TrimStart('/', '\\').Replace('\\', '/');
-            }
-            return string.Empty;
+            var relative = Path.GetRelativePath(_environment.WebRootPath, path);
+            return "/" + relative.Replace('\\', '/');
         }
 
         private void PopulateTypes(int count)
