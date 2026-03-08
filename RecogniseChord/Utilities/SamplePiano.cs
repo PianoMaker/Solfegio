@@ -1,9 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Net.Http;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Hosting;
 using NAudio.Wave;
 using RecogniseChord.Pages;
 
@@ -16,11 +10,6 @@ namespace Music
     /// </summary>
     public class SamplePiano
     {
-
-        private readonly IWebHostEnvironment _environment;
-        private readonly ILogger<IndexModel> _logger;
-
-
         // Configurable path or URL (webroot-relative by default)
         public string BaseSamplePath { get; set; } 
 
@@ -91,7 +80,7 @@ namespace Music
             int outSamples = Math.Max(1, (int)Math.Round(outSampleRate * (durationMs / 1000.0)));
             var outBuf = new float[outSamples];
 
-            double inputIndexScale = (_baseSampleRate / (double)outSampleRate) / ratio;
+            double inputIndexScale = 1 / ratio;
             int inputLen = _baseSamples.Length;
 
             for (int i = 0; i < outSamples; i++)
@@ -132,11 +121,13 @@ namespace Music
 
                 foreach (var f in freqs)
                 {
+                    Console.Write(f  + " ");
                     if (f <= 0) continue;
                     var buf = GetResampledNote(f, activeMs + 50, sampleRate);
                     int len = Math.Min(buf.Length, mix.Length);
                     for (int i = 0; i < len; i++) mix[i] += buf[i];
                 }
+                Console.WriteLine();
 
                 // normalize with headroom
                 float max = 0f;

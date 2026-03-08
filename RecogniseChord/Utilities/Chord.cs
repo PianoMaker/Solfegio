@@ -738,7 +738,7 @@ namespace Music
 
         public void SaveWave(string path, TIMBRE timbre = TIMBRE.sin, Duration duration = null)
         {
-            MessageL(COLORS.olive, $"Saving chord to WAV...");
+            MessageL(COLORS.olive, $"Saving chord WAV to {path}...");
             MessageL(COLORS.gray, $"timbre = {timbre}, chord = {this}...");
 
             List<double> freqs;
@@ -755,7 +755,7 @@ namespace Music
         // =======================================================================
         public void SaveSampleWave(string path, string samplepath, TIMBRE timbre = TIMBRE.piano)
         {
-            MessageL(COLORS.olive, $"Saving chord through sample {samplepath}...");
+            MessageL(COLORS.olive, $"Saving chord through sample to {path}...");
             var sp = new SamplePiano(samplepath);
             List<double> freqs;
             int activeMs;
