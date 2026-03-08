@@ -430,8 +430,8 @@ namespace RecogniseChord.Pages
                 chord.SaveSampleWave(fullPath, SamplePath);            
             else
                 chord.SaveWave(fullPath, timbre);
-            //string rel = RelativeFromFull(fullPath);            
-            //MessageL(8, $"WAV saved to {rel}");
+            string rel = RelativeFromFull(fullPath);            
+            MessageL(8, $"WAV saved to {rel}");
             AudioAnalysis(fullPath);
 
             // Update stored rchord metadata and TempData, then apply to page via ApplyChordData
@@ -667,14 +667,19 @@ namespace RecogniseChord.Pages
             currentChord = new ChordT();
         }
 
-        private string RelativeFromFull(string path)
+        private string RelativeFromFull(string fullPath)
         {
-            var idx = path.IndexOf("wwwroot", StringComparison.OrdinalIgnoreCase);
-            if (idx >= 0)
-            {
-                return "/" + path.Substring(idx + 7).TrimStart('/', '\\').Replace('\\', '/');
-            }
-            return string.Empty;
+            if (string.IsNullOrEmpty(fullPath) || !_environment.WebRootPath.EndsWith(Path.DirectorySeparatorChar))
+                return string.Empty;
+
+            if (!fullPath.StartsWith(_environment.WebRootPath, StringComparison.OrdinalIgnoreCase))
+                return string.Empty;
+
+            string relative = fullPath.Substring(_environment.WebRootPath.Length)
+                                       .TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
+                                       .Replace('\\', '/');
+
+            return "/" + relative;
         }
 
         private void PopulateTypes(int count)
