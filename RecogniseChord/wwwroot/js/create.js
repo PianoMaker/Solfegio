@@ -13,10 +13,13 @@ document.addEventListener('DOMContentLoaded', function () {
 	const audio = document.getElementById('chordAudio');
 	const genInput = document.getElementById('generatedRel');
 	const timbreform = document.getElementById('timbreform')
-	const SelectedTimbre = document.getElementById('SelectedTimbre');
+	const selectedTimbre = document.getElementById('SelectedTimbre');
+	const selectedQuality = document.getElementById('SelectedQuality');
+	const selectedType = document.getElementById('SelectedType');
 
 
-	
+
+
 	if (!playBtn || !audio || !genInput) {
 		console.warn('create.js: missing expected DOM elements');
 		return;
@@ -29,8 +32,30 @@ document.addEventListener('DOMContentLoaded', function () {
 		console.error('create.js setup error:', err);
 	}
 
+	//=================================
+	// Відновлюємо збережені значення з sessionStorage
+	//=================================
+	
+	const savedSoundCount = sessionStorage.getItem('selectedSoundCount');  // кількість звуків
+	console.log('Restoring session current sound count:', savedSoundCount);
 	const savedTimbre = sessionStorage.getItem('savedTimbre')				//тембр
 	console.log('restoring session timbre:', savedTimbre);
+	const savedQuality = sessionStorage.getItem('selectedQuality');		// якість інтервалу
+	console.log('restoring session quality:', savedQuality);
+	const savedType = sessionStorage.getItem('selectedType');			// тип акорду
+	console.log('restoring session type', savedType);
+	
+
+
+	// ============================
+	// значення якості і типу інтервалів
+	// ============================
+	if (savedQuality && selectedQuality) selectedQuality.value = savedQuality;
+
+	if (savedType && selectedType) selectedType.value = savedType;
+
+
+
 
 	// =================================
 	// ОБРОБНИК КНОПКИ ВІДТВОРЕННЯ
@@ -62,6 +87,23 @@ document.addEventListener('DOMContentLoaded', function () {
 	audio.addEventListener('ended', function () {
 		playBtn.innerText = 'Відтворити';
 	});
+	// =================================
+	// ОБРОБНИКИ ТИПІВ АКОРДІВ	
+	// =================================
+
+	if (selectedQuality) {
+		selectedQuality.addEventListener('change', (e) => {
+			sessionStorage.setItem('selectedQuality', e.target.value)
+			console.debug(`savedQuality set to ${e.target.value}`)
+		});
+	}
+
+	if (selectedType) {
+		selectedType.addEventListener('change', (e) => {
+			sessionStorage.setItem('selectedType', e.target.value)
+			console.debug(`savedType set to ${e.target.value}`)
+		});
+	}
 
 
 	function normalizeUrl(rel) {
@@ -89,14 +131,14 @@ document.addEventListener('DOMContentLoaded', function () {
 	//======================================
 	//Обробник переммикання тембрів
 	//=====================================
-	SelectedTimbre.addEventListener('change', (e) => {
+	selectedTimbre.addEventListener('change', (e) => {
 		console.debug(`timbre set to ${e}`);
 		if (!e.isTrusted) return;
 		if (!timbreform) {
 			console.warn('timbreform not found, cannot submit.');
 			return;
 		}
-		const newVal = (e.target && e.target.value) ? e.target.value : (SelectedTimbre.value || '');
+		const newVal = (e.target && e.target.value) ? e.target.value : (selectedTimbre.value || '');
 		console.debug(`timbre changed to ${newVal}`)
 		sessionStorage.setItem('savedTimbre', newVal);
 		// submit the timbre form so server can generate WAV with new timbre

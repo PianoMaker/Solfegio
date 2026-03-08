@@ -21,7 +21,7 @@ namespace RecogniseChord.Pages
         {
             _logger = logger;
             _environment = environment;
-            Console.WriteLine($"index constructor environment = {environment}");
+            Console.WriteLine($"index constructor environment = {environment.ToString()}");
         }
 
         private const string MaxCountTempKey = "__MaxCount";

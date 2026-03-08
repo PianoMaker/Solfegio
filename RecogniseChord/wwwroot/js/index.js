@@ -12,7 +12,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 	let radiobuttons = document.querySelectorAll('input[name="SelectedCount"]');
 
-	const choosemessage = document.getElementById('choosemessage')		// надпис "виберіть параметри"
 
 	if (!radiobuttons || radiobuttons.length === 0) {
 		const fallbackIds = ['sound2', 'sound3', 'sound4', 'sound5'];

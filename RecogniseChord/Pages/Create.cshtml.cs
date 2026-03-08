@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Mvc;
@@ -18,8 +19,6 @@ namespace RecogniseChord.Pages
         [BindProperty] public string SelectedQuality { get; set; } = string.Empty; // українська назва
         [BindProperty] public string RootNote { get; set; } = "C"; // основний тон
         [BindProperty] public string Timbre { get; set; }
-
-        
 
         public List<string> AllTimbres { get; set; } = Enum.GetNames(typeof(TIMBRE)).ToList();
 
@@ -179,20 +178,27 @@ namespace RecogniseChord.Pages
             return Page();
         }
 
-        private void GetRelativePath(string fullPath)
+        private void GetRelativePath(string path)
         {
-            var wwwroot = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
-            var relative = Path.GetRelativePath(wwwroot, fullPath).Replace('\\', '/');
-            GeneratedFileRelative = relative;
+            var relative = Path.GetRelativePath(_environment.WebRootPath, path);
+            if (relative != null)
+            {
+                MessageL(8, $"Set RelaivePath to {relative}");
+                GeneratedFileRelative = relative;
+            }
+            else ErrorMessageL("relative path for chord is missing");
         }
 
         public IActionResult OnPostTimbre()
         {
             MessageL(14, $"Index OnPostTimbre: set to {Timbre}");
 
+            PopulateTypes(); 
+            PopulateQualities();
             var chord = BuildChord();
             string fullPath = GetFullPath();
             var timbre = GetTimbre();
+            GetRelativePath(fullPath);
             try
             {
                 chord.SaveWave(fullPath, timbre);
