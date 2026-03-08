@@ -24,6 +24,7 @@
                 <input type="hidden" asp-for="RootNote" />
             </form>
 
+            <!-- Інтервал/Акорд -->
             <form method="post" asp-page-handler="Type" id="typeForm">
                 <div class="mt-3">
                     <label>Тип:</label>
@@ -70,6 +71,7 @@
                 <input type="hidden" asp-for="RootNote" />
             </form>
 
+            <!-- Якість  -->
             <form method="post" asp-page-handler="Quality" id="qualityForm">
                 <div class="mt-3">
                     <label>Якість:</label>
@@ -84,6 +86,8 @@
                         }
                     </select>
                 </div>
+
+                <!-- ТОНАЛЬНІСТЬ -->
                 <div class="mt-3">
                     <label>Від ноти:</label>
                     <select asp-for="RootNote" class="select-root" onchange="document.getElementById('qualityForm')?.submit();">
@@ -104,8 +108,25 @@
                 </div>
                 <input type="hidden" asp-for="SelectedCount" />
                 <input type="hidden" asp-for="SelectedType" />
+                <input type="hidden" asp-for="Timbre" />
             </form>
 
+            <!-- ТЕМБР -->
+            <div>
+                <form id="timbreform" method="post" asp-page-handler="timbre">
+                    <p>Обрати тембр: </p>
+                    <div style="display:block; margin:5px">
+                        <select asp-for="Timbre" id="SelectedTimbre">
+                            @foreach (var timbre in Model.AllTimbres)
+                            {
+                                <option value="@timbre" selected="@(Model.Timbre == timbre)">@timbre</option>
+                            }
+                        </select>                        
+                    </div>
+                </form>
+            </div>
+
+            <!-- ГРАТИ -->
             <div class="mt-4">
                 <button id="playBtn" type="button" class="btn btn-success">Відтворити</button>
                 <audio id="chordAudio" preload="auto"></audio>

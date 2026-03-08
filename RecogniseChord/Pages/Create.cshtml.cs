@@ -1,10 +1,11 @@
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Music;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Hosting;
+using Music;
 using static Music.Engine;
 using static Music.Messages;
 
@@ -16,7 +17,25 @@ namespace RecogniseChord.Pages
         [BindProperty] public string SelectedType { get; set; } = string.Empty; // українська назва
         [BindProperty] public string SelectedQuality { get; set; } = string.Empty; // українська назва
         [BindProperty] public string RootNote { get; set; } = "C"; // основний тон
-        [BindProperty] public TIMBRE Timbre { get; set; }
+        [BindProperty] public string Timbre { get; set; }
+
+        
+
+        public List<string> AllTimbres { get; set; } = Enum.GetNames(typeof(TIMBRE)).ToList();
+
+
+        private readonly ILogger<IndexModel> _logger;
+
+        public IWebHostEnvironment _environment;
+        public CreateModel(ILogger<IndexModel> logger, IWebHostEnvironment environment)
+        {
+            _logger = logger;
+            _environment = environment;
+            Console.WriteLine($"index constructor environment = {environment}");
+
+        }
+
+        public string SoundDir => Path.Combine(_environment.WebRootPath, "sound");
 
         public List<string> CountOptions { get; } = new() { "2", "3", "4", "5" };
         public List<string> TypeOptions { get; private set; } = new();
@@ -144,18 +163,12 @@ namespace RecogniseChord.Pages
                     var chord = BuildChord();
                     if (chord != null)
                     {
-                        // compute filesystem path and ensure directory exists
                         string fullPath = GetFullPath();
-
-                        // build sequence (frequency, durationMs) from chord notes
-                        chord.SaveWave(fullPath);
-
-                        // set web-relative path for client JS (relative to wwwroot)
-                        var wwwroot = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
-                        var relative = Path.GetRelativePath(wwwroot, fullPath).Replace('\\', '/');
-                        GeneratedFileRelative = relative;
-
-                        MessageL(14, $"Generated chord saved to: {fullPath} (relative: {GeneratedFileRelative})");
+                        TIMBRE timbre = GetTimbre();
+                        MessageL(8, $"timbre = {timbre}");
+                        chord.SaveWave(fullPath, timbre);
+                        GetRelativePath(fullPath);
+                        MessageL(8, $"path = {GeneratedFileRelative} vs {fullPath}");
                     }
                 }
             }
@@ -164,6 +177,48 @@ namespace RecogniseChord.Pages
                 ErrorMessageL(ex.Message);
             }
             return Page();
+        }
+
+        private void GetRelativePath(string fullPath)
+        {
+            var wwwroot = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+            var relative = Path.GetRelativePath(wwwroot, fullPath).Replace('\\', '/');
+            GeneratedFileRelative = relative;
+        }
+
+        public IActionResult OnPostTimbre()
+        {
+            MessageL(14, $"Index OnPostTimbre: set to {Timbre}");
+
+            var chord = BuildChord();
+            string fullPath = GetFullPath();
+            var timbre = GetTimbre();
+            try
+            {
+                chord.SaveWave(fullPath, timbre);
+            }
+            catch (Exception ex)
+            {
+                ErrorMessageL(ex.Message);
+            }
+
+            return Page();
+        }
+
+        private TIMBRE GetTimbre()
+        {
+            TIMBRE timbreEnum;
+            if (string.IsNullOrWhiteSpace(Timbre) || !Enum.TryParse<TIMBRE>(Timbre, ignoreCase: true, out timbreEnum))
+            {
+                timbreEnum = TIMBRE.sin;
+                MessageL(COLORS.gray, $"Timbre parse failed or empty ('{Timbre}'), defaulting to {timbreEnum}");
+            }
+            else
+            {
+                MessageL(COLORS.gray, $"Timbre parsed: {timbreEnum}");
+            }
+
+            return timbreEnum;
         }
 
         private void PopulateTypes()
@@ -289,16 +344,16 @@ namespace RecogniseChord.Pages
             else if (type == "NONACORD_4i") chord.InvertUp(4);
         }
 
-        private static string GetFullPath()
+        private string GetFullPath()
         {
-            string directory = Path.Combine("wwwroot", "sound");
-            Directory.CreateDirectory(directory);
+            
+            Directory.CreateDirectory(SoundDir);
 
             // find next sequential filename exampleN.wav
-            int nextIndex = GetNextIndex(directory);
+            int nextIndex = GetNextIndex(SoundDir);
 
             string filename = $"example{nextIndex}.wav";
-            string fullPath = System.IO.Path.Combine(directory, filename);
+            string fullPath = System.IO.Path.Combine(SoundDir, filename);
             return fullPath;
         }
 

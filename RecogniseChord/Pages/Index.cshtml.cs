@@ -15,6 +15,15 @@ namespace RecogniseChord.Pages
     {
         private readonly ILogger<IndexModel> _logger;
 
+        public IWebHostEnvironment _environment;
+
+        public IndexModel(ILogger<IndexModel> logger, IWebHostEnvironment environment)
+        {
+            _logger = logger;
+            _environment = environment;
+            Console.WriteLine($"index constructor environment = {environment}");
+        }
+
         private const string MaxCountTempKey = "__MaxCount";
 
         public int RequestCount;
@@ -132,7 +141,7 @@ namespace RecogniseChord.Pages
             return map.ToDictionary(kv => kv.Value, kv => kv.Key);
         }
         
-        public IWebHostEnvironment _environment;
+
         public string FilePath => Path.Combine(_environment.WebRootPath, "info", "info.txt");
 
         public string SoundDir => Path.Combine(_environment.WebRootPath, "sound");
@@ -140,14 +149,6 @@ namespace RecogniseChord.Pages
         public string SamplePath => Path.Combine(_environment.WebRootPath, "samplesound", "a4sample.wav");
 
         public bool SamplePathExist => System.IO.File.Exists(SamplePath);
-
-        public IndexModel(ILogger<IndexModel> logger, IWebHostEnvironment environment)
-        { 
-            _logger = logger; 
-            _environment = environment;
-            Console.WriteLine($"index constructor environment = {environment}");
-        
-        }
 
         public void OnGet()
         {

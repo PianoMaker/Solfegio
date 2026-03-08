@@ -12,12 +12,15 @@ document.addEventListener('DOMContentLoaded', function () {
 	const playBtn = document.getElementById('playBtn');
 	const audio = document.getElementById('chordAudio');
 	const genInput = document.getElementById('generatedRel');
+	const timbreform = document.getElementById('timbreform')
+	const SelectedTimbre = document.getElementById('SelectedTimbre');
 
+
+	
 	if (!playBtn || !audio || !genInput) {
 		console.warn('create.js: missing expected DOM elements');
 		return;
 	}
-
 
 	// initial setup
 	try {
@@ -26,7 +29,14 @@ document.addEventListener('DOMContentLoaded', function () {
 		console.error('create.js setup error:', err);
 	}
 
-	// play/pause behaviour
+	const savedTimbre = sessionStorage.getItem('savedTimbre')				//тембр
+	console.log('restoring session timbre:', savedTimbre);
+
+	// =================================
+	// ОБРОБНИК КНОПКИ ВІДТВОРЕННЯ
+	// натискання відтворює збережений WAV-файл або синтезує тони з payload
+	// =================================
+
 	if (playBtn) {
 		console.debug('playbtn eventlistener is loading')
 		playBtn.disabled = false;
@@ -74,5 +84,23 @@ document.addEventListener('DOMContentLoaded', function () {
 		audio.load();
 		playBtn.disabled = false;
 	}
+
+
+	//======================================
+	//Обробник переммикання тембрів
+	//=====================================
+	SelectedTimbre.addEventListener('change', (e) => {
+		console.debug(`timbre set to ${e}`);
+		if (!e.isTrusted) return;
+		if (!timbreform) {
+			console.warn('timbreform not found, cannot submit.');
+			return;
+		}
+		const newVal = (e.target && e.target.value) ? e.target.value : (SelectedTimbre.value || '');
+		console.debug(`timbre changed to ${newVal}`)
+		sessionStorage.setItem('savedTimbre', newVal);
+		// submit the timbre form so server can generate WAV with new timbre
+		timbreform.submit();
+	});
 
 });
