@@ -11,18 +11,17 @@ html {
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    html {
+        font-size: 16px;
+    }
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
 html {
-  position: relative;
-  
+    position: relative;
 }
 
 html, body {
@@ -34,11 +33,15 @@ body {
     display: flex;
     flex-direction: column;
     background-image: url("../../images/goldenpng.png");
-    background-size:cover;
+    background-size: cover;
+}
+
+a {
+    color: var(--header-color);
 }
 
 *, *::before, *::after {
-  box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 .container {
@@ -48,13 +51,12 @@ body {
     height: auto;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     max-width: 100%;
-    padding: 0px !important;
-    
+    padding: 0 5px !important;
 }
 
 .container-fluid {
     padding: 0px !important;
-    flex:1;
+    flex: 1;
 }
 
 .main {
@@ -69,8 +71,6 @@ body {
 .text-center {
     max-width: 1200px;
     margin: 0 auto;
-    
-    
 }
 
 #mainbox {
@@ -78,7 +78,6 @@ body {
     width: 90%;
     margin: 0 auto;
     justify-content: center;
-    
 }
 
 .innercontainer {
@@ -87,11 +86,9 @@ body {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    align-items: stretch; 
+    align-items: stretch;
     gap: 2%;
     width: 100%;
-
-    
 }
 
 .halfcontainer {
@@ -104,13 +101,13 @@ body {
 }
 
 
-.halfcontainer .innercontainer {
- border: none; 
-}
+    .halfcontainer .innercontainer {
+        border: none;
+    }
 
 /* Make right/left containers explicitly stretch and allow content to grow */
 #rightcontainer, #leftcontainer {
- align-items: stretch;
+    align-items: stretch;
 }
 
 /* Прив'язати реальну висоту header до змінної і вирівняти вміст по центру */
@@ -119,20 +116,19 @@ header {
     background-color: var(--header-color);
 }
 
-header .navbar {
-  height: 100%;
-  padding-top: 0;
-  padding-bottom: 0;
+    header .navbar {
+        height: 100%;
+        padding-top: 0;
+        padding-bottom: 0;
+    }
 
-}
-
-/* Вертикальне центровання бренда та навігації */
+    /* Вертикальне центровання бренда та навігації */
     header .navbar-brand,
     header .navbar-nav {
         height: 100%;
-      display: flex;
- align-items: center;
-   background-color: var(--header-color);
+        display: flex;
+        align-items: center;
+        background-color: var(--header-color);
     }
 
 .navbar-coloured {
@@ -143,33 +139,6 @@ footer {
     background-color: var(--footer-color);
 }
 
-/* Responsive: on narrow screens stack columns and ensure rightcontainer is above leftcontainer */
-@media (max-width: 768px) {
-  /* Make the parent a normal flex column so children stack vertically */
-  .innercontainer:not(#recognisebox) {
-    display: flex !important;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.75rem;
-  }
-
-  /* Each half becomes full width when stacked */
-  .halfcontainer {
-    width: 100% !important;
-    flex: 0 0 auto;
-}
-
-  /* Ensure rightcontainer is rendered above leftcontainer even if markup/order changes */
-  #rightcontainer {
-    order: -1;
-  }
-
-  /* Optional: tighten borders/padding on small screens */
-  .innercontainer:not(#recognisebox), .halfcontainer {
-    border-width: 1px;
-    padding: 0.5rem;
-  }
-}
 
 /* Стала ширина селектів для консистентного UI */
 .select-quality {
@@ -190,13 +159,13 @@ footer {
 /* Стилізація для правильної відповіді - весь блок темно-зеленим */
 .answer-correct {
     color: var(--correct-answer-color);
- font-weight: 600;
+    font-weight: 600;
 }
 
-.answer-correct p,
-.answer-correct code {
-    color: var(--correct-answer-color);
-}
+    .answer-correct p,
+    .answer-correct code {
+        color: var(--correct-answer-color);
+    }
 
 /* utility to force an element to take full width inside flex/flex-wrap containers */
 .full-row {
@@ -205,12 +174,23 @@ footer {
 }
 
 /* ensure the play button is centered within the full row */
-#playform { text-align: center; margin-bottom:0.5rem; }
-#playform button { min-width:160px; }
+#playform {
+    text-align: center;
+    margin-bottom: 0.5rem;
+}
+
+    #playform button {
+        min-width: 160px;
+    }
 
 /* Make success/danger messages bold for better visibility */
-.text-success { font-weight:700; }
-.text-danger { font-weight:700; }
+.text-success {
+    font-weight: 700;
+}
+
+.text-danger {
+    font-weight: 700;
+}
 
 .whitecontainer {
     background-color: #ffffff;
@@ -229,4 +209,109 @@ main .whitecontainer {
     border-radius: 5px;
 }
 
+#devpage ul {
+    list-style-type: none;
+}
+#devpage li {
 
+    text-align: left;
+    padding-left: 100px;
+}
+
+.devcontainer {
+    display: flex;
+    justify-content: end;
+}
+
+#dev {
+    border: 1px solid var(--footer-color);
+    border-radius: 25px;
+    max-width: min(900px, 80vh);
+    padding: 20px;
+    margin: 10px;
+    background-color: rgba(254, 254, 254, 0.5);
+    transition: transform 0.2s ease;
+    
+    
+}
+
+    #dev:hover {
+        transform: translateY(-4px);
+        box-shadow: rgba(40, 40, 20, 0.1) 4px 4px;
+    }
+
+    #dev img {
+        width: 100px;
+        height: auto;
+    }
+
+    #dev .inner {
+        display: flex;
+    }
+
+    #dev .leftcontainer {
+    }
+
+    #dev .rightcontainer {
+        padding: 0 40px;
+    }
+
+
+/* Responsive: on narrow screens stack columns and ensure rightcontainer is above leftcontainer */
+@media (max-width: 768px) {
+
+    .main {
+        background-color: rgba(254, 254, 204, 0.9);
+    }
+
+    /* Make the parent a normal flex column so children stack vertically */
+    .innercontainer:not(#recognisebox) {
+        display: flex !important;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+    }
+
+    /* Each half becomes full width when stacked */
+    .halfcontainer {
+        width: 100% !important;
+        flex: 0 0 auto;
+    }
+
+    /* Ensure rightcontainer is rendered above leftcontainer even if markup/order changes */
+    #rightcontainer {
+        order: -1;
+    }
+
+    /* Optional: tighten borders/padding on small screens */
+    .innercontainer:not(#recognisebox), .halfcontainer {
+        border-width: 1px;
+        padding: 0.5rem;
+    }
+
+    #dev {
+        padding: 15px;
+    }
+
+    #devpage li {
+        text-align: left;
+        padding-left: max(10px, 10%);
+    }
+}
+
+
+@media (max-width: 386px) {
+
+    #dev {
+        padding: 5px;
+    }
+
+        #dev img {
+            display: none;
+        }
+
+    #devpage li {
+        text-align: left;
+        padding-left: 5px;
+    }
+}
