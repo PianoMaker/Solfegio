@@ -61,11 +61,38 @@ namespace RecogniseChord.Resources.Pages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string Choose {
+            get {
+                return ResourceManager.GetString("Choose", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to ChordsIntervals.
         /// </summary>
         internal static string ChordsIntervals {
             get {
                 return ResourceManager.GetString("ChordsIntervals", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Play.
+        /// </summary>
+        internal static string Play {
+            get {
+                return ResourceManager.GetString("Play", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string Try {
+            get {
+                return ResourceManager.GetString("Try", resourceCulture);
             }
         }
     }
