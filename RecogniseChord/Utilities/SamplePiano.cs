@@ -1,5 +1,6 @@
 using NAudio.Wave;
 using RecogniseChord.Pages;
+using static Music.Messages;
 
 namespace Music
 {
@@ -75,12 +76,15 @@ namespace Music
         /// </summary>
         public float[] GetResampledNote(double targetFreq, int durationMs, int outSampleRate)
         {
+            
+
             if (_baseSamples == null) throw new InvalidOperationException("Base sample not loaded.");
             double ratio = targetFreq / 440.0;
             int outSamples = Math.Max(1, (int)Math.Round(outSampleRate * (durationMs / 1000.0)));
             var outBuf = new float[outSamples];
+            MessageL(4, $"SamplePiano: target = {targetFreq}, ratio={ratio}");
 
-            double inputIndexScale = 1 / ratio;
+            double inputIndexScale =  ratio;
             int inputLen = _baseSamples.Length;
 
             for (int i = 0; i < outSamples; i++)
@@ -111,7 +115,7 @@ namespace Music
         /// </summary>
         public bool TryRenderChordToWav(List<double> freqs, int activeMs, string fullPath, int sampleRate = 44100)
         {
-            Console.WriteLine("TryRenderChordToWav is runnning");
+            Console.WriteLine($"TryRenderChordToWav is runnning {freqs.ToList()}");
             try
             {
                 //if (_baseSamples == null) throw new InvalidOperationException("Base sample not loaded.");
