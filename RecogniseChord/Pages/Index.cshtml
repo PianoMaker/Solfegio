@@ -18,10 +18,10 @@
             <audio id="chordAudio" preload="auto"></audio>
 
             <!--    ПОЛЕ ДЛЯ ВГАДУВАННЯ       --> 
-            <div id="recognisebox" class="innercontainer" style="display:hidden">
+            <div id="recognisebox" class="innercontainer" style="display:none">
                 <!-- ПЕРЕМИКАЧ КІЛЬКОСТІ ЗВУКІВ-->
                 <div id="numberOfSoundsSelector" class="innercontainer" style="display:block">
-                    <div style="display:bolck">
+                    <div style="display:block">
                     <p>Скільки звуків?</p>
                     <form id="selectform" method="post" asp-page-handler="Select">
                         <input type="hidden" asp-for="MaxCount" />

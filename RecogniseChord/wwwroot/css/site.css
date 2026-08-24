@@ -26,12 +26,15 @@ html {
 }
 
 html, body {
-    height: calc(100% - var(--margin-bottom) - var(--header-height));
+    height: 100vh;
 }
 
 body {
-  margin-bottom: var(--margin-bottom); 
-  background-color: #fefecc;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    background-image: url("../../images/goldenpng.png");
+    background-size:cover;
 }
 
 *, *::before, *::after {
@@ -51,14 +54,22 @@ body {
 
 .container-fluid {
     padding: 0px !important;
-    height: 100%;
+    flex:1;
 }
 
 .main {
-    width: 95%;
-    max-width: 95%;
+    max-width: min(900px, 95%);
     margin: 0 auto;
     padding: 0px;
+    height: 100%;
+    background-color: rgba(254, 254, 204, 0.8);
+    box-shadow: 0 2px 4px rgba(254, 254, 204, 0.4);
+}
+
+.text-center {
+    max-width: 1200px;
+    margin: 0 auto;
+    
     
 }
 
@@ -67,8 +78,7 @@ body {
     width: 90%;
     margin: 0 auto;
     justify-content: center;
-    border: 1px solid #ddd;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    
 }
 
 .innercontainer {
@@ -80,14 +90,16 @@ body {
     align-items: stretch; 
     gap: 2%;
     width: 100%;
-    height: 100%;
+
+    
 }
 
 .halfcontainer {
     flex: 0 0 90%;
     display: flex;
     flex-direction: column;
-    background-color: #ffffff;
+    background-color: rgba(254, 254, 254, 0.2);
+    box-shadow: 10px 12px 14px rgba(254, 254, 204, 0.1);
     box-sizing: border-box;
 }
 
@@ -101,7 +113,7 @@ body {
  align-items: stretch;
 }
 
-/* Прив'язати реальну висоту header до змінної і вирівняти вміст по центру */
+/* РџСЂРёРІ'СЏР·Р°С‚Рё СЂРµР°Р»СЊРЅСѓ РІРёСЃРѕС‚Сѓ header РґРѕ Р·РјС–РЅРЅРѕС— С– РІРёСЂС–РІРЅСЏС‚Рё РІРјС–СЃС‚ РїРѕ С†РµРЅС‚СЂСѓ */
 header {
     height: var(--header-height);
     background-color: var(--header-color);
@@ -114,7 +126,7 @@ header .navbar {
 
 }
 
-/* Вертикальне центровання бренда та навігації */
+/* Р’РµСЂС‚РёРєР°Р»СЊРЅРµ С†РµРЅС‚СЂРѕРІР°РЅРЅСЏ Р±СЂРµРЅРґР° С‚Р° РЅР°РІС–РіР°С†С–С— */
     header .navbar-brand,
     header .navbar-nav {
         height: 100%;
@@ -159,7 +171,7 @@ footer {
   }
 }
 
-/* Стала ширина селектів для консистентного UI */
+/* РЎС‚Р°Р»Р° С€РёСЂРёРЅР° СЃРµР»РµРєС‚С–РІ РґР»СЏ РєРѕРЅСЃРёСЃС‚РµРЅС‚РЅРѕРіРѕ UI */
 .select-quality {
     width: 320px;
     max-width: 100%;
@@ -175,7 +187,7 @@ footer {
     max-width: 100%;
 }
 
-/* Стилізація для правильної відповіді - весь блок темно-зеленим */
+/* РЎС‚РёР»С–Р·Р°С†С–СЏ РґР»СЏ РїСЂР°РІРёР»СЊРЅРѕС— РІС–РґРїРѕРІС–РґС– - РІРµСЃСЊ Р±Р»РѕРє С‚РµРјРЅРѕ-Р·РµР»РµРЅРёРј */
 .answer-correct {
     color: var(--correct-answer-color);
  font-weight: 600;
@@ -216,3 +228,5 @@ main .whitecontainer {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     border-radius: 5px;
 }
+
+
