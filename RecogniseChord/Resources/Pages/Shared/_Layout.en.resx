@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -125,6 +125,9 @@
   </data>
   <data name="ChordsIntervals" xml:space="preserve">
     <value>Intervals and Chords</value>
+  </data>
+  <data name="MetaDescription" xml:space="preserve">
+    <value>Online solfeggio trainer for developing musical hearing and practicing chord construction.</value>
   </data>
   <data name="Recognise" xml:space="preserve">
     <value>Recognise a chord</value>

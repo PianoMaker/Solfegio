@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace RecogniseChord.Resources.Pages.Shared {
+namespace RecogniseChord.Resources.Pages {
     using System;
     
     
@@ -22,14 +22,14 @@ namespace RecogniseChord.Resources.Pages.Shared {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class _Layout {
+    internal class Privacy {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal _Layout() {
+        internal Privacy() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace RecogniseChord.Resources.Pages.Shared {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("RecogniseChord.Resources.Pages.Shared._Layout", typeof(_Layout).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("RecogniseChord.Resources.Pages.Privacy", typeof(Privacy).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,56 +61,11 @@ namespace RecogniseChord.Resources.Pages.Shared {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to About .
+        ///   Looks up a localized string similar to .
         /// </summary>
         internal static string About {
             get {
                 return ResourceManager.GetString("About", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Build.
-        /// </summary>
-        internal static string Build {
-            get {
-                return ResourceManager.GetString("Build", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to ChordsIntervals.
-        /// </summary>
-        internal static string ChordsIntervals {
-            get {
-                return ResourceManager.GetString("ChordsIntervals", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Online solfeggio trainer for developing musical hearing and practicing chord construction..
-        /// </summary>
-        internal static string MetaDescription {
-            get {
-                return ResourceManager.GetString("MetaDescription", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Recognise.
-        /// </summary>
-        internal static string Recognise {
-            get {
-                return ResourceManager.GetString("Recognise", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Title.
-        /// </summary>
-        internal static string Title {
-            get {
-                return ResourceManager.GetString("Title", resourceCulture);
             }
         }
     }

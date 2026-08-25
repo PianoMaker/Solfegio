@@ -24,6 +24,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Resources\Pages\Privacy.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Privacy.resx</DependentUpon>
+    </Compile>
     <Compile Update="Resources\Pages\Shared\_Layout.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -42,6 +47,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Update="Resources\Pages\Privacy.resx">
+      <LastGenOutput>Privacy.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Update="Resources\Pages\Shared\_Layout.resx">
       <LastGenOutput>_Layout.Designer.cs</LastGenOutput>
     </EmbeddedResource>
