@@ -4,20 +4,42 @@
     var appName = "Тренувальник сольфеджіо";
 }
 <!doctype html>
-<html lang="uk">
+<html lang="@CultureInfo.CurrentUICulture.TwoLetterISOLanguageName">
+@using System.Globalization
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Сольфеджіо - перевірте слух та побудуйте акорди онлайн.">
-    <link rel="canonical" href="https://solfegio.azurewebsites.net@(Context.Request.Path)" />
-    <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml" />
+
+    <meta name="description" content="@Localizer["MetaDescription"]" />
+    <meta name="robots" content="index, follow" />
+
+    <link rel="canonical"
+          href="https://solfegio.azurewebsites.net@(Context.Request.Path)" />
+
+    <link rel="sitemap"
+          type="application/xml"
+          title="Sitemap"
+          href="/sitemap.xml" />
+
     <title>@ViewData["Title"] - @appName</title>
 
-    <!-- Bootstrap & site css (adjust paths if you don't use libman/npm) -->
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="@ViewData["Title"] - @appName" />
+    <meta property="og:description" content="@Localizer["MetaDescription"]" />
+    <meta property="og:url"
+          content="https://solfegio.azurewebsites.net@(Context.Request.Path)" />
+    <meta property="og:site_name" content="@appName" />
+    <meta property="og:locale"
+          content="@(CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "uk" ? "uk_UA" : "en_US")" />
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- Bootstrap & site CSS -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
-
-
 </head>
 <body>
     <header>
@@ -62,11 +84,6 @@
           "@@type": "WebSite",
           "url": "https://solfegio.azurewebsites.net/",
           "name": "Solfegio",
-          "potentialAction": {
-            "@@type": "SearchAction",
-            "target": "https://solfegio.azurewebsites.net/?q={search_term_string}",
-            "query-input": "required name=search_term_string"
-          }
         }
     </script>
 
