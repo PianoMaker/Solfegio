@@ -502,15 +502,35 @@ namespace RecogniseChord.Pages
             else if (count == 4)
             {
                 var septTypes = new[] { "SEPT", "QUINTS", "TERZQ", "SEC" };
-                typeKey = septTypes[rnd.Next(septTypes.Length)];
-                // Тимчасово вилучаємо ALTPRIM та ALTQUINT з генерації
+
                 var septQualities = Enum.GetNames(typeof(SEPTS))
-              .Where(q => q != "ALTPRIM" && q != "ALTQUINT")
-     .ToArray();
+                    .Where(q => q != "ALTPRIM" && q != "ALTQUINT")
+                    .ToArray();
+
+                // Спочатку випадково визначаємо якість
                 qualityKey = septQualities[rnd.Next(septQualities.Length)];
-                SEPTS septQuality = Enum.TryParse<SEPTS>(qualityKey, out var sq) ? sq : SEPTS.MAJMAJ;
+
+                // Для зменшеного септакорду дозволяємо тільки основний вид
+                if (qualityKey == "DIMDIM")
+                {
+                    typeKey = "SEPT";
+                }
+                else
+                {
+                    typeKey = septTypes[rnd.Next(septTypes.Length)];
+                }
+
+                SEPTS septQuality = Enum.TryParse<SEPTS>(qualityKey, out var sq)
+                    ? sq
+                    : SEPTS.MAJMAJ;
+
                 chord.SeventhChord(root, septQuality);
-                ApplySeventhInversion(chord, typeKey);
+
+                // Обернення застосовується тільки для інших якостей
+                if (qualityKey != "DIMDIM")
+                {
+                    ApplySeventhInversion(chord, typeKey);
+                }
             }
             else if (count == 5)
             {
