@@ -1,4 +1,4 @@
-﻿// midiRenderer.js
+// midiRenderer.js
 
 /**
  * screen log if stepReadEl exists
@@ -428,7 +428,7 @@ function renderMeasuresToNotation(startAtMeasureIndex, measures, maxBarsToRender
         });
 
         const context = factory.getContext();
-        const score = factory.EasyScore();
+		const score = factory.EasyScore();
         scaleContext(scaleFactor, context);
 
         console.debug(`renderMidiFileToNotation: renderer ${rendererWidth}x${rendererHeight}, scaleFactor=${scaleFactor}`);

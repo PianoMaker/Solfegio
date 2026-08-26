@@ -42,7 +42,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             const notation = card.querySelector(".melody-notation");
             if (notation) {
-                notation.style.width = "600px";
+                notation.style.width = "800px";
             }
         }
     }
@@ -58,7 +58,22 @@ document.addEventListener("DOMContentLoaded", function () {
 
         applyMelodyLayout(card);
 
-        window.renderPatternString(pattern, id, null);
+        window.renderPatternString(
+            pattern,
+            id,
+            null,
+            4,      // numerator
+            4,      // denominator
+            1600,   // GENERALWIDTH
+            90,     // HEIGHT
+            0,      // TOPPADDING
+            200,    // BARWIDTH
+            40,     // CLEFZONE
+            10,     // Xmargin
+            512,    // RESPONSIVE_THRESHOLD
+            0.8,    // BASESCALING
+            0.7     // SCALINGFACTOR
+        );
     });
 
     // Якщо користувач змінює ширину вікна
