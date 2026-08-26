@@ -256,6 +256,30 @@ main .whitecontainer {
         padding: 0 40px;
     }
 
+.melodycontainer {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 20px;
+}
+
+.melody-card {
+    display: grid;
+    grid-template-columns: 210px minmax(0, 1fr);
+    align-items: center;
+    width: 100%;
+    min-width: 0;
+}
+
+.melody-info {
+    width: 212px;
+}
+
+.melody-notation {
+    min-width: 0;
+    max-width: 650px;
+    overflow: hidden;
+}
 
 /* Responsive: on narrow screens stack columns and ensure rightcontainer is above leftcontainer */
 @media (max-width: 768px) {
