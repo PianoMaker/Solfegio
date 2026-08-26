@@ -88,6 +88,15 @@ namespace RecogniseChord.Resources.Pages.Shared {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Intervals.
+        /// </summary>
+        internal static string Intervals {
+            get {
+                return ResourceManager.GetString("Intervals", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Online solfeggio trainer for developing musical hearing and practicing chord construction..
         /// </summary>
         internal static string MetaDescription {

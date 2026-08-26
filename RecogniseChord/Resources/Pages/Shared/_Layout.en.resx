@@ -126,6 +126,9 @@
   <data name="ChordsIntervals" xml:space="preserve">
     <value>Intervals and Chords</value>
   </data>
+  <data name="Intervals" xml:space="preserve">
+    <value>Intervals</value>
+  </data>
   <data name="MetaDescription" xml:space="preserve">
     <value>Online solfeggio trainer for developing musical hearing and practicing chord construction.</value>
   </data>

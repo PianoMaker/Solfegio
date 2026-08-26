@@ -126,6 +126,9 @@
   <data name="ChordsIntervals" xml:space="preserve">
     <value>Інтервали і акорди</value>
   </data>
+  <data name="Intervals" xml:space="preserve">
+    <value>Інтервали</value>
+  </data>
   <data name="MetaDescription" xml:space="preserve">
     <value>Онлайн-тренувальник сольфеджіо для розвитку музичного слуху та практики побудови акордів.</value>
   </data>
