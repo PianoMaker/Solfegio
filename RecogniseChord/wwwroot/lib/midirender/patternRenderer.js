@@ -1,4 +1,4 @@
-﻿// patternRenderer.js
+// patternRenderer.js
 // Утиліта для рендерингу нот з рядка шаблону (не MIDI)
 // --------------------------------------------------------
 // Вхідний рядок шаблону: послідовність нот/пауз, кожна з трьох частин:
@@ -224,11 +224,11 @@
 		ELEMENT_FOR_COMMENTS,
 		numerator = 4,
 		denominator = 4,
-		GENERALWIDTH = 1200,
-		HEIGHT = 170,
-		TOPPADDING = 20,
-		BARWIDTH = 250,
-		CLEFZONE = 60,
+		GENERALWIDTH = 1600,
+		HEIGHT = 100,
+		TOPPADDING = 10,
+		BARWIDTH = 120,
+		CLEFZONE = 40,
 		Xmargin = 10
 	) {
 		try {
@@ -258,7 +258,7 @@
 
 			// 1) Єдиний bar width для всієї сесії рендера
 			// МІНІМАЛЬНА ШИРИНА ТАКТУ, щоб не були вузькими
-			const MIN_BARWIDTH = 240; // налаштовуване значення
+			const MIN_BARWIDTH = Math.min(BARWIDTH, 150); // налаштовуване значення
 			const naiveBarWidth = GetMeanBarWidth(BARWIDTH, GEN_WIDTH);
 			const actualBarWidth = Math.max(MIN_BARWIDTH, naiveBarWidth);
 
@@ -274,6 +274,15 @@
 			const RESPONSIVE_THRESHOLD = 800;
 			const SCALINGFACTOR = 0.5;
 			const scaleFactor = (containerWidth > 0 && containerWidth <= RESPONSIVE_THRESHOLD) ? SCALINGFACTOR : 1;
+
+
+			console.log("WIDTH DEBUG:", {
+				containerWidth,
+				GENERALWIDTH,
+				MIN_SCORE_WIDTH,
+				GEN_WIDTH,
+				factoryWidth: GEN_WIDTH
+			});
 
 			// 3) Передаємо той самий actualBarWidth у рендер (щоб обтікання збігалось)
 			const factory = new Vex.Flow.Factory({
