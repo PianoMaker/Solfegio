@@ -229,7 +229,11 @@
 		TOPPADDING = 0,
 		BARWIDTH = 200,
 		CLEFZONE = 40,
-		Xmargin = 10
+		Xmargin = 10,
+		RESPONSIVE_THRESHOLD = 800,
+		BASESCALING = 1,
+		SCALINGFACTOR = 0.6
+
 	) {
 		try {
 			const notationDiv = document.getElementById(ELEMENT_FOR_RENDERING);
@@ -271,9 +275,9 @@
 
 			console.log(`patternRenderer: ${measures.length} measures, ${rows} rows, totalHeight=${totalHeight}, GEN_WIDTH=${GEN_WIDTH}, actualBarWidth=${actualBarWidth}`);
 
-			const RESPONSIVE_THRESHOLD = 800;
-			const SCALINGFACTOR = 0.5;
-			const scaleFactor = (containerWidth > 0 && containerWidth <= RESPONSIVE_THRESHOLD) ? SCALINGFACTOR : 0.7;
+			
+			
+			let scaleFactor = (containerWidth > 0 && containerWidth <= RESPONSIVE_THRESHOLD) ? SCALINGFACTOR : BASESCALING;
 
 
 			console.log("WIDTH DEBUG:", {
@@ -289,8 +293,9 @@
 				renderer: { elementId: ELEMENT_FOR_RENDERING, width: GEN_WIDTH, height: totalHeight }
 			});
 			const context = factory.getContext();
-			const score = factory.EasyScore();
-			//scaleContext(scaleFactor, context);
+			//const score = factory.EasyScore();			
+			console.log("containerWidth = ", containerWidth, "scaleFactor = ", scaleFactor);
+			scaleContext(scaleFactor, context);
 
 
 			// Render measure by measure similar to renderMeasures
