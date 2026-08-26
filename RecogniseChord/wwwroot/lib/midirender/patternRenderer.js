@@ -225,9 +225,9 @@
 		numerator = 4,
 		denominator = 4,
 		GENERALWIDTH = 1600,
-		HEIGHT = 100,
-		TOPPADDING = 10,
-		BARWIDTH = 120,
+		HEIGHT = 90,
+		TOPPADDING = 0,
+		BARWIDTH = 200,
 		CLEFZONE = 40,
 		Xmargin = 10
 	) {
@@ -273,7 +273,7 @@
 
 			const RESPONSIVE_THRESHOLD = 800;
 			const SCALINGFACTOR = 0.5;
-			const scaleFactor = (containerWidth > 0 && containerWidth <= RESPONSIVE_THRESHOLD) ? SCALINGFACTOR : 1;
+			const scaleFactor = (containerWidth > 0 && containerWidth <= RESPONSIVE_THRESHOLD) ? SCALINGFACTOR : 0.7;
 
 
 			console.log("WIDTH DEBUG:", {
