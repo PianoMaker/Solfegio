@@ -16,7 +16,8 @@
                 <p>Людвіг ван Бетховен</p>
             </div>
             <div class="melody-notation"
-                 data-pattern="e'8_dis'8_e'8_dis'8_e'8_h8_d'8_c'8_a4"></div>
+                 data-barwidth="210"
+                 data-pattern="e'8_dis'8_e'8_dis'8_e'8_h8_d'8_c'8_a4_r4"></div>
         </div>
 
 
@@ -55,7 +56,8 @@
                 <p>Українська народна пісня</p>
             </div>
             <div class="melody-notation"
-                 numerator="3"
+                 data-numerator="3"
+                 data-barwidth="120"
                  data-pattern="h4_h4_g4_h2._a4_a4_e4_g2."></div>
         </div>
 
@@ -87,6 +89,7 @@
                 <p>Микола Лисенко</p>
             </div>
             <div class="melody-notation"
+            data-barwidth="145"
                  data-pattern="r2_r4._e8_a4._e8_g4._c8_f4._d8_e4."></div>
         </div>
 
@@ -96,6 +99,7 @@
                 <p>народна</p>
             </div>
             <div class="melody-notation"
+                data-barwidth="195"
                  data-pattern="a8_a8_e8_e8_a8_a4_a8_a8_h8_c'8_h8_a4_g4"></div>
         </div>
     
@@ -129,8 +133,8 @@
     </div>
 
 
-        <!-- ВЕЛИКА СЕКСТА -->
-        <h2>Велика секста</h2>
+        <!-- МАЛА СЕКСТА -->
+        <h2>Мала секста</h2>
 
     <div class="melody-card">
         <div class="melody-info">
@@ -150,8 +154,8 @@
                  data-pattern="g4_e'4_d'4_c'4_d'4_e'4_d'4"></div>
         </div>
 
-    <!-- МАЛА СЕКСТА -->
-    <h2>Мала секста</h2>
+    <!-- ВЕЛИКА СЕКСТА -->
+    <h2>Велика секста</h2>
 
         <div class="melody-card">
             <div class="melody-info">
@@ -171,10 +175,10 @@
         <div class="melody-card">
             <div class="melody-info">
                 <h2>Ой на плаю</h2>
-                <p>народна</p>
+                <p>Українська народна пісня</p>
             </div>
             <div class="melody-notation"
-                 data-pattern="r2_r8_c8_c8_c8_b2_b8_a16_c16_b4_g4_g4"></div>
+                 data-pattern="r2_r8_c8_c8_c8_b2_b8_a16_c'16_b4_g4_g4"></div>
         </div>
 
 
@@ -191,7 +195,7 @@
                 <p>Гарольд Арлен</p>
             </div>
             <div class="melody-notation"
-                 data-pattern="c4_c'4_h4_g8_a8_h4_c4"></div>
+                 data-pattern="c2_c'2_h4_g8_a8_h4_c4"></div>
         </div>
 
     </div>
@@ -199,6 +203,7 @@
 @section Scripts {
     <script src="~/lib/midirender/vexflow.js"></script>
     <script src="~/lib/midirender/mr-beams-helper.js" asp-append-version="true"></script>
+    <script src="~/lib/midirender/mr-key-signatures-helper.js" asp-append-version="true"></script>
     <script src="~/lib/midirender/mr-calculate-rows-helper.js" asp-append-version="true"></script>
     <script src="~/lib/midirender/mr-svg-helper.js" asp-append-version="true"></script>
     <script src="~/lib/midirender/midiRenderer.js" asp-append-version="true"></script>
