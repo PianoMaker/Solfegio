@@ -16,6 +16,26 @@
 // - numerator, denominator: розмір такту (4/4 за замовчуванням)
 // - GENERALWIDTH, HEIGHT, TOPPADDING, BARWIDTH, CLEFZONE, Xmargin: параметри рендерингу
 // - SCALE_FACTOR (нова, необов'язкова): якщо задано (number) — форсує масштаб (1 = без зміни)
+
+
+//Приклад:
+//window.renderPatternString(
+//	pattern,
+//	id,
+//	null,
+//	4,      // numerator
+//	4,      // denominator
+//	1600,   // GENERALWIDTH
+//	90,     // HEIGHT
+//	0,      // TOPPADDING
+//	200,    // BARWIDTH
+//	40,     // CLEFZONE
+//	10,     // Xmargin
+//	512,    // RESPONSIVE_THRESHOLD
+//	0.7,    // BASESCALING
+//	0.6     // SCALINGFACTOR
+//);
+
 // --------------------------------------------------------
 
 (function () {
@@ -317,7 +337,7 @@
 				stave.setContext(context).draw();
 
 				const ties = measures[i].ties || [];
-				drawMeasure(measures[i].notes, actualBarWidth, context, stave, ties, i, commentsDiv || { innerHTML: '' }, numerator, denominator, 480); // midiRenderer.js
+				drawMeasure(measures[i].notes, actualBarWidth, context, stave, ties, isFirstMeasureInRow, i, commentsDiv || { innerHTML: '' }, numerator, denominator, 480); // midiRenderer.js
 
 				Xposition += STAVE_WIDTH;
 				isFirstMeasureInRow = false;
