@@ -279,11 +279,16 @@ main .whitecontainer {
     transform: translateY(-4px);
 }
 
-.melody-info {
-    width: 212px;
-}
+    .melody-card img {
+        max-width:400px;
 
-.melody-notation {
+    }
+
+    .melody-info {
+        width: 212px;
+    }
+
+.melody-notation, .melodyexample {
     min-width: 0;
     max-width: 650px;
     overflow: hidden;
@@ -354,15 +359,23 @@ main .whitecontainer {
         padding-left: max(10px, 10%);
     }
 
-    .melody-notation {        
-        max-width: 512px;        
+    .melody-notation, .melodyexample {
+        max-width: 512px;
+    }
+}
+
+@media (max-width: 586px) {
+    .melody-card {
+        grid-template-columns: 1fr;
+    }
+    .melody-info {
+        width: 100%;
     }
 }
 
 
-@media (max-width: 386px) {
-
-    #dev {
+    @media (max-width: 386px) {
+        #dev {
         padding: 5px;
     }
 
