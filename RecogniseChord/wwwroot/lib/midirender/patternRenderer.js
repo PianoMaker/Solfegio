@@ -370,69 +370,208 @@
 })();
 
 
-function getMeasuresFromTokens(tokens, parseToken, numerator, denominator, UNITS_PER_QUARTER, durationToUnits, unitsToDurationList, sumUnits) {
-    const items = tokens.map(parseToken).filter(Boolean);
+function getMeasuresFromTokens(
+	tokens,
+	parseToken,
+	numerator,
+	denominator,
+	UNITS_PER_QUARTER,
+	durationToUnits,
+	unitsToDurationList,
+	sumUnits
+) {
+	const items = tokens.map(parseToken).filter(Boolean);
 
-    // Build measures with cross-bar splitting + ties
-    const capacityQuarters = numerator * (4 / denominator); // quarters per bar
-    const capacityUnits = Math.round(capacityQuarters * UNITS_PER_QUARTER);
-    const measures = []; // array of { notes: StaveNote[], ties: StaveTie[] }
-    let cur = { notes: [], ties: [] };
-    let usedUnits = 0;
-    measures.push(cur);
+	// Тривалість одного такту в units
+	const capacityQuarters = numerator * (4 / denominator);
+	const capacityUnits = Math.round(
+		capacityQuarters * UNITS_PER_QUARTER
+	);
 
-    for (const it of items) {
-        let remaining = durationToUnits(it.durationCode);
-        let prevPieceNote = null; // last piece of the same logical note to tie from
+	const measures = [];
 
-        while (remaining > 0) {
-            if (usedUnits >= capacityUnits) {
-                // start new bar
-                cur = { notes: [], ties: [] };
-                measures.push(cur);
-                usedUnits = 0;
-            }
+	let cur = {
+		notes: [],
+		ties: []
+	};
 
-            const room = capacityUnits - usedUnits;
-            const pieceUnits = Math.min(remaining, room);
-            const pieceCodes = unitsToDurationList(pieceUnits, /*allowDotted*/ true);
+	measures.push(cur);
 
-            for (let i = 0; i < pieceCodes.length; i++) {
-                const code = pieceCodes[i];
-                if (it.isRest) {
-                    const r = createRest(code);
-                    if (r) { r.__durationCode = code; cur.notes.push(r); }
-                    prevPieceNote = null; // rests break ties
-                } else {
-                    const n = processNoteElement(code, it.key, it.accidental);
-                    if (n) n.__durationCode = code;
-                    cur.notes.push(n);
-                    if (prevPieceNote) cur.ties.push(new Vex.Flow.StaveTie({ first_note: prevPieceNote, last_note: n }));
-                    prevPieceNote = n;
-                }
-            }
+	let usedUnits = 0;
 
-            usedUnits += pieceUnits;
-            remaining -= pieceUnits;
-        }
-    }
+	// ---------------------------------------------------------
+	// Стан випадкових знаків ПОТОЧНОГО ТАКТУ
+	//
+	// Він скидається при переході на новий такт.
+	// ---------------------------------------------------------
+	let measureAccState = {};
 
-    // Drop trailing empty measure if any
-    if (measures.length && measures[measures.length - 1].notes.length === 0) {
-        measures.pop();
-    }
+	for (const it of items) {
 
-    // Ensure each bar is filled with trailing rests (non‑dotted) to capacity
-    for (const m of measures) {
-        console.info('PR: calling sumUnits for fill check');
-        const used = sumUnits(m.notes);
-        const leftUnits = Math.max(0, capacityUnits - used);
-        console.info('PR: leftUnits', leftUnits, 'capacityUnits', capacityUnits, 'used', used);
-        const restCodes = unitsToDurationList(leftUnits, /*allowDotted*/ false);
-        for (const rc of restCodes) {
-            const r = createRest(rc);
-            if (r) { r.__durationCode = rc; m.notes.push(r); }
-        }
-    }
-    return measures;
+		let remaining = durationToUnits(it.durationCode);
+
+		// Остання частина тієї самої логічної ноти.
+		// Потрібно для ліги при переході через тактову риску.
+		let prevPieceNote = null;
+
+		while (remaining > 0) {
+
+			// -------------------------------------------------
+			// Якщо попередній такт заповнений —
+			// починаємо новий такт.
+			// -------------------------------------------------
+			if (usedUnits >= capacityUnits) {
+
+				cur = {
+					notes: [],
+					ties: []
+				};
+
+				measures.push(cur);
+
+				usedUnits = 0;
+
+				// НОВИЙ ТАКТ -> нова пам'ять альтерацій
+				measureAccState = {};
+			}
+
+			const room = capacityUnits - usedUnits;
+
+			const pieceUnits = Math.min(
+				remaining,
+				room
+			);
+
+			const pieceCodes = unitsToDurationList(
+				pieceUnits,
+				true
+			);
+
+			// -------------------------------------------------
+			// Створюємо частини ноти
+			// -------------------------------------------------
+			for (let i = 0; i < pieceCodes.length; i++) {
+
+				const code = pieceCodes[i];
+
+				if (it.isRest) {
+
+					const r = createRest(code);
+
+					if (r) {
+						r.__durationCode = code;
+						cur.notes.push(r);
+					}
+
+					// Пауза перериває лігу
+					prevPieceNote = null;
+
+				} else {
+
+					// -------------------------------------------------
+					// ВИЗНАЧАЄМО, ЧИ ПОТРІБНО ДРУКУВАТИ ACCIDENTAL
+					//
+					// decideAccidentalForNote() вже враховує:
+					// - accidental самої ноти;
+					// - попередню альтерацію в цьому такті;
+					// - зміну # / b / natural.
+					//
+					// currentKeySig тут null, оскільки
+					// patternRenderer поки не отримує тональність.
+					// -------------------------------------------------
+
+					const accToDraw = decideAccidentalForNote(
+						it.key,
+						it.accidental,
+						null,
+						measureAccState,
+						i
+					);
+
+					const n = processNoteElement(
+						code,
+						it.key,
+						accToDraw
+					);
+
+					if (n) {
+						n.__durationCode = code;
+					}
+
+					cur.notes.push(n);
+
+					// -------------------------------------------------
+					// Ліга між частинами ноти, яка перетнула
+					// межу такту або була розкладена на кілька частин.
+					// -------------------------------------------------
+					if (prevPieceNote && n) {
+						cur.ties.push(
+							new Vex.Flow.StaveTie({
+								first_note: prevPieceNote,
+								last_note: n
+							})
+						);
+					}
+
+					prevPieceNote = n;
+				}
+			}
+
+			usedUnits += pieceUnits;
+			remaining -= pieceUnits;
+		}
+	}
+
+	// ---------------------------------------------------------
+	// Видаляємо останній порожній такт
+	// ---------------------------------------------------------
+	if (
+		measures.length &&
+		measures[measures.length - 1].notes.length === 0
+	) {
+		measures.pop();
+	}
+
+	// ---------------------------------------------------------
+	// Заповнюємо незаповнений кінець кожного такту паузами
+	// ---------------------------------------------------------
+	for (const m of measures) {
+
+		console.info(
+			'PR: calling sumUnits for fill check'
+		);
+
+		const used = sumUnits(m.notes);
+
+		const leftUnits = Math.max(
+			0,
+			capacityUnits - used
+		);
+
+		console.info(
+			'PR: leftUnits',
+			leftUnits,
+			'capacityUnits',
+			capacityUnits,
+			'used',
+			used
+		);
+
+		const restCodes = unitsToDurationList(
+			leftUnits,
+			false
+		);
+
+		for (const rc of restCodes) {
+
+			const r = createRest(rc);
+
+			if (r) {
+				r.__durationCode = rc;
+				m.notes.push(r);
+			}
+		}
+	}
+
+	return measures;
 }
