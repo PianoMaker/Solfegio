@@ -53,6 +53,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const pattern = element.dataset.pattern;
         const id = "melody-notation-" + index;
+        const numerator = element.dataset.numerator || 4;
+        const denominator = element.dataset.denominator || 4;
 
         element.id = id;
 
@@ -62,8 +64,8 @@ document.addEventListener("DOMContentLoaded", function () {
             pattern,
             id,
             null,
-            4,      // numerator
-            4,      // denominator
+            numerator,      // numerator
+            denominator,      // denominator
             1600,   // GENERALWIDTH
             90,     // HEIGHT
             0,      // TOPPADDING
@@ -71,8 +73,8 @@ document.addEventListener("DOMContentLoaded", function () {
             40,     // CLEFZONE
             10,     // Xmargin
             512,    // RESPONSIVE_THRESHOLD
-            0.8,    // BASESCALING
-            0.7     // SCALINGFACTOR
+            0.7,    // BASESCALING
+            0.6     // SCALINGFACTOR
         );
     });
 
