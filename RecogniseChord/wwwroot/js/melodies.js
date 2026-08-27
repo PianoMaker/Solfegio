@@ -49,12 +49,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
     melodyNotation.forEach(function (element, index) {
 
-        const card = element.parentElement;
+        console.log("time signature from dataset = ", element.dataset.numerator, "/", element.dataset.denominator);
 
+        const card = element.parentElement;
         const pattern = element.dataset.pattern;
         const id = "melody-notation-" + index;
         const numerator = element.dataset.numerator || 4;
         const denominator = element.dataset.denominator || 4;
+        const barwidth = element.dataset.barwidth|| 160;
 
         element.id = id;
 
@@ -69,7 +71,7 @@ document.addEventListener("DOMContentLoaded", function () {
             1600,   // GENERALWIDTH
             90,     // HEIGHT
             0,      // TOPPADDING
-            200,    // BARWIDTH
+            barwidth,    // BARWIDTH
             40,     // CLEFZONE
             10,     // Xmargin
             512,    // RESPONSIVE_THRESHOLD
