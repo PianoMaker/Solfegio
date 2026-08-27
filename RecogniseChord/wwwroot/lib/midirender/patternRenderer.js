@@ -252,7 +252,8 @@
 		Xmargin = 10,
 		RESPONSIVE_THRESHOLD = 800,
 		BASESCALING = 1,
-		SCALINGFACTOR = 0.6
+		SCALINGFACTOR = 0.6,
+		keySign = "C"
 
 	) {
 		try {
@@ -272,7 +273,7 @@
 			}
 
 			// Parse tokens -> items
-			const measures = getMeasuresFromTokens(tokens, parseToken, numerator, denominator, UNITS_PER_QUARTER, durationToUnits, unitsToDurationList, sumUnits);
+			const measures = getMeasuresFromTokens(tokens, parseToken, numerator, denominator, UNITS_PER_QUARTER, durationToUnits, unitsToDurationList, sumUnits, keySign);
 
 			// Compute width/height
 			const MIN_SCORE_WIDTH = Math.max(320, CLEFZONE + BARWIDTH + Xmargin * 2);
@@ -293,7 +294,7 @@
 			const extra = Math.max(10, TOPPADDING || 0);
 			const totalHeight = rows * HEIGHT + extra;
 
-			console.log(`patternRenderer: ${measures.length} measures, ${rows} rows, totalHeight=${totalHeight}, GEN_WIDTH=${GEN_WIDTH}, actualBarWidth=${actualBarWidth}`);
+			console.log(`patternRenderer: ${measures.length} measures, ${rows} rows, totalHeight=${totalHeight}, GEN_WIDTH=${GEN_WIDTH}, actualBarWidth=${actualBarWidth}, keySign=${keySign}`);
 
 			
 			
@@ -331,9 +332,9 @@
 				if (Yposition !== previousY) {
 					isFirstMeasureInRow = true;
 				}
-
+				console.log("keySign = ", keySign);
 				let STAVE_WIDTH = adjustStaveWidth(actualBarWidth, i, CLEFZONE, isFirstMeasureInRow, false);
-				const stave = setStave(Xposition, Yposition, STAVE_WIDTH, i, numerator, denominator, isFirstMeasureInRow, false, false, null);
+				const stave = setStave(Xposition, Yposition, STAVE_WIDTH, i, numerator, denominator, isFirstMeasureInRow, false, false, keySign);
 				stave.setContext(context).draw();
 
 				const ties = measures[i].ties || [];
@@ -378,7 +379,8 @@ function getMeasuresFromTokens(
 	UNITS_PER_QUARTER,
 	durationToUnits,
 	unitsToDurationList,
-	sumUnits
+	sumUnits,
+	keySign
 ) {
 	const items = tokens.map(parseToken).filter(Boolean);
 
@@ -483,7 +485,7 @@ function getMeasuresFromTokens(
 					const accToDraw = decideAccidentalForNote(
 						it.key,
 						it.accidental,
-						null,
+						keySign,
 						measureAccState,
 						i
 					);

@@ -1098,8 +1098,35 @@ function decideAccidentalForNote(key, spelledAccidental, currentKeySig, measureA
 	const id = `${letter}/${octave}`;
 
 	// Key signature accidental for this letter
-	const ksMap = currentKeySig ? buildKeySignatureMap(currentKeySig.sf) : {};
-	const ksAcc = ksMap[letter]; // '#', 'b', or undefined
+	const keySigFifths = {
+		C: 0,
+		G: 1,
+		D: 2,
+		A: 3,
+		E: 4,
+		B: 5,
+		"F#": 6,
+		"C#": 7,
+		F: -1,
+		Bb: -2,
+		Eb: -3,
+		Ab: -4,
+		Db: -5,
+		Gb: -6,
+		Cb: -7
+	};
+
+	const sf = typeof currentKeySig === "string"
+		? keySigFifths[currentKeySig]
+		: typeof currentKeySig === "number"
+			? currentKeySig
+			: currentKeySig?.sf;
+
+	const ksMap = sf !== undefined
+		? buildKeySignatureMap(sf)
+		: {};
+
+	const ksAcc = ksMap[letter];
 
 	// spelledAccidental is the enharmonic choice for this pitch: '#', 'b', or null (natural)
 	const spelled = spelledAccidental ?? null;
