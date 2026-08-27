@@ -56,7 +56,8 @@ document.addEventListener("DOMContentLoaded", function () {
         const id = "melody-notation-" + index;
         const numerator = element.dataset.numerator || 4;
         const denominator = element.dataset.denominator || 4;
-        const barwidth = element.dataset.barwidth|| 160;
+        const barwidth = element.dataset.barwidth || 160;
+        const key = element.dataset.key || "C";
 
         element.id = id;
 
@@ -76,7 +77,8 @@ document.addEventListener("DOMContentLoaded", function () {
             10,     // Xmargin
             512,    // RESPONSIVE_THRESHOLD
             0.7,    // BASESCALING
-            0.6     // SCALINGFACTOR
+            0.6,     // SCALINGFACTOR
+            key     //KeySignature
         );
     });
 
