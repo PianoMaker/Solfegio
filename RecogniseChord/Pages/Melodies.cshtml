@@ -18,7 +18,7 @@
                 </div>
                 <div class="melody-notation"
                      data-barwidth="230"
-                     data-pattern="e'8_dis'8_e'8_dis'8_e'8_h8_d'8_c'8_a4_r4"></div>
+                     data-pattern="e'8_dis'8_e'8_dis'8_e'8_h8_d'8_c'8_a2"></div>
             </div>
 
             <div class="melody-card">
@@ -45,6 +45,16 @@
                 <div class="melody-notation"
                      data-barwidth="230"
                      data-pattern="a8_a8_g8_g8_a4_e8_e8_a8_a8_g8_g8_a4_e8_e8"></div>
+            </div>
+
+            <div class="melody-card">
+                <div class="melody-info">
+                    <h3>Пісня Петрика П'яточкина'</h3>
+                    <p>Володимир Бистряков</p>
+                </div>
+                <div class="melody-notation"
+                     data-barwidth="145"
+                     data-pattern="r4_d8_d8_d8_d8_d8_d8_e8_d8_r4_r2_r4_d8_d8_d8_d8_d8_d8_e8_d8_"></div>
             </div>
 
 
@@ -87,6 +97,17 @@
                      data-pattern="r4_c4_e4_f4_g1_r4_c4_e4_f4_g1"></div>
             </div>
 
+            <div class="melody-card">
+                <div class="melody-info">
+                    <h3>Harry Potter theme 2</h3>
+                    <p>Nicholas Hooper</p>
+                </div>
+                <div class="melody-notation"
+                     data-barwidth="100"
+                     data-numerator="3"
+                     data-pattern="r2_c4_e2_c4_e2_c4_f2_e4_dis2_dis4_e4._c8_a,4"></div>
+            </div>
+
 
             <!-- ЧИСТА КВАРТА -->
             <h2>Чиста кварта</h2>
@@ -127,7 +148,16 @@
             <!-- ТРИТОН -->
             <h2>Тритон</h2>
 
+            <div class="melody-card" data-audio="sound/s8crryce.mp3">
+                <div class="melody-info">
+                    <h3>Prélude à l'après-midi d'un faune</h3>
+                    <p>Claude Debussi</p>
+                </div>
 
+                <div class="melodyexample">
+                    <img src="https://upload.wikimedia.org/score/s/8/s8crrycesbyym1mol7uphf5o9efbgf9/s8crryce.svg" alt="Debussi." />
+                </div>
+            </div>
 
 
             <!-- ЧИСТА КВІНТА -->
@@ -147,9 +177,8 @@
                 <div class="melody-info">
                     <h3>Бандуристе, орле сизий</h3>
                     <p>Українська народна пісня</p>
-                </div>
-                <div class="melody-notation"
-                     data-key="F"
+                </div><div class="melody-notation"
+                           data-key="F"
                      data-barwidth="240"
                      data-pattern="d4_a4_a4._c'8_b8_a8_g8_b8_a4_a4"></div>
             </div>
@@ -167,16 +196,6 @@
                      data-key="Bb"
                      data-barwidth="240"
                      data-pattern="d8_d8_d8_d8_b4_a4_g2"></div>
-            </div>
-
-            <div class="melody-card">
-                <div class="melody-info">
-                    <h3>My Bonnie Lies Over the Ocean</h3>
-                    <p>народна</p>
-                </div>
-                <div class="melody-notation"
-                     data-barwidth="240"
-                     data-pattern="g4_e'4_d'4_c'4_d'4_e'4_d'4"></div>
             </div>
 
             <!-- ВЕЛИКА СЕКСТА -->
@@ -205,7 +224,18 @@
                 </div>
                 <div class="melody-notation"
                      data-key="F"
-                     data-pattern="r2_r8_c8_c8_c8_b2_b8_a16_c'16_b4_g4_g4"></div>
+                     data-numerator="6"
+                     data-pattern="c4_c4_c4_b2._b4_a8_c'8_b4_g4_g2"></div>
+            </div>
+
+            <div class="melody-card">
+                <div class="melody-info">
+                    <h3>"Тепер я турок не козак""</h3>
+                    <p>С.Гулак-Артемовський (арія Уарася з опери "Запорожець за Дунаєм")</p>
+                </div>
+                <div class="melody-notation"
+                     data-key="F"
+                     data-pattern="r2_r4._c8_b4._a8_g8_f8_e8_d8_c4"></div>
             </div>
 
 
@@ -231,6 +261,7 @@
 </div>
 @section Scripts {
     <script src="~/lib/midirender/vexflow.js"></script>
+    <script src="~/lib/midirender/melodyAudio.js" asp-append-version="true"></script>
     <script src="~/lib/midirender/mr-beams-helper.js" asp-append-version="true"></script>
     <script src="~/lib/midirender/mr-key-signatures-helper.js" asp-append-version="true"></script>
     <script src="~/lib/midirender/mr-calculate-rows-helper.js" asp-append-version="true"></script>
