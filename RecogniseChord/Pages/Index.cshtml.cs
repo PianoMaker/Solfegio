@@ -445,6 +445,94 @@ namespace RecogniseChord.Pages
             return Page();
         }
         //генереує випадкове співзвуччя та записує аудіофайл
+
+
+        public IActionResult OnPostRegenerate()
+        {
+            MessageL(12, "perform Regenerate");
+
+            ReadInfo();
+            RestoreTimbre();
+
+            var chordData = TryGetCurrentChord(keep: true);
+
+            if (chordData == null)
+            {
+                ErrorMessageL("Regenerate: current chord is not available.");
+                return Page();
+            }
+
+            string fullPath = Path.Combine(_environment.WebRootPath,chordData.FileRelative.TrimStart('/', '\\'));
+
+            //Якщо є файл на сервері
+            if (System.IO.File.Exists(fullPath))
+            {
+                MessageL(COLORS.gray,
+                    $"Regenerate: audio file already exists: {chordData.FileRelative}");
+
+                ApplyChordData(chordData);
+                PopulateTypesForGenerated();
+                PopulateQualitiesForGenerated();
+                SyncLegacyLists();
+
+                return Page();
+            }
+
+            try
+            {
+                // Відновлюємо ТОЧНО ті самі MIDI pitches.
+                // Тут НЕ використовуємо GenerateRandomChord(),
+                // тому акорд не зміниться.
+                var chord = new ChordT();
+
+                foreach (var pitch in chordData.AbsPitches)
+                {
+                    chord.AddNote(new Note(pitch));
+                }
+
+                chord.SetDuration(DURATION.whole);
+
+                TIMBRE timbre = GetTimbre();
+                fullPath = GetFullPath();
+
+                if (timbre == TIMBRE.piano && SamplePathExist)
+                    chord.SaveSampleWave(fullPath, SamplePath);
+                else
+                    chord.SaveWave(fullPath, timbre);
+
+                AudioAnalysis(fullPath);
+
+                string rel = RelativeFromFull(fullPath);
+
+                chordData.FileRelative = rel;
+
+                // Зберігаємо оновлений шлях до нового WAV,
+                // але всі характеристики акорду залишаються старими.
+                TempData[CurrentChordKey] =
+                    JsonSerializer.Serialize(chordData);
+
+                ApplyChordData(chordData);
+
+                PopulateTypesForGenerated();
+                PopulateQualitiesForGenerated();
+                SyncLegacyLists();
+
+                MessageL(
+                    COLORS.green,
+                    $"Regenerate successful: {chordData.NotesDisplay} -> {rel}"
+                );
+            }
+            catch (Exception ex)
+            {
+                ErrorMessageL($"Regenerate failed: {ex.Message}");
+            }
+
+            return Page();
+
+
+        }
+
+
         private ChordData GenerateRandomChord()
         {
             var rnd = new Random();
