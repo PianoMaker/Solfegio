@@ -38,7 +38,7 @@ namespace RecogniseChord.Pages
         // Legacy / UI binding names (map to existing quality/type)
         [BindProperty] public string SelectedChord { get; set; } = string.Empty; // mapped to SelectedQuality
 
-        [BindProperty] public string Timbre { get; set; }
+        [BindProperty] public string Timbre { get; set; } = "piano";
 
         public string UserAnswer { get; set; } = string.Empty;
 
@@ -413,6 +413,9 @@ namespace RecogniseChord.Pages
             }
 
             MessageL(8, "start restoring");
+
+
+
             var chord = RestoreChord(restored);            
             if (chord is null)
             {
@@ -425,7 +428,14 @@ namespace RecogniseChord.Pages
             MessageL(8, $"save wave with timbre {timbre}");
             string fullPath = GetFullPath();
 
-            
+
+            Console.WriteLine("=== TIMBRE TEST ===");
+            Console.WriteLine($"Timbre = {timbre}");
+            Console.WriteLine($"SoundDir = {SoundDir}");
+            Console.WriteLine($"FullPath = {fullPath}");
+            Console.WriteLine($"Directory.Exists = {Directory.Exists(SoundDir)}");
+
+
             if (timbre == TIMBRE.piano && SamplePathExist)                            
                 chord.SaveSampleWave(fullPath, SamplePath);            
             else
@@ -757,7 +767,7 @@ namespace RecogniseChord.Pages
             TIMBRE timbreEnum;
             if (string.IsNullOrWhiteSpace(Timbre) || !Enum.TryParse<TIMBRE>(Timbre, ignoreCase: true, out timbreEnum))
             {
-                timbreEnum = TIMBRE.sin;
+                timbreEnum = TIMBRE.piano;
                 MessageL(COLORS.gray, $"Timbre parse failed or empty ('{Timbre}'), defaulting to {timbreEnum}");
             }
             else
@@ -947,13 +957,30 @@ namespace RecogniseChord.Pages
                     var rchord = new ChordT();
                     foreach (var ap in cd.AbsPitches)
                     {
-                        var note = new Note(ap);
-                        rchord.AddNote(note);
+                        MessageL(8, $"Restore: creating Note({ap})");
+
+                        try
+                        {
+                            var note = new Note(ap);
+                            MessageL(8, $"Restore: Note({ap}) created");
+
+                            rchord.AddNote(note);
+                            MessageL(8, $"Restore: Note({ap}) added");
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageL(4, $"Restore ERROR at Note({ap}): {ex}");
+                            throw;
+                        }
                     }
 
-                    try { rchord.OctUp(); } catch { /* ignore if ChordT doesn't support it */ }
-                    rchord.SetDuration(DURATION.whole);
+                    MessageL(8, "Restore: before OctUp");
+                    rchord.OctUp();
+                    MessageL(8, "Restore: after OctUp");
 
+                    MessageL(8, "Restore: before SetDuration");
+                    rchord.SetDuration(DURATION.whole);
+                    MessageL(8, "Restore: after SetDuration");
                     MessageL(8, $"Restored rchord from AbsPitches: {string.Join(',', cd.AbsPitches)}");
                     return rchord;
                 }

@@ -1,4 +1,4 @@
-﻿using System.Text.RegularExpressions;
+using System.Text.RegularExpressions;
 using static Music.Globals;
 using static Music.Messages;
 using static System.Console;
@@ -682,7 +682,7 @@ namespace Music
 
         public static Tuple<int, int> pitch_to_step_alter(int pitch)
         {
-            if (pitch > NotesInOctave) pitch = pitch % NotesInOctave; 
+            if (pitch >= NotesInOctave) pitch = pitch % NotesInOctave; 
             switch(pitch)
             {
                 case 0: return new Tuple<int, int>(0, 0);

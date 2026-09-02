@@ -85,7 +85,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		;
 		if (savedTimbre)
 			SelectedTimbre.value = savedTimbre;
-		else SelectedTimbre.value = 'sin';
+		else SelectedTimbre.value = 'piano';
 	}
 
 
