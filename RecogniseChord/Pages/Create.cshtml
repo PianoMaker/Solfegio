@@ -1,15 +1,15 @@
 @page
 @model CreateModel
 @{
-    ViewData["Title"] = "Побудувати акорд";
+    ViewData["Title"] = Localizer["BuildChord"];
 }
 
 <div class="text-center">
-    <h1 class="display-4">Побудувати акорд</h1>
+    <h1 class="display-4">@Localizer["BuildChord"]</h1>
     <div class="innercontainer">
         <div id="rightcontainer" class="halfcontainer">
             <form method="post" asp-page-handler="Count" id="countForm">
-                <p>Кількість звуків?</p>
+                <p>@Localizer["CountQuestion"]</p>
                 @foreach (var c in Model.CountOptions)
                 {
                     if (Model.SelectedCount.ToString() == c)
@@ -27,7 +27,7 @@
             <!-- Інтервал/Акорд -->
             <form method="post" asp-page-handler="Type" id="typeForm">
                 <div class="mt-3">
-                    <label>Тип:</label>
+                    <label>@Localizer["Type"]</label>
                     <select asp-for="SelectedType" id="SelectedType" class="select-chord" onchange="document.getElementById('typeForm')?.submit();">
                         <option value="">--</option>
                         @foreach (var t in Model.TypeOptions)
@@ -74,7 +74,7 @@
             <!-- Якість  -->
             <form method="post" asp-page-handler="Quality" id="qualityForm">
                 <div class="mt-3">
-                    <label>Якість:</label>
+                    <label>@Localizer["Quality"]</label>
                     @{
                         var displayCount = Model.SelectedCount;
                     }
@@ -89,7 +89,7 @@
 
                 <!-- ТОНАЛЬНІСТЬ -->
                 <div class="mt-3">
-                    <label>Від ноти:</label>
+                    <label>@Localizer["RootNote"]</label>
                     <select asp-for="RootNote" class="select-root" onchange="document.getElementById('qualityForm')?.submit();">
                         @foreach (var r in Model.RootOptions)
                         {
@@ -114,7 +114,7 @@
             <!-- ТЕМБР -->
             <div>
                 <form id="timbreform" method="post" asp-page-handler="timbre">
-                    <p>Обрати тембр: </p>
+                    <p>@Localizer["ChooseTimbre"]</p>
                     <div style="display:block; margin:5px">
                         <select asp-for="Timbre" id="SelectedTimbre" class="select-chord">
                             @foreach (var timbre in Model.AllTimbres)
@@ -131,7 +131,7 @@
 
             <!-- ГРАТИ -->
             <div class="mt-4">
-                <button id="playBtn" type="button" class="btn btn-success">Відтворити</button>
+                <button id="playBtn" type="button" class="btn btn-success">@Localizer["Play"]</button>
                 <audio id="chordAudio" preload="auto"></audio>
                 <input type="hidden" id="generatedRel" value="@Model.GeneratedFileRelative" />
             </div>

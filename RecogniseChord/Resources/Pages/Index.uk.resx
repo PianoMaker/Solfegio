@@ -120,11 +120,29 @@
   <data name="Choose" xml:space="preserve">
     <value>Виберіть параметри акорду та натисніть "Перевірити"</value>
   </data>
+  <data name="Check" xml:space="preserve">
+    <value>Перевірити</value>
+  </data>
   <data name="ChordsIntervals" xml:space="preserve">
     <value>Інтервали і акорди</value>
   </data>
+  <data name="AttemptsOnSite" xml:space="preserve">
+    <value>спроб на сайті</value>
+  </data>
   <data name="Play" xml:space="preserve">
     <value>Відтворити</value>
+  </data>
+  <data name="MaxSounds" xml:space="preserve">
+    <value>Максимальна кількість звуків:</value>
+  </data>
+  <data name="ChooseTimbre" xml:space="preserve">
+    <value>Обрати тембр:</value>
+  </data>
+  <data name="Regenerate" xml:space="preserve">
+    <value>Згенерувати ще раз</value>
+  </data>
+  <data name="SoundCountQuestion" xml:space="preserve">
+    <value>Скільки звуків?</value>
   </data>
   <data name="Try" xml:space="preserve">
     <value>Спробувати новий акорд?</value>

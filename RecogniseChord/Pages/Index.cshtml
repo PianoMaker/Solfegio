@@ -22,7 +22,7 @@
                 <!-- ПЕРЕМИКАЧ КІЛЬКОСТІ ЗВУКІВ-->
                 <div id="numberOfSoundsSelector" class="innercontainer" style="display:block">
                     <div style="display:block">
-                    <p>Скільки звуків?</p>
+                    <p>@Localizer["SoundCountQuestion"]</p>
                     <form id="selectform" method="post" asp-page-handler="Select">
                         <input type="hidden" asp-for="MaxCount" />
                         <input type="hidden" asp-for="Timbre" />
@@ -56,7 +56,7 @@
                             </select>
                         </div>
                         <input type="hidden" asp-for="SelectedCount" />
-                        <button id="recogniseButton" type="submit">Перевірити</button>
+                        <button id="recogniseButton" type="submit">@Localizer["Check"]</button>
                     </form>
                     </div>
                 </div>
@@ -88,10 +88,10 @@
                 }
                 else
                 {
-                    <p id="choosemessage">Виберіть параметри акорду та натисніть "Перевірити"</p>
+                    <p id="choosemessage">@Localizer["Choose"]</p>
                 }
             </div>
-            <p> @Model.RequestCount спроб на сайті</p>
+            <p>@Model.RequestCount @Localizer["AttemptsOnSite"]</p>
         </div>
         
     </div>
@@ -99,7 +99,7 @@
     <div>
         <form id="maxsoundsform" method="post" asp-page-handler="max">
             <input type="hidden" asp-for="Timbre" />
-            <p>Максимальна кількість звуків: </p>
+            <p>@Localizer["MaxSounds"]</p>
             <input id="maxsoundsinput" type="range" name="maxCount" min="2" max="5" value="@Model.MaxCount" />
             <label for="maxsoundsinput">@Model.MaxCount</label>
         </form>
@@ -107,7 +107,7 @@
     <!-- ТЕМБР -->
     <div>
         <form id="timbreform" method="post" asp-page-handler="timbre">
-            <p>Обрати тембр: </p>
+            <p>@Localizer["ChooseTimbre"]</p>
             <div style="display:block; margin:5px">                
                 <select asp-for="Timbre" id="SelectedTimbre">                    
                     @foreach (var timbre in Model.AllTimbres)
@@ -122,7 +122,7 @@
     <!-- перегенерувати -->
     <div>
         <form id="regenerateform" method="post" asp-page-handler="regenerate">
-            <button id="regeneratebtn" type="submit">Згенерувати ще раз</button>
+            <button id="regeneratebtn" type="submit">@Localizer["Regenerate"]</button>
         </form>
     </div>
 
