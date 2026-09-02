@@ -32,38 +32,7 @@
                         <option value="">--</option>
                         @foreach (var t in Model.TypeOptions)
                         {
-                            var label = t switch
-                            {
-                                "SECUNDA" => "секунда",
-                                "TERZIA"  => "терція",
-                                "QUARTA"  => "кварта",
-                                "QUINTA"  => "квінта",
-                                "SEKSTA"  => "секста",
-                                "SEPTYMA" => "септима",
-                                "OCTAVA"  => "октава",
-                                "TRI"     => "тризвук",
-                                "SEXT"    => "сексакторд",
-                                "QSEXT"   => "квартсекстакорд",
-                                "SEPT"    => "септакорд",
-                                "QUINTS"  => "квінтсекстакорд",
-                                "TERZQ"   => "терцквартакорд",
-                                "SEC"     => "секундакорд",
-                                "NONACORD" => "нонакорд",
-                                "NONACORD_1i" => "нонакорд в 1 оберненні",
-                                "NONACORD_2i" => "нонакорд в 2 оберненні",
-                                "NONACORD_3i" => "нонакорд в 3 оберненні",
-                                "NONACORD_4i" => "нонакорд в 4 оберненні",
-                                _ => t
-                            };
-
-                            if (Model.SelectedType == t)
-                            {
-                                <option value="@t" selected>@label</option>
-                            }
-                            else
-                            {
-                                <option value="@t">@label</option>
-                            }
+                            <option value="@t">@Localizer[t]</option>
                         }
                     </select>
                 </div>
@@ -140,7 +109,7 @@
             @if (Model.CanPlay)
             {
                 <!--<p>Файл створено: <code>@Model.GeneratedFileRelative</code></p>-->
-                <p>Акорд: @Model.SelectedType @Model.SelectedQuality (@Model.RootNote)</p>
+                <p>Акорд: @Localizer[Model.SelectedType] @Model.SelectedQuality (@Model.RootNote)</p>
             }
         </div>
     </div>

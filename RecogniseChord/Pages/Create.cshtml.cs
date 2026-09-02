@@ -15,7 +15,7 @@ namespace RecogniseChord.Pages
     public class CreateModel : PageModel
     {
         [BindProperty] public int SelectedCount { get; set; } = 0; //2..5
-        [BindProperty] public string SelectedType { get; set; } = string.Empty; // українська назва
+        [BindProperty] public string SelectedType { get; set; } = string.Empty; // internal key
         [BindProperty] public string SelectedQuality { get; set; } = string.Empty; // українська назва
         [BindProperty] public string RootNote { get; set; } = "C"; // основний тон
         [BindProperty] public string Timbre { get; set; }
@@ -243,7 +243,7 @@ namespace RecogniseChord.Pages
 
             foreach (var key in keys)
             {
-                TypeOptions.Add(TypeToUkrainian.GetValueOrDefault(key, key));
+                TypeOptions.Add(key);
             }
         }
 
@@ -255,14 +255,14 @@ namespace RecogniseChord.Pages
             // Якщо обрано тип інтервалу (для count==2), показуємо тільки відповідні якості
             if (SelectedCount == 2 && !string.IsNullOrWhiteSpace(SelectedType))
             {
-                var perfectNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+                var perfectTypes = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
                 {
-                    TypeToUkrainian.GetValueOrDefault("QUARTA", "кварта"),
-                    TypeToUkrainian.GetValueOrDefault("QUINTA", "квінта"),
-                    TypeToUkrainian.GetValueOrDefault("OCTAVA", "октава")
+                    "QUARTA",
+                    "QUINTA",
+                    "OCTAVA"
                 };
 
-                if (perfectNames.Contains(SelectedType))
+                if (perfectTypes.Contains(SelectedType))
                 {
                     QualityOptions.Add("чиста");
                     return;
@@ -279,7 +279,7 @@ namespace RecogniseChord.Pages
             MessageL(14, $"BuildChord: Count={SelectedCount}, Type={SelectedType}, Quality={SelectedQuality}, Root={RootNote}");
             
             // Маппінг українських назв -> enum ключі
-            var typeKey = UkrainianToType.GetValueOrDefault(SelectedType, string.Empty);
+            var typeKey = UkrainianToType.GetValueOrDefault(SelectedType, SelectedType);
             var qualityMap = GetUkrainianToQuality(SelectedCount);
             var qualityKey = qualityMap.GetValueOrDefault(SelectedQuality, string.Empty);
 

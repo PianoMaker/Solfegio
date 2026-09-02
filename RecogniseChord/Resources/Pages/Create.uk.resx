@@ -15,17 +15,77 @@
   <data name="BuildChord" xml:space="preserve">
     <value>Побудувати акорд</value>
   </data>
+  <data name="CORD69" xml:space="preserve">
+    <value>нонакорд з секстою</value>
+  </data>
   <data name="CountQuestion" xml:space="preserve">
     <value>Кількість звуків?</value>
   </data>
+  <data name="NONACORD" xml:space="preserve">
+    <value>нонакорд</value>
+  </data>
+  <data name="NONACORD_1i" xml:space="preserve">
+    <value>нонакорд в 1 оберненні</value>
+  </data>
+  <data name="NONACORD_2i" xml:space="preserve">
+    <value>нонакорд в 2 оберненні</value>
+  </data>
+  <data name="NONACORD_3i" xml:space="preserve">
+    <value>нонакорд в 3 оберненні</value>
+  </data>
+  <data name="NONACORD_4i" xml:space="preserve">
+    <value>нонакорд в 4 оберненні</value>
+  </data>
+  <data name="OCTAVA" xml:space="preserve">
+    <value>октава</value>
+  </data>
   <data name="Type" xml:space="preserve">
     <value>Тип:</value>
+  </data>
+  <data name="QSEXT" xml:space="preserve">
+    <value>квартсекстакорд</value>
+  </data>
+  <data name="QUARTA" xml:space="preserve">
+    <value>кварта</value>
+  </data>
+  <data name="QUINTA" xml:space="preserve">
+    <value>квінта</value>
+  </data>
+  <data name="QUINTS" xml:space="preserve">
+    <value>квінтсекстакорд</value>
   </data>
   <data name="Quality" xml:space="preserve">
     <value>Якість:</value>
   </data>
   <data name="RootNote" xml:space="preserve">
     <value>Від ноти (root note):</value>
+  </data>
+  <data name="SEC" xml:space="preserve">
+    <value>секундакорд</value>
+  </data>
+  <data name="SECUNDA" xml:space="preserve">
+    <value>секунда</value>
+  </data>
+  <data name="SEKSTA" xml:space="preserve">
+    <value>секста</value>
+  </data>
+  <data name="SEPT" xml:space="preserve">
+    <value>септакорд</value>
+  </data>
+  <data name="SEPTYMA" xml:space="preserve">
+    <value>септима</value>
+  </data>
+  <data name="SEXT" xml:space="preserve">
+    <value>сексакторд</value>
+  </data>
+  <data name="TERZIA" xml:space="preserve">
+    <value>терція</value>
+  </data>
+  <data name="TERZQ" xml:space="preserve">
+    <value>терцквартакорд</value>
+  </data>
+  <data name="TRI" xml:space="preserve">
+    <value>тризвук</value>
   </data>
   <data name="ChooseTimbre" xml:space="preserve">
     <value>Обрати тембр:</value>
