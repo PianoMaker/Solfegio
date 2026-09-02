@@ -202,6 +202,7 @@ namespace RecogniseChord.Pages
             try
             {
                 chord.SaveWave(fullPath, timbre);
+                
             }
             catch (Exception ex)
             {

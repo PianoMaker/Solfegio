@@ -431,6 +431,11 @@ namespace RecogniseChord.Pages
             else
                 chord.SaveWave(fullPath, timbre);
 
+            MessageL(COLORS.cyan,
+    $"WAV CREATED: {fullPath}, " +
+    $"exists={System.IO.File.Exists(fullPath)}, " +
+    $"size={(System.IO.File.Exists(fullPath) ? new System.IO.FileInfo(fullPath).Length : 0)}");
+
             string rel = RelativeFromFull(fullPath);            
             MessageL(8, $"rel = {rel}");
             AudioAnalysis(fullPath);
