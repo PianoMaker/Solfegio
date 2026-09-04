@@ -169,6 +169,20 @@ document.addEventListener('DOMContentLoaded', function () {
 	// натискання скидає всі прапорці в сесії та надсилає форму розпізнавання
 	//=================================
 	if (recognisebutton) {
+		function updateRecogniseButton() {
+			if (!recognisebutton) return;
+
+			recognisebutton.disabled =
+				!selectedType?.value ||
+				!SelectedQuality?.value;
+		}
+
+		selectedType?.addEventListener('change', updateRecogniseButton);
+		SelectedQuality?.addEventListener('change', updateRecogniseButton);
+
+		updateRecogniseButton();
+
+
 		recognisebutton.addEventListener('click', (e) => {
 			if (!e.isTrusted) return;
 			console.log('Recognise button clicked.');
