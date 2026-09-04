@@ -61,11 +61,65 @@ namespace RecogniseChord.Resources.Pages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to altered root.
+        /// </summary>
+        internal static string ALTPRIM {
+            get {
+                return ResourceManager.GetString("ALTPRIM", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to with diminished fifth.
+        /// </summary>
+        internal static string ALTQUINT {
+            get {
+                return ResourceManager.GetString("ALTQUINT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to attempts on site.
+        /// </summary>
+        internal static string AttemptsOnSite {
+            get {
+                return ResourceManager.GetString("AttemptsOnSite", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to augmented.
+        /// </summary>
+        internal static string AUG {
+            get {
+                return ResourceManager.GetString("AUG", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Check.
+        /// </summary>
+        internal static string Check {
+            get {
+                return ResourceManager.GetString("Check", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
         internal static string Choose {
             get {
                 return ResourceManager.GetString("Choose", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Choose timbre:.
+        /// </summary>
+        internal static string ChooseTimbre {
+            get {
+                return ResourceManager.GetString("ChooseTimbre", resourceCulture);
             }
         }
         
@@ -79,11 +133,407 @@ namespace RecogniseChord.Resources.Pages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to diminished.
+        /// </summary>
+        internal static string DIM {
+            get {
+                return ResourceManager.GetString("DIM", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to diminished.
+        /// </summary>
+        internal static string DIMDIM {
+            get {
+                return ResourceManager.GetString("DIMDIM", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to doubly augmented.
+        /// </summary>
+        internal static string HAUG {
+            get {
+                return ResourceManager.GetString("HAUG", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to augmented dominant.
+        /// </summary>
+        internal static string HDOM {
+            get {
+                return ResourceManager.GetString("HDOM", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to augmented major.
+        /// </summary>
+        internal static string HMAJ {
+            get {
+                return ResourceManager.GetString("HMAJ", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to major.
+        /// </summary>
+        internal static string MAJ {
+            get {
+                return ResourceManager.GetString("MAJ", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to major augmented.
+        /// </summary>
+        internal static string MAJAUG {
+            get {
+                return ResourceManager.GetString("MAJAUG", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to major major.
+        /// </summary>
+        internal static string MAJMAJ {
+            get {
+                return ResourceManager.GetString("MAJMAJ", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to minor major.
+        /// </summary>
+        internal static string MAJMIN {
+            get {
+                return ResourceManager.GetString("MAJMIN", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Maximum number of sounds:.
+        /// </summary>
+        internal static string MaxSounds {
+            get {
+                return ResourceManager.GetString("MaxSounds", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to minor.
+        /// </summary>
+        internal static string MIN {
+            get {
+                return ResourceManager.GetString("MIN", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to minor diminished.
+        /// </summary>
+        internal static string MINDIM {
+            get {
+                return ResourceManager.GetString("MINDIM", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to major minor.
+        /// </summary>
+        internal static string MINMAJ {
+            get {
+                return ResourceManager.GetString("MINMAJ", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to minor minor.
+        /// </summary>
+        internal static string MINMIN {
+            get {
+                return ResourceManager.GetString("MINMIN", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to major dominant.
+        /// </summary>
+        internal static string NDOM {
+            get {
+                return ResourceManager.GetString("NDOM", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to major major.
+        /// </summary>
+        internal static string NMAJ {
+            get {
+                return ResourceManager.GetString("NMAJ", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to minor diminished.
+        /// </summary>
+        internal static string NMDIM {
+            get {
+                return ResourceManager.GetString("NMDIM", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to minor dominant.
+        /// </summary>
+        internal static string NMDOM {
+            get {
+                return ResourceManager.GetString("NMDOM", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to minor half-diminished.
+        /// </summary>
+        internal static string NMHALFDIM {
+            get {
+                return ResourceManager.GetString("NMHALFDIM", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to major minor.
+        /// </summary>
+        internal static string NMIN {
+            get {
+                return ResourceManager.GetString("NMIN", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to major augmented.
+        /// </summary>
+        internal static string NMJAUG {
+            get {
+                return ResourceManager.GetString("NMJAUG", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to minor minor.
+        /// </summary>
+        internal static string NMMIN {
+            get {
+                return ResourceManager.GetString("NMMIN", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ninth chord.
+        /// </summary>
+        internal static string NONACORD {
+            get {
+                return ResourceManager.GetString("NONACORD", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ninth chord, first inversion.
+        /// </summary>
+        internal static string NONACORD_1i {
+            get {
+                return ResourceManager.GetString("NONACORD_1i", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ninth chord, second inversion.
+        /// </summary>
+        internal static string NONACORD_2i {
+            get {
+                return ResourceManager.GetString("NONACORD_2i", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ninth chord, third inversion.
+        /// </summary>
+        internal static string NONACORD_3i {
+            get {
+                return ResourceManager.GetString("NONACORD_3i", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ninth chord, fourth inversion.
+        /// </summary>
+        internal static string NONACORD_4i {
+            get {
+                return ResourceManager.GetString("NONACORD_4i", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to octave.
+        /// </summary>
+        internal static string OCTAVA {
+            get {
+                return ResourceManager.GetString("OCTAVA", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to perfect.
+        /// </summary>
+        internal static string PERFECT {
+            get {
+                return ResourceManager.GetString("PERFECT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Play.
         /// </summary>
         internal static string Play {
             get {
                 return ResourceManager.GetString("Play", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to six-four chord.
+        /// </summary>
+        internal static string QSEXT {
+            get {
+                return ResourceManager.GetString("QSEXT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to fourth.
+        /// </summary>
+        internal static string QUARTA {
+            get {
+                return ResourceManager.GetString("QUARTA", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to fifth.
+        /// </summary>
+        internal static string QUINTA {
+            get {
+                return ResourceManager.GetString("QUINTA", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to seventh chord, second inversion.
+        /// </summary>
+        internal static string QUINTS {
+            get {
+                return ResourceManager.GetString("QUINTS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Generate again.
+        /// </summary>
+        internal static string Regenerate {
+            get {
+                return ResourceManager.GetString("Regenerate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 2th chord.
+        /// </summary>
+        internal static string SEC {
+            get {
+                return ResourceManager.GetString("SEC", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to second.
+        /// </summary>
+        internal static string SECUNDA {
+            get {
+                return ResourceManager.GetString("SECUNDA", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to sixth.
+        /// </summary>
+        internal static string SEKSTA {
+            get {
+                return ResourceManager.GetString("SEKSTA", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to seventh chord.
+        /// </summary>
+        internal static string SEPT {
+            get {
+                return ResourceManager.GetString("SEPT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to seventh.
+        /// </summary>
+        internal static string SEPTYMA {
+            get {
+                return ResourceManager.GetString("SEPTYMA", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to sixth chord.
+        /// </summary>
+        internal static string SEXT {
+            get {
+                return ResourceManager.GetString("SEXT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to How many sounds?.
+        /// </summary>
+        internal static string SoundCountQuestion {
+            get {
+                return ResourceManager.GetString("SoundCountQuestion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to third.
+        /// </summary>
+        internal static string TERZIA {
+            get {
+                return ResourceManager.GetString("TERZIA", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to seventh chord, third inversion.
+        /// </summary>
+        internal static string TERZQ {
+            get {
+                return ResourceManager.GetString("TERZQ", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to triad.
+        /// </summary>
+        internal static string TRI {
+            get {
+                return ResourceManager.GetString("TRI", resourceCulture);
             }
         }
         

@@ -144,6 +144,138 @@
   <data name="SoundCountQuestion" xml:space="preserve">
     <value>Скільки звуків?</value>
   </data>
+  <data name="SECUNDA" xml:space="preserve">
+    <value>секунда</value>
+  </data>
+  <data name="TERZIA" xml:space="preserve">
+    <value>терція</value>
+  </data>
+  <data name="QUARTA" xml:space="preserve">
+    <value>кварта</value>
+  </data>
+  <data name="QUINTA" xml:space="preserve">
+    <value>квінта</value>
+  </data>
+  <data name="SEKSTA" xml:space="preserve">
+    <value>секста</value>
+  </data>
+  <data name="SEPTYMA" xml:space="preserve">
+    <value>септима</value>
+  </data>
+  <data name="OCTAVA" xml:space="preserve">
+    <value>октава</value>
+  </data>
+  <data name="TRI" xml:space="preserve">
+    <value>тризвук</value>
+  </data>
+  <data name="SEXT" xml:space="preserve">
+    <value>сексакторд</value>
+  </data>
+  <data name="QSEXT" xml:space="preserve">
+    <value>квартсекстакорд</value>
+  </data>
+  <data name="SEPT" xml:space="preserve">
+    <value>септакорд</value>
+  </data>
+  <data name="QUINTS" xml:space="preserve">
+    <value>квінтсекстакорд</value>
+  </data>
+  <data name="TERZQ" xml:space="preserve">
+    <value>терцквартакорд</value>
+  </data>
+  <data name="SEC" xml:space="preserve">
+    <value>секундакорд</value>
+  </data>
+  <data name="NONACORD" xml:space="preserve">
+    <value>нонакорд</value>
+  </data>
+  <data name="NONACORD_1i" xml:space="preserve">
+    <value>нонакорд в 1 оберненні</value>
+  </data>
+  <data name="NONACORD_2i" xml:space="preserve">
+    <value>нонакорд в 2 оберненні</value>
+  </data>
+  <data name="NONACORD_3i" xml:space="preserve">
+    <value>нонакорд в 3 оберненні</value>
+  </data>
+  <data name="NONACORD_4i" xml:space="preserve">
+    <value>нонакорд в 4 оберненні</value>
+  </data>
+  <data name="MAJ" xml:space="preserve">
+    <value>велика</value>
+  </data>
+  <data name="MIN" xml:space="preserve">
+    <value>мала</value>
+  </data>
+  <data name="PERFECT" xml:space="preserve">
+    <value>чиста</value>
+  </data>
+  <data name="AUG" xml:space="preserve">
+    <value>збільшений</value>
+  </data>
+  <data name="DIM" xml:space="preserve">
+    <value>зменшений</value>
+  </data>
+  <data name="MAJAUG" xml:space="preserve">
+    <value>великий збільшений</value>
+  </data>
+  <data name="MAJMAJ" xml:space="preserve">
+    <value>великий мажорний</value>
+  </data>
+  <data name="MAJMIN" xml:space="preserve">
+    <value>малий мажорний</value>
+  </data>
+  <data name="MINMAJ" xml:space="preserve">
+    <value>великий мінорний</value>
+  </data>
+  <data name="MINMIN" xml:space="preserve">
+    <value>малий мінорний</value>
+  </data>
+  <data name="MINDIM" xml:space="preserve">
+    <value>малий зменшений</value>
+  </data>
+  <data name="DIMDIM" xml:space="preserve">
+    <value>зменшений</value>
+  </data>
+  <data name="ALTQUINT" xml:space="preserve">
+    <value>з понеженою квінтою</value>
+  </data>
+  <data name="ALTPRIM" xml:space="preserve">
+    <value>альт. прима</value>
+  </data>
+  <data name="HAUG" xml:space="preserve">
+    <value>двічі збільшений</value>
+  </data>
+  <data name="HMAJ" xml:space="preserve">
+    <value>збільшений мажорний</value>
+  </data>
+  <data name="HDOM" xml:space="preserve">
+    <value>збільшений домінантовий</value>
+  </data>
+  <data name="NMJAUG" xml:space="preserve">
+    <value>великий збільшений</value>
+  </data>
+  <data name="NMAJ" xml:space="preserve">
+    <value>великий мажорний</value>
+  </data>
+  <data name="NDOM" xml:space="preserve">
+    <value>великий домінантовий</value>
+  </data>
+  <data name="NMIN" xml:space="preserve">
+    <value>великий мінорний</value>
+  </data>
+  <data name="NMDOM" xml:space="preserve">
+    <value>малий домінантовий</value>
+  </data>
+  <data name="NMMIN" xml:space="preserve">
+    <value>малий мінорний</value>
+  </data>
+  <data name="NMHALFDIM" xml:space="preserve">
+    <value>малий напівзменшений</value>
+  </data>
+  <data name="NMDIM" xml:space="preserve">
+    <value>малий зменшений</value>
+  </data>
   <data name="Try" xml:space="preserve">
     <value>Спробувати новий акорд?</value>
   </data>

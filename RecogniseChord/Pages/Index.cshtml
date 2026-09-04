@@ -42,7 +42,7 @@
                                 <option value="">--</option>
                                 @foreach (var type in Model.TypeOptions)
                                 {
-                                    <option value="@type" selected="@(Model.SelectedType == type)">@type</option>
+                                    <option value="@type">@Localizer[type]</option>
                                 }
                             </select>
                         </div>
@@ -51,7 +51,7 @@
                             <select asp-for="SelectedQuality" id="SelectedQuality" class="select-quality">
                                 @foreach (var quality in Model.QualityOptions)
                                 {
-                                    <option value="@quality" selected="@(Model.SelectedQuality == quality)">@quality</option>
+                                    <option value="@quality">@Localizer[quality]</option>
                                 }
                             </select>
                         </div>

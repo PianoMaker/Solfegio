@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Localization;
 using Music;
 using System;
 using System.Collections.Generic;
@@ -14,13 +15,15 @@ namespace RecogniseChord.Pages
     public class IndexModel : PageModel
     {
         private readonly ILogger<IndexModel> _logger;
+        private readonly IStringLocalizer _localizer;
 
         public IWebHostEnvironment _environment;
 
-        public IndexModel(ILogger<IndexModel> logger, IWebHostEnvironment environment)
+        public IndexModel(ILogger<IndexModel> logger, IWebHostEnvironment environment, IStringLocalizerFactory localizerFactory)
         {
             _logger = logger;
             _environment = environment;
+            _localizer = localizerFactory.Create("RecogniseChord.Resources.Pages.Index", typeof(IndexModel).Assembly.GetName().Name!);
             Console.WriteLine($"index constructor environment = {environment.ToString()}");
         }
 
@@ -30,10 +33,10 @@ namespace RecogniseChord.Pages
 
         public List<string> AllTimbres { get; set; } = Enum.GetNames(typeof(TIMBRE)).ToList();
 
-        // User selections (guess) — тепер зберігають українські назви
+        // User selections (guess) — internal keys
         [BindProperty] public int SelectedCount { get; set; } = 0; //2..5
-        [BindProperty] public string SelectedType { get; set; } = string.Empty; // українська назва
-        [BindProperty] public string SelectedQuality { get; set; } = string.Empty; // українська назва
+        [BindProperty] public string SelectedType { get; set; } = string.Empty;
+        [BindProperty] public string SelectedQuality { get; set; } = string.Empty;
         [BindProperty] public string RootNoteGuess { get; set; } = string.Empty;
         // Legacy / UI binding names (map to existing quality/type)
         [BindProperty] public string SelectedChord { get; set; } = string.Empty; // mapped to SelectedQuality
@@ -59,11 +62,11 @@ namespace RecogniseChord.Pages
         public bool? RecogniseOk { get; private set; }
         public string? RecogniseCorrect { get; private set; }
 
-        // Options for UI (display strings in Ukrainian)
+        // Options for UI
         public List<string> CountOptions { get; } = new() { "2", "3", "4", "5" };
-        public List<string> Options { get; private set; } = new(); // qualities list (display)
-        public List<string> Types { get; private set; } = new(); // type list (display)
-        public List<string> TypeOptions { get; private set; } = new(); // internal storage for display strings
+        public List<string> Options { get; private set; } = new();
+        public List<string> Types { get; private set; } = new();
+        public List<string> TypeOptions { get; private set; } = new();
         public List<string> QualityOptions { get; private set; } = new();
         public List<string> RootOptions { get; } = new() { "C", "D", "E", "F", "G", "A", "B" };
 
@@ -74,72 +77,38 @@ namespace RecogniseChord.Pages
         // TempData key for the current rchord
         private const string CurrentChordKey = "__currentChord";
 
-        // Маппінг enum -> українська назва
-        private static readonly Dictionary<string, string> TypeToUkrainian = new()
+        private Dictionary<string, string> GetQualityLabels(int count) => count switch
         {
-            ["SECUNDA"] = "секунда",
-            ["TERZIA"] = "терція",
-            ["QUARTA"] = "кварта",
-            ["QUINTA"] = "квінта",
-            ["SEKSTA"] = "секста",
-            ["SEPTYMA"] = "септима",
-            ["OCTAVA"] = "октава",
-            ["TRI"] = "тризвук",
-            ["SEXT"] = "сексакторд",
-            ["QSEXT"] = "квартсекстакорд",
-            ["SEPT"] = "септакорд",
-            ["QUINTS"] = "квінтсекстакорд",
-            ["TERZQ"] = "терцквартакорд",
-            ["SEC"] = "секундакорд",
-            ["NONACORD"] = "нонакорд",
-            ["NONACORD_1i"] = "нонакорд в 1 оберненні",
-            ["NONACORD_2i"] = "нонакорд в 2 оберненні",
-            ["NONACORD_3i"] = "нонакорд в 3 оберненні",
-            ["NONACORD_4i"] = "нонакорд в 4 оберненні",
-        };
-
-        private static readonly Dictionary<string, string> UkrainianToType =
-            TypeToUkrainian.ToDictionary(kv => kv.Value, kv => kv.Key);
-
-        // Маппінг для якостей (залежить від кількості нот)
-        private static Dictionary<string, string> GetQualityToUkrainian(int count) => count switch
-        {
-            2 => new() { ["MAJ"] = "велика", ["MIN"] = "мала", ["PERFECT"] = "чиста" },
-            3 => new() { ["MAJ"] = "мажорний", ["MIN"] = "мінорний", ["AUG"] = "збільшений", ["DIM"] = "зменшений" },
+            2 => new() { ["MAJ"] = _localizer["MAJ"], ["MIN"] = _localizer["MIN"], ["PERFECT"] = _localizer["PERFECT"] },
+            3 => new() { ["MAJ"] = _localizer["MAJ"], ["MIN"] = _localizer["MIN"], ["AUG"] = _localizer["AUG"], ["DIM"] = _localizer["DIM"] },
             4 => new()
             {
-                ["MAJAUG"] = "великий збільшений",
-                ["MAJMAJ"] = "великий мажорний",
-                ["MAJMIN"] = "малий мажорний",
-                ["MINMAJ"] = "великий мінорний",
-                ["MINMIN"] = "малий мінорний",
-                ["MINDIM"] = "малий зменшений",
-                ["DIMDIM"] = "зменшений",
-                ["ALTQUINT"] = "з понеженою квінтою",
-                ["ALTPRIM"] = "альт. прима"
+                ["MAJAUG"] = _localizer["MAJAUG"],
+                ["MAJMAJ"] = _localizer["MAJMAJ"],
+                ["MAJMIN"] = _localizer["MAJMIN"],
+                ["MINMAJ"] = _localizer["MINMAJ"],
+                ["MINMIN"] = _localizer["MINMIN"],
+                ["MINDIM"] = _localizer["MINDIM"],
+                ["DIMDIM"] = _localizer["DIMDIM"],
+                ["ALTQUINT"] = _localizer["ALTQUINT"],
+                ["ALTPRIM"] = _localizer["ALTPRIM"]
             },
             5 => new()
             {
-                ["HAUG"] = "двічі збільшений",
-                ["HMAJ"] = "збільшений мажорний",
-                ["HDOM"] = "збільшений домінантовий",
-                ["NMJAUG"] = "великий збільшений",
-                ["NMAJ"] = "великий мажорний",
-                ["NDOM"] = "великий домінантовий",
-                ["NMIN"] = "великий мінорний",
-                ["NMDOM"] = "малий домінантовий",
-                ["NMMIN"] = "малий мінорний",
-                ["NMHALFDIM"] = "малий напівзменшений",
-                ["NMDIM"] = "малий зменшений"
+                ["HAUG"] = _localizer["HAUG"],
+                ["HMAJ"] = _localizer["HMAJ"],
+                ["HDOM"] = _localizer["HDOM"],
+                ["NMJAUG"] = _localizer["NMJAUG"],
+                ["NMAJ"] = _localizer["NMAJ"],
+                ["NDOM"] = _localizer["NDOM"],
+                ["NMIN"] = _localizer["NMIN"],
+                ["NMDOM"] = _localizer["NMDOM"],
+                ["NMMIN"] = _localizer["NMMIN"],
+                ["NMHALFDIM"] = _localizer["NMHALFDIM"],
+                ["NMDIM"] = _localizer["NMDIM"]
             },
             _ => new()
         };
-
-        private static Dictionary<string, string> GetUkrainianToQuality(int count)
-        {
-            var map = GetQualityToUkrainian(count);
-            return map.ToDictionary(kv => kv.Value, kv => kv.Key);
-        }
         
 
         public string FilePath => Path.Combine(_environment.WebRootPath, "info", "info.txt");
@@ -292,10 +261,8 @@ namespace RecogniseChord.Pages
                 if (!string.IsNullOrEmpty(SelectedChord))
                     SelectedQuality = SelectedChord;
 
-                // Маппінг українських назв -> enum ключі
-                var typeKey = string.IsNullOrEmpty(SelectedType) ? string.Empty : UkrainianToType.GetValueOrDefault(SelectedType, string.Empty);
-                var qualityMap = GetUkrainianToQuality(SelectedCount > 0 ? SelectedCount : actual.Count);
-                var qualityKey = string.IsNullOrEmpty(SelectedQuality) ? string.Empty : qualityMap.GetValueOrDefault(SelectedQuality, string.Empty);
+                var typeKey = SelectedType ?? string.Empty;
+                var qualityKey = SelectedQuality ?? string.Empty;
 
                 bool ok = SelectedCount == actual.Count &&
                          string.Equals(typeKey, actual.Type, StringComparison.OrdinalIgnoreCase) &&
@@ -307,19 +274,19 @@ namespace RecogniseChord.Pages
                 TempData[MaxCountTempKey] = MaxCount.ToString();
 
 
-                // Показуємо правильну відповідь українською
-                var correctTypeUkr = TypeToUkrainian.GetValueOrDefault(actual.Type, actual.Type);
-                var correctQualMap = GetQualityToUkrainian(actual.Count);
-                var correctQualUkr = correctQualMap.GetValueOrDefault(actual.Quality, actual.Quality);
+                var correctType = _localizer[actual.Type];
+                var correctQuality = _localizer[actual.Quality];
 
-                RecogniseCorrect = $"{correctTypeUkr} {correctQualUkr} (від ноти {actual.Root}) — ноти: {actual.NotesDisplay}";
+                RecogniseCorrect = $"{correctType} {correctQuality} (від ноти {actual.Root}) — ноти: {actual.NotesDisplay}";
 
                 MessageL(ok ? COLORS.green : COLORS.red,
                          $"Recognise: user={SelectedCount}/{typeKey}/{qualityKey} actual={actual.Count}/{actual.Type}/{actual.Quality}");
 
                 // генеруємо відображення введеної користувачем відповіді
 
-                UserAnswer = string.Join(SelectedQuality + " " + SelectedChord);
+                UserAnswer = string.Join(" ", new[] { SelectedType, SelectedQuality }
+                    .Where(x => !string.IsNullOrWhiteSpace(x))
+                    .Select(x => _localizer[x].Value));
 
                 // keep current rchord in TempData while we display feedback
                 TempData.Keep(CurrentChordKey);
@@ -358,10 +325,8 @@ namespace RecogniseChord.Pages
             if (!string.IsNullOrEmpty(SelectedChord))
                 SelectedQuality = SelectedChord;
 
-            // Маппінг українських назв -> enum ключі
-            var typeKey = string.IsNullOrEmpty(SelectedType) ? string.Empty : UkrainianToType.GetValueOrDefault(SelectedType, string.Empty);
-            var qualityMap = GetUkrainianToQuality(SelectedCount);
-            var qualityKey = string.IsNullOrEmpty(SelectedQuality) ? string.Empty : qualityMap.GetValueOrDefault(SelectedQuality, string.Empty);
+            var typeKey = SelectedType ?? string.Empty;
+            var qualityKey = SelectedQuality ?? string.Empty;
 
             PopulateTypes(SelectedCount);
             PopulateQualities(SelectedCount, SelectedType);
@@ -811,44 +776,37 @@ namespace RecogniseChord.Pages
 
             foreach (var key in keys)
             {
-                TypeOptions.Add(TypeToUkrainian.GetValueOrDefault(key, key));
+                TypeOptions.Add(key);
             }
         }
         private void PopulateTypesForGenerated() => PopulateTypes(GeneratedCount);
 
         // заповнює спадний список якостей інтервалів
-        private void PopulateQualities(int count, string? typeUkr = null)
+        private void PopulateQualities(int count, string? typeKey = null)
         {
             QualityOptions.Clear();
             if (count <= 0) return;
 
-            // If asking about intervals of two sounds (count==2) and the selected type is a perfect interval
-            // (кварта / квінта / октава) then only show "чиста"
-            if (count == 2 && !string.IsNullOrWhiteSpace(typeUkr))
+            if (count == 2 && !string.IsNullOrWhiteSpace(typeKey))
             {
-                var perfectNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+                var perfectTypes = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
                 {
-                    TypeToUkrainian.GetValueOrDefault("QUARTA", "кварта"),
-                    TypeToUkrainian.GetValueOrDefault("QUINTA", "квінта"),
-                    TypeToUkrainian.GetValueOrDefault("OCTAVA", "октава")
+                    "QUARTA",
+                    "QUINTA",
+                    "OCTAVA"
                 };
 
-                if (perfectNames.Contains(typeUkr))
+                if (perfectTypes.Contains(typeKey))
                 {
-                    QualityOptions.Add("чиста");
+                    QualityOptions.Add("PERFECT");
                     return;
                 }
             }
 
-            // Fallback: populate usual qualities for the given count
-            var map = GetQualityToUkrainian(count);
-            QualityOptions.AddRange(map.Values);
+            var map = GetQualityLabels(count);
+            QualityOptions.AddRange(map.Keys);
         }
-        private void PopulateQualitiesForGenerated()
-        {
-            var genTypeUkr = TypeToUkrainian.GetValueOrDefault(GeneratedType, string.Empty);
-            PopulateQualities(GeneratedCount, genTypeUkr);
-        }
+        private void PopulateQualitiesForGenerated() => PopulateQualities(GeneratedCount, GeneratedType);
 
         private void SyncLegacyLists()
         {

@@ -145,6 +145,138 @@
   <data name="SoundCountQuestion" xml:space="preserve">
     <value>How many sounds?</value>
   </data>
+  <data name="SECUNDA" xml:space="preserve">
+    <value>second</value>
+  </data>
+  <data name="TERZIA" xml:space="preserve">
+    <value>third</value>
+  </data>
+  <data name="QUARTA" xml:space="preserve">
+    <value>fourth</value>
+  </data>
+  <data name="QUINTA" xml:space="preserve">
+    <value>fifth</value>
+  </data>
+  <data name="SEKSTA" xml:space="preserve">
+    <value>sixth</value>
+  </data>
+  <data name="SEPTYMA" xml:space="preserve">
+    <value>seventh</value>
+  </data>
+  <data name="OCTAVA" xml:space="preserve">
+    <value>octave</value>
+  </data>
+  <data name="TRI" xml:space="preserve">
+    <value>triad</value>
+  </data>
+  <data name="SEXT" xml:space="preserve">
+    <value>sixth chord</value>
+  </data>
+  <data name="QSEXT" xml:space="preserve">
+    <value>six-four chord</value>
+  </data>
+  <data name="SEPT" xml:space="preserve">
+    <value>seventh chord</value>
+  </data>
+  <data name="QUINTS" xml:space="preserve">
+    <value>seventh chord, second inversion</value>
+  </data>
+  <data name="TERZQ" xml:space="preserve">
+    <value>seventh chord, third inversion</value>
+  </data>
+  <data name="SEC" xml:space="preserve">
+    <value>2th chord</value>
+  </data>
+  <data name="NONACORD" xml:space="preserve">
+    <value>ninth chord</value>
+  </data>
+  <data name="NONACORD_1i" xml:space="preserve">
+    <value>ninth chord, first inversion</value>
+  </data>
+  <data name="NONACORD_2i" xml:space="preserve">
+    <value>ninth chord, second inversion</value>
+  </data>
+  <data name="NONACORD_3i" xml:space="preserve">
+    <value>ninth chord, third inversion</value>
+  </data>
+  <data name="NONACORD_4i" xml:space="preserve">
+    <value>ninth chord, fourth inversion</value>
+  </data>
+  <data name="MAJ" xml:space="preserve">
+    <value>major</value>
+  </data>
+  <data name="MIN" xml:space="preserve">
+    <value>minor</value>
+  </data>
+  <data name="PERFECT" xml:space="preserve">
+    <value>perfect</value>
+  </data>
+  <data name="AUG" xml:space="preserve">
+    <value>augmented</value>
+  </data>
+  <data name="DIM" xml:space="preserve">
+    <value>diminished</value>
+  </data>
+  <data name="MAJAUG" xml:space="preserve">
+    <value>major augmented</value>
+  </data>
+  <data name="MAJMAJ" xml:space="preserve">
+    <value>major major</value>
+  </data>
+  <data name="MAJMIN" xml:space="preserve">
+    <value>minor major</value>
+  </data>
+  <data name="MINMAJ" xml:space="preserve">
+    <value>major minor</value>
+  </data>
+  <data name="MINMIN" xml:space="preserve">
+    <value>minor minor</value>
+  </data>
+  <data name="MINDIM" xml:space="preserve">
+    <value>minor diminished</value>
+  </data>
+  <data name="DIMDIM" xml:space="preserve">
+    <value>diminished</value>
+  </data>
+  <data name="ALTQUINT" xml:space="preserve">
+    <value>with diminished fifth</value>
+  </data>
+  <data name="ALTPRIM" xml:space="preserve">
+    <value>altered root</value>
+  </data>
+  <data name="HAUG" xml:space="preserve">
+    <value>doubly augmented</value>
+  </data>
+  <data name="HMAJ" xml:space="preserve">
+    <value>augmented major</value>
+  </data>
+  <data name="HDOM" xml:space="preserve">
+    <value>augmented dominant</value>
+  </data>
+  <data name="NMJAUG" xml:space="preserve">
+    <value>major augmented</value>
+  </data>
+  <data name="NMAJ" xml:space="preserve">
+    <value>major major</value>
+  </data>
+  <data name="NDOM" xml:space="preserve">
+    <value>major dominant</value>
+  </data>
+  <data name="NMIN" xml:space="preserve">
+    <value>major minor</value>
+  </data>
+  <data name="NMDOM" xml:space="preserve">
+    <value>minor dominant</value>
+  </data>
+  <data name="NMMIN" xml:space="preserve">
+    <value>minor minor</value>
+  </data>
+  <data name="NMHALFDIM" xml:space="preserve">
+    <value>minor half-diminished</value>
+  </data>
+  <data name="NMDIM" xml:space="preserve">
+    <value>minor diminished</value>
+  </data>
   <data name="Try" xml:space="preserve">
     <value />
   </data>
