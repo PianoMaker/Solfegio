@@ -6,6 +6,9 @@
 
 <div class="text-center">
     <h1 class="display-4">@Localizer["ChordsIntervals"]</h1>
+    <div id="newChordFlag"
+         data-new-chord="@Model.IsNewChord.ToString().ToLower()"
+         style="display:none;"></div>
     
     <div id="mainbox" class="innercontainer">
         <!--КОНТЕЙНЕР ЛІВОРУЧ (ВГОРІ)-->
@@ -49,6 +52,7 @@
                         <!--РІЗНОВИД (якість)-->
                         <div style="display:block; margin:5px">
                             <select asp-for="SelectedQuality" id="SelectedQuality" class="select-quality">
+                                    <option value="">---</option>
                                 @foreach (var quality in Model.QualityOptions)
                                 {
                                     <option value="@quality">@Localizer[quality]</option>

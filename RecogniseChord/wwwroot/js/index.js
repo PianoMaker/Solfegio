@@ -103,10 +103,21 @@ document.addEventListener('DOMContentLoaded', function () {
 	// ============================
 	// значення якості і типу інтервалів
 	// ============================
-	if (savedQuality && SelectedQuality) SelectedQuality.value = savedQuality;
+	const newChordFlag = document.getElementById('newChordFlag');
+	const isNewChord = newChordFlag?.dataset.newChord === 'true';
 
+	if (isNewChord) {
+		if (SelectedQuality) SelectedQuality.value = '';
+		if (selectedType) selectedType.value = '';
+	} else {
+		if (savedQuality && SelectedQuality) {
+			SelectedQuality.value = savedQuality;
+		}
 
-	if (savedType && selectedType) selectedType.value = savedType;
+		if (savedType && selectedType) {
+			selectedType.value = savedType;
+		}
+	}
 
 	//=================================
 	//значення макс кількості звуків

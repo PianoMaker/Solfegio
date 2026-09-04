@@ -53,6 +53,8 @@ namespace RecogniseChord.Pages
         public string GeneratedRoot { get; private set; } = string.Empty;
         public string GeneratedNotesDisplay { get; private set; } = string.Empty;
         public bool CanPlay => !string.IsNullOrEmpty(GeneratedFileRelative);
+
+        public bool IsNewChord { get; private set; }
         public string? GuessResult { get; private set; } // "вірно" / "невірно"
         public string? GeneratedChordJson { get; private set; } // JSON payload for client playback (notes + meta)
         [BindProperty]
@@ -138,6 +140,7 @@ namespace RecogniseChord.Pages
             var chordData = GenerateRandomChord();
             ApplyChordData(chordData); // show to user
                                        // store current shown rchord so recognise can validate
+            IsNewChord = true;
             TempData[CurrentChordKey] = JsonSerializer.Serialize(chordData);
 
             // Prepare UI option lists for initial generated rchord (display strings)
@@ -300,6 +303,7 @@ namespace RecogniseChord.Pages
 
             var chordData = GenerateRandomChord();
             ApplyChordData(chordData);
+            IsNewChord = true;
             TempData[CurrentChordKey] = JsonSerializer.Serialize(chordData);
 
             PopulateTypes(SelectedCount);
@@ -349,6 +353,7 @@ namespace RecogniseChord.Pages
 
             var chordData = GenerateRandomChord();
             ApplyChordData(chordData);
+            IsNewChord = true;
             TempData[CurrentChordKey] = JsonSerializer.Serialize(chordData);
 
             // Refresh UI lists
@@ -602,14 +607,45 @@ namespace RecogniseChord.Pages
             }
             else if (count == 5)
             {
-                var ninthTypes = new[] { "NONACORD", "NONACORD_1i", "NONACORD_2i", "NONACORD_3i", "NONACORD_4i", "CORD69" };
+                var ninthTypes = new[]
+                {
+        "NONACORD",
+        "NONACORD_1i",
+        "NONACORD_2i",
+        "NONACORD_3i",
+        "NONACORD_4i"
+    };
+
                 typeKey = ninthTypes[rnd.Next(ninthTypes.Length)];
-                var ninthQualities = Enum.GetNames(typeof(NINTHS)).Where(n => n != "OTHER").ToArray();
-                qualityKey = ninthQualities.Length > 0 ? ninthQualities[rnd.Next(ninthQualities.Length)] : string.Empty;
-                if (!string.IsNullOrEmpty(qualityKey) && Enum.TryParse<NINTHS>(qualityKey, out var nq))
-                    chord.NinthChord(root, nq);
-                // ІНВЕРСІЇ НОНАКОРДІВ
-                //ApplyNinthInversion(chord, typeKey);
+
+                var ninthQualities = Enum.GetNames(typeof(NINTHS))
+                    .Where(n => n != "OTHER")
+                    .ToArray();
+
+                qualityKey = ninthQualities[rnd.Next(ninthQualities.Length)];
+
+                // Обернення дозволені тільки для NMAJ, NDOM, NMIN
+                if (qualityKey != "NMAJ" &&
+                    qualityKey != "NDOM" &&
+                    qualityKey != "NMIN")
+                {
+                    typeKey = "NONACORD";
+                }
+
+                NINTHS ninthQuality = Enum.TryParse<NINTHS>(qualityKey, out var nq)
+                    ? nq
+                    : NINTHS.NMAJ;
+
+                // Створюємо сам нонакорд
+                chord.NinthChord(root, ninthQuality);
+
+                // Застосовуємо обернення тільки для дозволених якостей
+                if (qualityKey == "NMAJ" ||
+                    qualityKey == "NDOM" ||
+                    qualityKey == "NMIN")
+                {
+                    ApplyNinthInversion(chord, typeKey);
+                }
             }
             if (chord.GetHighestMidiNote() > highestpitch)
             {
