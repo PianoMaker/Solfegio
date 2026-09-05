@@ -1,4 +1,4 @@
-﻿using static Music.Engine;
+using static Music.Engine;
 using static System.Console;
 using static System.Convert;
 using static Music.Globals;
@@ -24,12 +24,15 @@ namespace Music
         private bool rest;
 
         public int Pitch
+        //від 0 ("до") до 11 ("сі")
         {
             get { return pitch; }
             set { pitch = value; }
         }
 
+        
         public int Step
+        //від 0 ("до") до 6 ("сі")
         {
             get { return step; }
             set { step = value; }
@@ -40,12 +43,12 @@ namespace Music
             get { return oct; }
             set { oct = value; }
         }
-
+        // 0 - без альтерації, + дієзи, - бемолі
         public int Alter { get { return pitch_to_alter(step, pitch); } }
 
-
-        public int MidiNote { get { return AbsPitch() + GMCorrection; } }
         // 1-а октава відповідає 4-й MIDI-октаві, нумерація MIDI-октав з нуля
+        public int MidiNote { get { return AbsPitch() + GMCorrection; } }
+        
 
         // розташування на квінтовому колі. D = 0.
         public float Sharpness { get { return sharpness_counter(step, Alter); } }
@@ -73,6 +76,15 @@ namespace Music
                     return pitch_to_notename(step, pitch).Replace("b", "♭");
                 else
                     return "-";
+            }
+        }
+
+        public string LatinName
+        {
+            get
+            {
+                
+                return note_to_key(step, pitch, Notation.eu);
             }
         }
 

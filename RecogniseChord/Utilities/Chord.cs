@@ -801,6 +801,34 @@ namespace Music
             
         }
 
+        public string ChordToCode()
+        {
+            string code = "";
+            foreach (var note in Notes)
+            {
+                code += note.LatinName;
+                code += ConvertOct(note.Oct);
+                code += note.PrintDuration;                
+                code += "=";
+            }
+
+            if (code.EndsWith("="))
+                code = code.Substring(0, code.Length - 1);
+            MessageL(14, $"ChordToCode returns {code}");
+            return code;
+        }
+        private string ConvertOct(int oct)
+        {
+            switch (oct)
+            {
+                case 1: return "";
+                case 2: return "'";
+                case 3: return "''";
+                case 4: return "'''";
+                default: return "";
+            }
+        }
+
 
 
 

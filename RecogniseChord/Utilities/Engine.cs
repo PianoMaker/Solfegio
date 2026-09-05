@@ -532,7 +532,7 @@ namespace Music
         }
 
 
-        public static string note_to_key(int step, int pitch)
+        public static string note_to_key(int step, int pitch, Notation notation = Notation.us)
         {//Визначає латинську назву за ступенем і висотою
             string key;
             string postfix;
