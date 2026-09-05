@@ -98,6 +98,33 @@
 		return { isRest, key: vexKey, accidental, durationCode };
 	}
 
+	function parseChordToken(rawToken) {
+		if (!rawToken) return null;
+
+		const parts = String(rawToken)
+			.split('=')
+			.map(x => x.trim())
+			.filter(x => x.length > 0);
+
+		if (parts.length < 2) {
+			return parseToken(rawToken);
+		}
+
+		const notes = parts
+			.map(part => parseToken(part))
+			.filter(Boolean);
+
+		if (notes.length < 2) {
+			return null;
+		}
+
+		return {
+			isChord: true,
+			notes: notes,
+			durationCode: notes[0].durationCode
+		};
+	}
+
 	function mapDurationToVex(num, dotted) {
 		let code;
 		switch (num) {
@@ -273,7 +300,7 @@
 			}
 
 			// Parse tokens -> items
-			const measures = getMeasuresFromTokens(tokens, parseToken, numerator, denominator, UNITS_PER_QUARTER, durationToUnits, unitsToDurationList, sumUnits, keySign);
+			const measures = getMeasuresFromTokens(tokens, parseChordToken, numerator, denominator, UNITS_PER_QUARTER, durationToUnits, unitsToDurationList, sumUnits, keySign);
 
 			// Compute width/height
 			const MIN_SCORE_WIDTH = Math.max(320, CLEFZONE + BARWIDTH + Xmargin * 2);
@@ -373,7 +400,7 @@
 
 function getMeasuresFromTokens(
 	tokens,
-	parseToken,
+	parseChordToken,
 	numerator,
 	denominator,
 	UNITS_PER_QUARTER,
@@ -382,7 +409,7 @@ function getMeasuresFromTokens(
 	sumUnits,
 	keySign
 ) {
-	const items = tokens.map(parseToken).filter(Boolean);
+	const items = tokens.map(parseChordToken).filter(Boolean);
 
 	// Тривалість одного такту в units
 	const capacityQuarters = numerator * (4 / denominator);
@@ -482,19 +509,59 @@ function getMeasuresFromTokens(
 					// patternRenderer поки не отримує тональність.
 					// -------------------------------------------------
 
-					const accToDraw = decideAccidentalForNote(
-						it.key,
-						it.accidental,
-						keySign,
-						measureAccState,
-						i
-					);
+					let n;
 
-					const n = processNoteElement(
-						code,
-						it.key,
-						accToDraw
-					);
+					if (it.isChord) {
+
+						const keys = [];
+						const accidentals = [];
+
+						for (const note of it.notes) {
+
+							const accToDraw = decideAccidentalForNote(
+								note.key,
+								note.accidental,
+								keySign,
+								measureAccState,
+								i
+							);
+
+							keys.push(note.key);
+							accidentals.push(accToDraw);
+						}
+
+						n = new Vex.Flow.StaveNote({
+							keys: keys,
+							duration: code
+						});
+
+						for (let k = 0; k < accidentals.length; k++) {
+							if (accidentals[k]) {
+								n.addAccidental(
+									k,
+									new Vex.Flow.Accidental(accidentals[k])
+								);
+							}
+						}
+
+						applyAutoStem(n, code);
+
+					} else {
+
+						const accToDraw = decideAccidentalForNote(
+							it.key,
+							it.accidental,
+							keySign,
+							measureAccState,
+							i
+						);
+
+						n = processNoteElement(
+							code,
+							it.key,
+							accToDraw
+						);
+					}
 
 					if (n) {
 						n.__durationCode = code;
