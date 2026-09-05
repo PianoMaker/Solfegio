@@ -273,7 +273,7 @@ namespace RecogniseChord.Pages
             }
 
             // Для акордів та інших інтервалів — повний список якостей
-            var map = GetQualityToUkrainian(SelectedCount);
+            var map = GetQualityLabels(SelectedCount);
             QualityOptions.AddRange(map.Values);
         }
 

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -21,6 +21,10 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>$(IntermediateOutputPath)\%(Filename).Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <EmbeddedResource Update="Resources\**\*.uk.resx;Resources\**\*.en.resx">
+      <Generator></Generator>
+      <LastGenOutput></LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>
@@ -39,11 +43,6 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>_Layout.resx</DependentUpon>
     </Compile>
-    <Compile Update="Resources\Pages\Shared\_layout.uk.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>_Layout.uk.resx</DependentUpon>
-    </Compile>
     <Compile Update="Resources\Pages\Index.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -60,9 +59,6 @@
     </EmbeddedResource>
     <EmbeddedResource Update="Resources\Pages\Shared\_Layout.resx">
       <LastGenOutput>_Layout.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Resources\Pages\Shared\_Layout.uk.resx">
-      <LastGenOutput>_layout.uk.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Update="Resources\Pages\Index.resx">
       <LastGenOutput>Index.Designer.cs</LastGenOutput>

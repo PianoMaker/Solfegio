@@ -133,7 +133,7 @@ namespace RecogniseChord.Resources.Pages {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to CorrectAnswer.
+        ///   Looks up a localized string similar to Correct answer:.
         /// </summary>
         internal static string CorrectAnswer {
             get {
@@ -160,7 +160,7 @@ namespace RecogniseChord.Resources.Pages {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Введено.
+        ///   Looks up a localized string similar to Entered:.
         /// </summary>
         internal static string Entered {
             get {
@@ -201,6 +201,15 @@ namespace RecogniseChord.Resources.Pages {
         internal static string MAJ {
             get {
                 return ResourceManager.GetString("MAJ", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to мажорний.
+        /// </summary>
+        internal static string MAJ_CHORD {
+            get {
+                return ResourceManager.GetString("MAJ_CHORD", resourceCulture);
             }
         }
         
@@ -246,6 +255,15 @@ namespace RecogniseChord.Resources.Pages {
         internal static string MIN {
             get {
                 return ResourceManager.GetString("MIN", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to мінорний.
+        /// </summary>
+        internal static string MIN_CHORD {
+            get {
+                return ResourceManager.GetString("MIN_CHORD", resourceCulture);
             }
         }
         
@@ -534,6 +552,15 @@ namespace RecogniseChord.Resources.Pages {
         internal static string String1 {
             get {
                 return ResourceManager.GetString("String1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string String2 {
+            get {
+                return ResourceManager.GetString("String2", resourceCulture);
             }
         }
         
