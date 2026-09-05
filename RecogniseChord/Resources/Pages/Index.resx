@@ -281,10 +281,10 @@
     <value />
   </data>
   <data name="CorrectAnswer" xml:space="preserve">
-    <value>CorrectAnswer</value>
+    <value>Correct answer:</value>
   </data>
   <data name="Entered" xml:space="preserve">
-    <value>Введено</value>
+    <value>Entered:</value>
   </data>
   <data name="String1" xml:space="preserve">
     <value />

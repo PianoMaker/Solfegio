@@ -23,7 +23,7 @@ namespace RecogniseChord.Pages
         {
             _logger = logger;
             _environment = environment;
-            _localizer = localizerFactory.Create("RecogniseChord.Resources.Pages.Index", typeof(IndexModel).Assembly.GetName().Name!);
+            _localizer = localizerFactory.Create("Pages.Index", typeof(IndexModel).Assembly.GetName().Name!);
             Console.WriteLine($"index constructor environment = {environment.ToString()}");
         }
 
@@ -82,7 +82,13 @@ namespace RecogniseChord.Pages
         private Dictionary<string, string> GetQualityLabels(int count) => count switch
         {
             2 => new() { ["MAJ"] = _localizer["MAJ"], ["MIN"] = _localizer["MIN"], ["PERFECT"] = _localizer["PERFECT"] },
-            3 => new() { ["MAJ"] = _localizer["MAJ"], ["MIN"] = _localizer["MIN"], ["AUG"] = _localizer["AUG"], ["DIM"] = _localizer["DIM"] },
+            3 => new()
+            {
+                ["MAJ"] = _localizer["MAJ_CHORD"],
+                ["MIN"] = _localizer["MIN_CHORD"],
+                ["AUG"] = _localizer["AUG"],
+                ["DIM"] = _localizer["DIM"]
+            },
             4 => new()
             {
                 ["MAJAUG"] = _localizer["MAJAUG"],

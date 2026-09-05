@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Localization;
 using Music;
 using static Music.Engine;
 using static Music.Messages;
@@ -23,14 +24,17 @@ namespace RecogniseChord.Pages
         public List<string> AllTimbres { get; set; } = Enum.GetNames(typeof(TIMBRE)).ToList();
 
 
-        private readonly ILogger<IndexModel> _logger;
+        private readonly ILogger<CreateModel> _logger;
+        private readonly IStringLocalizer _localizer;
 
         public IWebHostEnvironment _environment;
-        public CreateModel(ILogger<IndexModel> logger, IWebHostEnvironment environment)
+        public CreateModel(ILogger<CreateModel> logger, IWebHostEnvironment environment, IStringLocalizerFactory localizerFactory)
         {
             _logger = logger;
             _environment = environment;
-            Console.WriteLine($"index constructor environment = {environment}");
+            Console.WriteLine($"Create constructor environment = {environment}");
+            _localizer = localizerFactory.Create("Pages.Index", typeof(IndexModel).Assembly.GetName().Name!);
+            Console.WriteLine($"Create constructor environment = {environment}");
 
         }
 
@@ -44,71 +48,70 @@ namespace RecogniseChord.Pages
 
         public FORMULA Formula { get; set; }
 
-        // Маппінг enum -> українська назва (копія з Index)
-        private static readonly Dictionary<string, string> TypeToUkrainian = new()
+        // Локалізовані назви типів акордів/інтервалів
+        private Dictionary<string, string> GetTypeLabels()
         {
-            ["SECUNDA"] = "секунда",
-            ["TERZIA"] = "терція",
-            ["QUARTA"] = "кварта",
-            ["QUINTA"] = "квінта",
-            ["SEKSTA"] = "секста",
-            ["SEPTYMA"] = "септима",
-            ["OCTAVA"] = "октава",
-            ["TRI"] = "тризвук",
-            ["SEXT"] = "сексакторд",
-            ["QSEXT"] = "квартсекстакорд",
-            ["SEPT"] = "септакорд",
-            ["QUINTS"] = "квінтсекстакорд",
-            ["TERZQ"] = "терцквартакорд",
-            ["SEC"] = "секундакорд",
-            ["NONACORD"] = "нонакорд",
-            ["NONACORD_1i"] = "нонакорд в 1 оберненні",
-            ["NONACORD_2i"] = "нонакорд в 2 оберненні",
-            ["NONACORD_3i"] = "нонакорд в 3 оберненні",
-            ["NONACORD_4i"] = "нонакорд в 4 оберненні",
-            ["CORD69"] = "акорд 6/9"
-        };
+            var keys = new[]
+            {
+                "SECUNDA", "TERZIA", "QUARTA", "QUINTA", "SEKSTA", "SEPTYMA", "OCTAVA",
+                "TRI", "SEXT", "QSEXT", "SEPT", "QUINTS", "TERZQ", "SEC",
+                "NONACORD", "NONACORD_1i", "NONACORD_2i", "NONACORD_3i", "NONACORD_4i",
+                "CORD69"
+            };
 
-        private static readonly Dictionary<string, string> UkrainianToType =
-            TypeToUkrainian.ToDictionary(kv => kv.Value, kv => kv.Key);
+            return keys.ToDictionary(key => key, key => _localizer[key].Value);
+        }
+
+        private Dictionary<string, string> GetLocalizedToType()
+        {
+            return GetTypeLabels()
+                .ToDictionary(kv => kv.Value, kv => kv.Key);
+        }
 
         // Маппінг для якостей (залежить від кількості нот)
-        private static Dictionary<string, string> GetQualityToUkrainian(int count) => count switch
+        private Dictionary<string, string> GetQualityLabels(int count) => count switch
         {
-            2 => new() { ["MAJ"] = "велика", ["MIN"] = "мала", ["PERFECT"] = "чиста" },
-            3 => new() { ["MAJ"] = "мажорний", ["MIN"] = "мінорний", ["AUG"] = "збільшений", ["DIM"] = "зменшений" },
+            2 => new() { ["MAJ"] = _localizer["MAJ"], ["MIN"] = _localizer["MIN"], ["PERFECT"] = _localizer["PERFECT"] },
+            3 => new()
+            {
+                ["MAJ"] = _localizer["MAJ_CHORD"],
+                ["MIN"] = _localizer["MIN_CHORD"],
+                ["AUG"] = _localizer["AUG"],
+                ["DIM"] = _localizer["DIM"]
+            },
             4 => new()
             {
-                ["MAJAUG"] = "великий збільшений",
-                ["MAJMAJ"] = "великий мажорний",
-                ["MAJMIN"] = "малий мажорний",
-                ["MINMAJ"] = "великий мінорний",
-                ["MINMIN"] = "малий мінорний",
-                ["MINDIM"] = "малий зменшений",
-                ["DIMDIM"] = "зменшений",
-                ["ALTQUINT"] = "з пониженою квінтою",
-                ["ALTPRIM"] = "альт. прима"
+                ["MAJAUG"] = _localizer["MAJAUG"],
+                ["MAJMAJ"] = _localizer["MAJMAJ"],
+                ["MAJMIN"] = _localizer["MAJMIN"],
+                ["MINMAJ"] = _localizer["MINMAJ"],
+                ["MINMIN"] = _localizer["MINMIN"],
+                ["MINDIM"] = _localizer["MINDIM"],
+                ["DIMDIM"] = _localizer["DIMDIM"],
+                ["ALTQUINT"] = _localizer["ALTQUINT"],
+                ["ALTPRIM"] = _localizer["ALTPRIM"]
             },
             5 => new()
             {
-                ["HAUG"] = "двічі збільшений",
-                ["HMAJ"] = "збільшений мажорний",
-                ["HDOM"] = "збільшений домінантовий",
-                ["NMJAUG"] = "великий збільшений",
-                ["NMAJ"] = "великий мажорний",
-                ["NDOM"] = "великий домінантовий",
-                ["NMIN"] = "великий мінорний",
-                ["NMDOM"] = "малий домінантовий",
-                ["NMMIN"] = "малий мінорний",
-                ["NMHALFDIM"] = "малий напівзменшений",
-                ["NMDIM"] = "малий зменшений"
+                ["HAUG"] = _localizer["HAUG"],
+                ["HMAJ"] = _localizer["HMAJ"],
+                ["HDOM"] = _localizer["HDOM"],
+                ["NMJAUG"] = _localizer["NMJAUG"],
+                ["NMAJ"] = _localizer["NMAJ"],
+                ["NDOM"] = _localizer["NDOM"],
+                ["NMIN"] = _localizer["NMIN"],
+                ["NMDOM"] = _localizer["NMDOM"],
+                ["NMMIN"] = _localizer["NMMIN"],
+                ["NMHALFDIM"] = _localizer["NMHALFDIM"],
+                ["NMDIM"] = _localizer["NMDIM"]
             },
             _ => new()
         };
 
-        private static Dictionary<string, string> GetUkrainianToQuality(int count)
+
+        private Dictionary<string, string> GetUkrainianToQuality(int count)
         {
-            var map = GetQualityToUkrainian(count);
+            var map = GetQualityLabels(count);
             return map.ToDictionary(kv => kv.Value, kv => kv.Key);
         }
 
@@ -193,7 +196,7 @@ namespace RecogniseChord.Pages
         {
             MessageL(14, $"Index OnPostTimbre: set to {Timbre}");
 
-            PopulateTypes(); 
+            PopulateTypes();
             PopulateQualities();
             var chord = BuildChord();
             string fullPath = GetFullPath();
@@ -202,7 +205,7 @@ namespace RecogniseChord.Pages
             try
             {
                 chord.SaveWave(fullPath, timbre);
-                
+
             }
             catch (Exception ex)
             {
@@ -264,7 +267,7 @@ namespace RecogniseChord.Pages
 
                 if (perfectTypes.Contains(SelectedType))
                 {
-                    QualityOptions.Add("чиста");
+                    QualityOptions.Add(_localizer["PERFECT"].Value);
                     return;
                 }
             }
@@ -277,20 +280,20 @@ namespace RecogniseChord.Pages
         private ChordT? BuildChord()
         {
             MessageL(14, $"BuildChord: Count={SelectedCount}, Type={SelectedType}, Quality={SelectedQuality}, Root={RootNote}");
-            
+
             // Маппінг українських назв -> enum ключі
-            var typeKey = UkrainianToType.GetValueOrDefault(SelectedType, SelectedType);
+            var typeKey = GetLocalizedToType().GetValueOrDefault(SelectedType, SelectedType);
             var qualityMap = GetUkrainianToQuality(SelectedCount);
             var qualityKey = qualityMap.GetValueOrDefault(SelectedQuality, string.Empty);
 
             var root = MakeRoot();
             var chord = new ChordT();
-            
+
             // intervals
             if (SelectedCount == 2)
             {
                 var note2 = (Note)root.Clone();
-                QUALITY qual = qualityKey == "MIN" ? QUALITY.MIN : 
+                QUALITY qual = qualityKey == "MIN" ? QUALITY.MIN :
                               qualityKey == "PERFECT" ? QUALITY.PERFECT : QUALITY.MAJ;
                 INTERVALS interval = Enum.TryParse<INTERVALS>(typeKey, out var intr) ? intr : INTERVALS.SECUNDA;
                 // transpose second note
@@ -353,7 +356,7 @@ namespace RecogniseChord.Pages
 
         private string GetFullPath()
         {
-            
+
             Directory.CreateDirectory(SoundDir);
 
             // find next sequential filename exampleN.wav
