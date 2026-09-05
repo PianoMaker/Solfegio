@@ -106,7 +106,7 @@ namespace RecogniseChord.Resources.Pages {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to Choose.
         /// </summary>
         internal static string Choose {
             get {
@@ -133,6 +133,15 @@ namespace RecogniseChord.Resources.Pages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to CorrectAnswer.
+        /// </summary>
+        internal static string CorrectAnswer {
+            get {
+                return ResourceManager.GetString("CorrectAnswer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to diminished.
         /// </summary>
         internal static string DIM {
@@ -147,6 +156,15 @@ namespace RecogniseChord.Resources.Pages {
         internal static string DIMDIM {
             get {
                 return ResourceManager.GetString("DIMDIM", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Введено.
+        /// </summary>
+        internal static string Entered {
+            get {
+                return ResourceManager.GetString("Entered", resourceCulture);
             }
         }
         
@@ -507,6 +525,15 @@ namespace RecogniseChord.Resources.Pages {
         internal static string SoundCountQuestion {
             get {
                 return ResourceManager.GetString("SoundCountQuestion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string String1 {
+            get {
+                return ResourceManager.GetString("String1", resourceCulture);
             }
         }
         

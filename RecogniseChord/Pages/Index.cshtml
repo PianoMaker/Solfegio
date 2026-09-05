@@ -60,7 +60,9 @@
                             </select>
                         </div>
                         <input type="hidden" asp-for="SelectedCount" />
-                        <button id="recogniseButton" type="submit">@Localizer["Check"]</button>
+                            <button id="recogniseButton" type="submit" disabled>
+                                @Localizer["Check"]
+                            </button>
                     </form>
                     </div>
                 </div>
@@ -77,16 +79,20 @@
                     {
                         <div class="answer-correct">
                             <p class="text-success">@Model.GuessResult</p>
-                            <p class="text-success">Правильна відповідь: <code>@Model.RecogniseCorrect</code></p>
+                            <p class="text-success">
+                                @Localizer["CorrectAnswer"] <code>@Model.RecogniseCorrect</code>
+                            </p>
                         </div>
                     }
                     else
                     {
                         <div>
                             <p class="text-danger">@Model.GuessResult</p>
-                            <p>Введено: <code>@Model.UserAnswer</code></p>
+                            <p>@Localizer["Entered"] <code>@Model.UserAnswer</code></p>
 
-                            <p class="text-danger">Правильна відповідь: <code>@Model.RecogniseCorrect</code></p>
+                            <p class="text-danger">
+                                @Localizer["CorrectAnswer"] <code>@Model.RecogniseCorrect</code>
+                            </p>
                         </div>
                     }
                 }
@@ -123,12 +129,13 @@
             </div>
         </form>
     </div>
-    <!-- перегенерувати -->
+
+@*     <!-- перегенерувати -->
     <div>
         <form id="regenerateform" method="post" asp-page-handler="regenerate">
             <button id="regeneratebtn" type="submit">@Localizer["Regenerate"]</button>
         </form>
-    </div>
+    </div> *@
 
 </div>
 

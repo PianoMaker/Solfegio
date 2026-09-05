@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Choose" xml:space="preserve">
-    <value />
+    <value>Choose</value>
   </data>
   <data name="Check" xml:space="preserve">
     <value>Check</value>
@@ -278,6 +278,15 @@
     <value>minor diminished</value>
   </data>
   <data name="Try" xml:space="preserve">
+    <value />
+  </data>
+  <data name="CorrectAnswer" xml:space="preserve">
+    <value>CorrectAnswer</value>
+  </data>
+  <data name="Entered" xml:space="preserve">
+    <value>Введено</value>
+  </data>
+  <data name="String1" xml:space="preserve">
     <value />
   </data>
 </root>

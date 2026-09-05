@@ -278,7 +278,8 @@ namespace RecogniseChord.Pages
 
 
                 var correctType = _localizer[actual.Type];
-                var correctQuality = _localizer[actual.Quality];
+                var correctQuality = GetQualityLabels(actual.Count)
+                    .GetValueOrDefault(actual.Quality, actual.Quality);
 
                 RecogniseCorrect = $"{correctType} {correctQuality} (від ноти {actual.Root}) — ноти: {actual.NotesDisplay}";
 
