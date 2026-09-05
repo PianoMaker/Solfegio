@@ -263,11 +263,16 @@ main .whitecontainer {
     gap: 5px;
 }
 
-.melody-card {
-    display: grid;
-    grid-template-columns: 210px minmax(0, 1fr);
-    align-items: center;
-    width: 80%;
+.chordbox {
+    width: 200px !important;
+    height: 120px;
+    text-align: center;
+    padding-left: 10px; 
+}
+
+.melody-card,.chordbox  {
+    
+    align-items: center;    
     min-width: 0;
     margin:auto;
     border: 1px solid var(--header-color);
@@ -275,13 +280,18 @@ main .whitecontainer {
     background-color: rgb(254, 254, 254, 0.8);
     transition:ease 1s;
 }
-.melody-card:hover {
-    transform: translateY(-4px);
+.melody-card {
+    display: grid;
+    grid-template-columns: 210px minmax(0, 1fr);
+    width: 80%;
 }
+    .melody-card:hover, .chordbox:hover {
+        transform: translateY(-4px);
+    }
+
 
     .melody-card img {
-        max-width:400px;
-
+        max-width: 400px;
     }
 
     .melody-info {
@@ -332,6 +342,21 @@ main .whitecontainer {
         align-items: stretch;
         gap: 0.75rem;
     }
+
+    h1 {
+        font-size: 3.9rem !important;
+    }
+
+    p, button, .btn, ul, .navbar-brand, input {
+        font-size: 1.9rem;
+    }
+
+    label, select {
+        font-size: 1.8rem;
+        margin:1rem;
+    }
+
+
 
     /* Each half becomes full width when stacked */
     .halfcontainer {

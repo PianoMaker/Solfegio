@@ -52,6 +52,8 @@
 	function parseToken(rawToken) {
 		if (!rawToken) return null;
 		let token = String(rawToken).trim();
+		console.log("PARSE RAW:", JSON.stringify(rawToken));
+		console.log("PARSE TOKEN:", JSON.stringify(token));
 		if (!token) return null;
 
 		// Extract duration (digits + optional dot) from the end
@@ -74,9 +76,19 @@
 		// Determine accidental from suffix: 'is' -> sharp, 'es' or trailing 's' (not 'is') -> flat
 		let accidental = null;
 		let base = token.toLowerCase();
-		if (base.endsWith('is')) { accidental = '#'; base = base.slice(0, -2); }
-		else if (base.endsWith('es')) { accidental = 'b'; base = base.slice(0, -2); }
-		else if (base.endsWith('s')) { accidental = 'b'; base = base.slice(0, -1); }
+
+		if (base.endsWith('is')) {
+			accidental = '#';
+			base = base.slice(0, -2);
+		}
+		else if (base.endsWith('es') && base.length > 2) {
+			accidental = 'b';
+			base = base.slice(0, -2);
+		}
+		else if (base.endsWith('s')) {
+			accidental = 'b';
+			base = base.slice(0, -1);
+		}
 
 		// Special-case: German notation single 'b' means Bb (B-flat)
 		// If user wrote just 'b' (without 'es'/'is'), default to B with flat accidental
@@ -87,6 +99,13 @@
 		} else {
 			letterName = mapEuBase(base);
 		}
+		console.log("BEFORE LETTER CHECK:", {
+			rawToken,
+			token,
+			base,
+			letterName,
+			accidental
+		});
 
 		if (!letterName) {
 			// unknown base; treat as rest
@@ -95,6 +114,14 @@
 
 		const vexKey = `${letterName}/${octave}`; // VexFlow format
 		const durationCode = mapDurationToVex(durNum, dotted);
+		console.log("PARSE:", rawToken, "=>", {
+			token,
+			base,
+			letterName,
+			accidental,
+			vexKey,
+			durationCode
+		});
 		return { isRest, key: vexKey, accidental, durationCode };
 	}
 
@@ -529,7 +556,8 @@ function getMeasuresFromTokens(
 							keys.push(note.key);
 							accidentals.push(accToDraw);
 						}
-
+						console.log("CHORD KEYS:", keys);
+						console.log("CHORD ACCIDENTALS:", accidentals);
 						n = new Vex.Flow.StaveNote({
 							keys: keys,
 							duration: code

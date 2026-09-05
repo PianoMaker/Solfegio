@@ -21,6 +21,8 @@ namespace RecogniseChord.Pages
         [BindProperty] public string RootNote { get; set; } = "C"; // основний тон
         [BindProperty] public string Timbre { get; set; }
 
+        [BindProperty] public string ChordCode { get; set; }
+
         public List<string> AllTimbres { get; set; } = Enum.GetNames(typeof(TIMBRE)).ToList();
 
 
@@ -277,6 +279,7 @@ namespace RecogniseChord.Pages
             QualityOptions.AddRange(map.Values);
         }
 
+        // БУДУЄ АКОРД //
         private ChordT? BuildChord()
         {
             MessageL(14, $"BuildChord: Count={SelectedCount}, Type={SelectedType}, Quality={SelectedQuality}, Root={RootNote}");
@@ -302,6 +305,7 @@ namespace RecogniseChord.Pages
                 chord.AddNote(note2);
                 var notes = string.Join(", ", chord.Notes.Select(n => n.ToString()));
                 MessageL(COLORS.gray, $"Built interval: {notes}");
+                ChordCode = chord.ChordToCode();
                 return chord;
             }
             if (SelectedCount == 3)
@@ -312,6 +316,7 @@ namespace RecogniseChord.Pages
                 ApplyTriadInversion(chord, typeKey);
                 var notes = string.Join(", ", chord.Notes.Select(n => n.ToString()));
                 MessageL(COLORS.gray, $"Built triad chord: {notes}");
+                ChordCode = chord.ChordToCode();
                 return chord;
             }
             if (SelectedCount == 4)
@@ -321,6 +326,7 @@ namespace RecogniseChord.Pages
                 ApplySeventhInversion(chord, typeKey);
                 var notes = string.Join(", ", chord.Notes.Select(n => n.ToString()));
                 MessageL(COLORS.gray, $"Built seventh chord: {notes}");
+                ChordCode = chord.ChordToCode();
                 return chord;
             }
             if (SelectedCount == 5)
@@ -330,10 +336,14 @@ namespace RecogniseChord.Pages
                 ApplyNinthInversion(chord, typeKey);
                 var notes = string.Join(", ", chord.Notes.Select(n => n.ToString()));
                 MessageL(COLORS.gray, $"Built ninth chord: {notes}");
+                ChordCode = chord.ChordToCode();
                 return chord;
             }
             return null;
         }
+
+
+       
 
         private void ApplyTriadInversion(ChordT chord, string type)
         {

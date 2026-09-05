@@ -16,7 +16,10 @@ document.addEventListener('DOMContentLoaded', function () {
 	const selectedTimbre = document.getElementById('SelectedTimbre');
 	const selectedQuality = document.getElementById('SelectedQuality');
 	const selectedType = document.getElementById('SelectedType');
-
+	const notecontainer = document.getElementById('notecontainer');
+	const pattern = notecontainer.dataset.pattern;
+	console.log("notecontainer:", notecontainer);
+	console.log("pattern:", pattern);
 
 
 
@@ -35,7 +38,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	//=================================
 	// Відновлюємо збережені значення з sessionStorage
 	//=================================
-	
+
 	const savedSoundCount = sessionStorage.getItem('selectedSoundCount');  // кількість звуків
 	console.log('Restoring session current sound count:', savedSoundCount);
 	const savedTimbre = sessionStorage.getItem('savedTimbre')				//тембр
@@ -44,7 +47,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	console.log('restoring session quality:', savedQuality);
 	const savedType = sessionStorage.getItem('selectedType');			// тип акорду
 	console.log('restoring session type', savedType);
-	
+
 
 
 	// ============================
@@ -144,5 +147,33 @@ document.addEventListener('DOMContentLoaded', function () {
 		// submit the timbre form so server can generate WAV with new timbre
 		timbreform.submit();
 	});
+	//======================================
+	//вивоидмо нотне зображення
+	//=====================================
+
+	console.log("rendering sheet")
+	notecontainer.innerHTML = "";
+	window.renderPatternString(
+		pattern,
+		'notecontainer',
+		null,
+		4,       // numerator
+		4,     // denominator
+		300,            // GENERALWIDTH
+		100,              // HEIGHT
+		10,               // TOPPADDING
+		105,			// BARWIDTH
+		30,              // CLEFZONE
+		0,              // Xmargin
+		512,              // RESPONSIVE_THRESHOLD
+		1.2,              // BASESCALING
+		1.0,              // SCALINGFACTOR
+		0               // KeySignature
+	);
+
+
+	
+	
 
 });
+
