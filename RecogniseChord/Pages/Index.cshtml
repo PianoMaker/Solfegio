@@ -12,8 +12,7 @@
     
     <div id="mainbox" class="innercontainer">
         <!--КОНТЕЙНЕР ЛІВОРУЧ (ВГОРІ)-->
-        <div id="rightcontainer" class="halfcontainer">    
-            <p class="full-row">@Localizer["Try"]</p>
+        <div id="rightcontainer" class="halfcontainer">                
             <form id="playform" class="full-row" method="post" asp-page-handler="Play">
                 <button id="playBtn" type="button">@Localizer["Play"]</button>
             </form>
@@ -105,14 +104,22 @@
         </div>
         
     </div>
-    <!-- Максимальна кількість звуків -->
-    <div>
-        <form id="maxsoundsform" method="post" asp-page-handler="max">
-            <input type="hidden" asp-for="Timbre" />
-            <p>@Localizer["MaxSounds"]</p>
-            <input id="maxsoundsinput" type="range" name="maxCount" min="2" max="5" value="@Model.MaxCount" />
-            <label for="maxsoundsinput">@Model.MaxCount</label>
+    <!-- НОВИЙ АКОРД -->
+    <div id="createbox">
+        <p class="full-row">@Localizer["Try"]</p>
+        <form id="newchord" asp-page-handler="new">
+            <button type="submit">@Localizer["CreateNew"]</button>
         </form>
+
+        <!-- Максимальна кількість звуків -->
+        <div>
+            <form id="maxsoundsform" method="post" asp-page-handler="max">
+                <input type="hidden" asp-for="Timbre" />
+                <p>@Localizer["MaxSounds"]</p>
+                <input id="maxsoundsinput" type="range" name="maxCount" min="2" max="5" value="@Model.MaxCount" />
+                <label for="maxsoundsinput">@Model.MaxCount</label>
+            </form>
+        </div>
     </div>
     <!-- ТЕМБР -->
     <div>

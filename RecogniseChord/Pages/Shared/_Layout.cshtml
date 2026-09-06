@@ -67,7 +67,7 @@
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="langMenu" role="button"
                                data-bs-toggle="dropdown" aria-expanded="false">
-                                Мова
+                                @Localizer["Lang"]
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="langMenu">
                                 <li><a class="dropdown-item" href='@Url.Page("/SetLanguage", new { culture = "uk", returnUrl = Context.Request.Path + Context.Request.QueryString })'>UK</a></li>

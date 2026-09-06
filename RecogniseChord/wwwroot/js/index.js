@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	// приховуємо ноти
 	// ===================================
 
-	if (checkchord)
+	if (checkchord && chordbox)
 		chordbox.style.display = 'none'; 
 
 	//====================================

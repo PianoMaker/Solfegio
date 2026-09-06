@@ -207,6 +207,7 @@ namespace RecogniseChord.Pages
             }
         }
 
+        // КНОПКА "ВІДТВОРИТИ"
         public IActionResult OnPostPlay()
         {
             MessageL(14, "Index OnPostPlay: processing user play request");
@@ -236,7 +237,7 @@ namespace RecogniseChord.Pages
             }
         }
 
-        // Handler when user changes count of notes (radio buttons) -> refresh type/quality lists
+        // ПОВЗУНОК НА КІЛЬКІСТЬ НОТ
         public IActionResult OnPostSelect()
         {
             MessageL(14, "Index OnPostSelect: processing user selection change");
@@ -262,7 +263,7 @@ namespace RecogniseChord.Pages
 
 
 
-        // When user posts recognise, convert displayed strings back to internal keys before comparing
+        // КНОПКА "ПЕРЕВІРИТИ"
         public IActionResult OnPostRecognise()
         {
             MessageL(14, "Index OnPostRecognise: processing user recognise");
@@ -314,7 +315,19 @@ namespace RecogniseChord.Pages
                 RecogniseOk = null;
                 RecogniseCorrect = "Немає збереженого акорду для перевірки.";
             }
+            SyncLegacyLists();
 
+            RestoreOrGenerateChord();
+
+            System.IO.File.WriteAllText(FilePath, RequestCount.ToString());
+
+            return Page();
+        }
+
+        // КНОПКА СТВОHИТИ НОВИЙ //
+        public IActionResult OnPostNew()
+        {
+            MessageL(14, "Index OnPostNew");
             var chordData = GenerateRandomChord();
             ApplyChordData(chordData);
             IsNewChord = true;
@@ -324,12 +337,9 @@ namespace RecogniseChord.Pages
             PopulateQualities(SelectedCount, SelectedType);
             SyncLegacyLists();
 
-            System.IO.File.WriteAllText(FilePath, RequestCount.ToString());
-
             SelectedCount = 0;
             SelectedType = string.Empty;
             SelectedQuality = string.Empty;
-
 
             return Page();
         }
@@ -358,6 +368,7 @@ namespace RecogniseChord.Pages
             return Page();
         }
 
+        // ПОВЗУНОК МАКСИМАЛЬНА КІЛЬКІСТЬ ЗВУКІВ
         public IActionResult OnPostMax()
         {
             MessageL(14, $"Index OnPostMax: processing user max count change to {MaxCount}");
@@ -365,11 +376,12 @@ namespace RecogniseChord.Pages
             RestoreTimbre();
             TempData[MaxCountTempKey] = MaxCount.ToString();
 
-            var chordData = GenerateRandomChord();
-            ApplyChordData(chordData);
-            IsNewChord = true;
-            TempData[CurrentChordKey] = JsonSerializer.Serialize(chordData);
+            //var chordData = GenerateRandomChord();
+            //ApplyChordData(chordData);
+            //IsNewChord = true;
+            //TempData[CurrentChordKey] = JsonSerializer.Serialize(chordData);
 
+            RestoreOrGenerateChord();            
             // Refresh UI lists
             PopulateTypesForGenerated();
             PopulateQualitiesForGenerated();
