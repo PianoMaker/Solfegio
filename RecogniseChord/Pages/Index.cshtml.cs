@@ -70,8 +70,14 @@ namespace RecogniseChord.Pages
         public List<string> Options { get; private set; } = new();
         public List<string> Types { get; private set; } = new();
         public List<string> TypeOptions { get; private set; } = new();
-        public List<string> QualityOptions { get; private set; } = new();
+        public List<QualityOption> QualityOptions { get; private set; } = new();
         public List<string> RootOptions { get; } = new() { "C", "D", "E", "F", "G", "A", "B" };
+
+        public class QualityOption
+        {
+            public string Key { get; set; } = string.Empty;
+            public string Label { get; set; } = string.Empty;
+        }
 
         // Current rchord object
         public ChordT currentChord = new();
@@ -833,6 +839,8 @@ namespace RecogniseChord.Pages
             QualityOptions.Clear();
             if (count <= 0) return;
 
+            var labels = GetQualityLabels(count);
+
             if (count == 2 && !string.IsNullOrWhiteSpace(typeKey))
             {
                 var perfectTypes = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
@@ -844,19 +852,22 @@ namespace RecogniseChord.Pages
 
                 if (perfectTypes.Contains(typeKey))
                 {
-                    QualityOptions.Add("PERFECT");
+                    QualityOptions.Add(new QualityOption { Key = "PERFECT", Label = labels["PERFECT"] });
                     return;
                 }
             }
 
-            var map = GetQualityLabels(count);
-            QualityOptions.AddRange(map.Keys);
+            QualityOptions.AddRange(labels.Select(option => new QualityOption
+            {
+                Key = option.Key,
+                Label = option.Value
+            }));
         }
         private void PopulateQualitiesForGenerated() => PopulateQualities(GeneratedCount, GeneratedType);
 
         private void SyncLegacyLists()
         {
-            Options = QualityOptions.ToList();
+            Options = QualityOptions.Select(option => option.Key).ToList();
             Types = TypeOptions.ToList();
             if (!string.IsNullOrEmpty(SelectedQuality)) SelectedChord = SelectedQuality;
         }

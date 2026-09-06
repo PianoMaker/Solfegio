@@ -53,9 +53,9 @@
                         <div style="display:block; margin:5px">
                             <select asp-for="SelectedQuality" id="SelectedQuality" class="select-quality">
                                     <option value="">---</option>
-                                @foreach (var quality in Model.QualityOptions)
+                                @foreach (var option in Model.QualityOptions)
                                 {
-                                    <option value="@quality">@Localizer[quality]</option>
+                                    <option value="@option.Key">@option.Label</option>
                                 }
                             </select>
                         </div>
