@@ -338,9 +338,7 @@ namespace RecogniseChord.Pages
             MessageL(14, "Index OnPostNew");
             ReadInfo();
             var chordData = GenerateRandomChord();
-            ApplyChordData(chordData);
-            Console.WriteLine($"OnPostNew ChordCode = '{ChordCode}'");
-            Console.WriteLine($"ChordData ChordCode = '{chordData.ChordCode}'");
+            ApplyChordData(chordData);            
             TempData[CurrentChordKey] = JsonSerializer.Serialize(chordData);
 
             PopulateTypes(SelectedCount);
@@ -350,7 +348,10 @@ namespace RecogniseChord.Pages
             SelectedCount = 0;
             SelectedType = string.Empty;
             SelectedQuality = string.Empty;
-
+            IsNewChord = true;
+            Console.WriteLine($"OnPostNew ChordCode = '{ChordCode}'");
+            Console.WriteLine($"ChordData ChordCode = '{chordData.ChordCode}'");
+            Console.WriteLine($"IsNewChord = '{IsNewChord}'");
             return Page();
         }
 

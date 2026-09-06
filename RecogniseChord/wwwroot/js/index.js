@@ -7,22 +7,40 @@ document.addEventListener('DOMContentLoaded', function () {
 	const selectform = document.getElementById('selectform'); 		// форма для вибору кількості звуків під час відповіді користувача
 	const maxsoundsform = document.getElementById('maxsoundsform');		// форма для вибору максимальної кількості звуків 
 	const recogniseform = document.getElementById('recogniseform');		// форма для кнопки "Перевірити"
-	const chordbox = document.querySelector('.chordbox');
+	const chordbox = document.querySelector('.chordbox');				//поле для відображення акорда
+	const createbox = document.getElementById('createbox');				//поле для кнопок генерації нового акорда
 	const timbreform = document.getElementById('timbreform')			// форма встановлення тембру
 	const numberofsoundsselector = document.getElementById('numberOfSoundsSelector')// форма вгадування акорду
+	const recognisebox = document.getElementById('recognisebox');			// поле для вгадування
+	const recognisebutton = document.getElementById('recogniseButton');		// кнопка ""
+	const SelectedQuality = document.getElementById('SelectedQuality');
+	const SelectedTimbre = document.getElementById('SelectedTimbre');
+	const selectedType = document.getElementById('SelectedType');
+	const playBtn = document.getElementById('playBtn');						//play button
+	const resultBox = document.getElementById('resultBox');
+	const maxsoundsinput = document.getElementById('maxsoundsinput');
+
+	//ПРАПОРЦІ
 	const isaftercheck = document.getElementById('AfterCheck').textContent.trim().toLowerCase() === 'true';	// прапорець чи виконано завантаження після перевірки акорду користувачем
 	const isnewchord = document.getElementById('IsNewChord').textContent.trim().toLowerCase() === 'true';  // прапорець чи виконано завантаження після генерації нового акорду
+	
 
 	let radiobuttons = document.querySelectorAll('input[name="SelectedCount"]');
 	const notecontainer = document.getElementById('notecontainer');
 	const pattern = notecontainer.dataset.pattern;
 	console.log("notecontainer:", notecontainer);
 	console.log("pattern:", pattern);
+	console.log("isnewchord:", isnewchord);
+	console.log("createbox:", createbox);
 
 
-	if (isaftercheck) {
+	if (isaftercheck && numberofsoundsselector) {
 
 		numberofsoundsselector.style.display = 'none';
+		SelectedTimbre.disabled = 'disabled';
+	}
+	if (isnewchord && createbox) {
+		createbox.style.display = 'none';
 	}
 
 
@@ -42,15 +60,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	}
 
 	
-	const recognisebox = document.getElementById('recognisebox');			// поле для вгадування
-	const recognisebutton = document.getElementById('recogniseButton');		// кнопка ""
-	const SelectedQuality = document.getElementById('SelectedQuality');
-	const SelectedTimbre = document.getElementById('SelectedTimbre');
-	const selectedType = document.getElementById('SelectedType');
-	const playBtn = document.getElementById('playBtn');						//play button
 	
-	const resultBox = document.getElementById('resultBox');
-	const maxsoundsinput = document.getElementById('maxsoundsinput');
 	
 
 	// Additional mappings (do not change existing triadTypes / ninthQualities)
@@ -357,6 +367,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			const resultBox = document.getElementById('resultBox');
 			console.log('Play button clicked.');
 			logChord();
+			createbox.style.display = "block";
 			if (!isaftercheck) {
 				if (resultBox) {
 					resultBox.style.display = 'none';

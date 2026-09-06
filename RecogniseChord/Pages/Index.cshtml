@@ -4,131 +4,144 @@
     ViewData["Title"] = "Головна";
 }
 
-<div class="text-center">
-    <div id="IsNewChord" style="display:none">@Model.IsNewChord</div>
-    <div id="AfterCheck" style="display:none">@Model.AfterCheck</div>
-    <h1 class="display-4">@Localizer["ChordsIntervals"]</h1>
-    <div id="newChordFlag"
-         data-new-chord="@Model.IsNewChord.ToString().ToLower()"
-         style="display:none;"></div>
-    
-    <div id="mainbox" class="innercontainer">
-        <!--КОНТЕЙНЕР ЛІВОРУЧ (ВГОРІ)-->
-        <div id="rightcontainer" class="halfcontainer">                
-            <form id="playform" class="full-row" method="post" asp-page-handler="Play">
-                <button id="playBtn" type="button">@Localizer["Play"]</button>
-            </form>
+<div id="indexpagecontainer" class="d-flex flex-column justify-content-between h-100 mb-5">
+    <div class="text-center">
+        <div id="IsNewChord" style="display:none">@Model.IsNewChord</div>
+        <div id="AfterCheck" style="display:none">@Model.AfterCheck</div>
+        <h1 class="display-4">@Localizer["ChordsIntervals"]</h1>
+        <div id="newChordFlag"
+             data-new-chord="@Model.IsNewChord.ToString().ToLower()"
+             style="display:none;"></div>
 
-            <audio id="chordAudio" preload="auto"></audio>
+        <div id="mainbox" class="innercontainer">
+            <!--КОНТЕЙНЕР ЛІВОРУЧ (ВГОРІ)-->
+            <div id="rightcontainer" class="halfcontainer">
+                <form id="playform" class="full-row" method="post" asp-page-handler="Play">
+                    <button id="playBtn" type="button">@Localizer["Play"]</button>
+                </form>
 
-            <!--    ПОЛЕ ДЛЯ ВГАДУВАННЯ       --> 
-            <div id="recognisebox" class="innercontainer" style="display:none">
-                <!-- ПЕРЕМИКАЧ КІЛЬКОСТІ ЗВУКІВ-->
-                <div id="numberOfSoundsSelector" class="innercontainer" style="display:block">
-                    <div style="display:block">
-                    <p>@Localizer["SoundCountQuestion"]</p>
-                    <form id="selectform" method="post" asp-page-handler="Select">
-                        <input type="hidden" asp-for="MaxCount" />
-                        <input type="hidden" asp-for="Timbre" />
-                        <input id="sound2" type="radio" name="SelectedCount" value="2" @(Model.SelectedCount == 2 ? "checked" : "")>2
-                        <input id="sound3" type="radio" name="SelectedCount" value="3" @(Model.SelectedCount == 3 ? "checked" : "")>3
-                        <input id="sound4" type="radio" name="SelectedCount" value="4" @(Model.SelectedCount == 4 ? "checked" : "")>4
-                        <input id="sound5" type="radio" name="SelectedCount" value="5" @(Model.SelectedCount == 5 ? "checked" : "")>5
-                    </form>
-                    </div>
-                    <div style="display:bolck">
-                    <form id="recogniseform" method="post" asp-page-handler="Recognise">
-                        <input type="hidden" asp-for="MaxCount" />
-                        <input type="hidden" asp-for="Timbre" />
-                        <!--ТИП АКОРДУ-->
-                        <div style="display:block; margin:5px">
-                            <select asp-for="SelectedType" id="SelectedType" class="select-quality">
-                                <option value="">--</option>
-                                @foreach (var type in Model.TypeOptions)
-                                {
-                                    <option value="@type">@Localizer[type]</option>
-                                }
-                            </select>
+                <audio id="chordAudio" preload="auto"></audio>
+
+                <!--    ПОЛЕ ДЛЯ ВГАДУВАННЯ       -->
+                <div id="recognisebox" class="innercontainer" style="display:none">
+                    <!-- ПЕРЕМИКАЧ КІЛЬКОСТІ ЗВУКІВ-->
+                    <div id="numberOfSoundsSelector" class="innercontainer" style="display:block">
+                        <div style="display:block">
+                            <p>@Localizer["SoundCountQuestion"]</p>
+                            <form id="selectform" method="post" asp-page-handler="Select">
+                                <input type="hidden" asp-for="MaxCount" />
+                                <input type="hidden" asp-for="Timbre" />
+                                <input id="sound2" type="radio" name="SelectedCount" value="2" @(Model.SelectedCount == 2 ? "checked" : "")>2
+                                <input id="sound3" type="radio" name="SelectedCount" value="3" @(Model.SelectedCount == 3 ? "checked" : "")>3
+                                <input id="sound4" type="radio" name="SelectedCount" value="4" @(Model.SelectedCount == 4 ? "checked" : "")>4
+                                <input id="sound5" type="radio" name="SelectedCount" value="5" @(Model.SelectedCount == 5 ? "checked" : "")>5
+                            </form>
                         </div>
-                        <!--РІЗНОВИД (якість)-->
-                        <div style="display:block; margin:5px">
-                            <select asp-for="SelectedQuality" id="SelectedQuality" class="select-quality">
-                                    <option value="">---</option>
-                                @foreach (var option in Model.QualityOptions)
-                                {
-                                    <option value="@option.Key">@option.Label</option>
-                                }
-                            </select>
+                        <div style="display:bolck">
+                            <form id="recogniseform" method="post" asp-page-handler="Recognise">
+                                <input type="hidden" asp-for="MaxCount" />
+                                <input type="hidden" asp-for="Timbre" />
+                                <!--ТИП АКОРДУ-->
+                                <div style="display:block; margin:5px">
+                                    <select asp-for="SelectedType" id="SelectedType" class="select-quality">
+                                        <option value="">--</option>
+                                        @foreach (var type in Model.TypeOptions)
+                                        {
+                                            <option value="@type">@Localizer[type]</option>
+                                        }
+                                    </select>
+                                </div>
+                                <!--РІЗНОВИД (якість)-->
+                                <div style="display:block; margin:5px">
+                                    <select asp-for="SelectedQuality" id="SelectedQuality" class="select-quality">
+                                        <option value="">---</option>
+                                        @foreach (var option in Model.QualityOptions)
+                                        {
+                                            <option value="@option.Key">@option.Label</option>
+                                        }
+                                    </select>
+                                </div>
+                                <input type="hidden" asp-for="SelectedCount" />
+                                <button id="recogniseButton" type="submit" disabled>
+                                    @Localizer["Check"]
+                                </button>
+                            </form>
                         </div>
-                        <input type="hidden" asp-for="SelectedCount" />
-                            <button id="recogniseButton" type="submit" disabled>
-                                @Localizer["Check"]
-                            </button>
-                    </form>
                     </div>
                 </div>
             </div>
-        </div>
-        
-        <!--КОНТЕЙНЕР ПРАВОРУЧ (ЗНИЗУ)-->
-        <div id="leftcontainer" class="halfcontainer">
-            <div id="resultBox">
-                @if (Model.RecogniseOk is not null)
-                {
 
-                    @if (Model.RecogniseOk == true)
+            <!--КОНТЕЙНЕР ПРАВОРУЧ (ЗНИЗУ)-->
+            <div id="leftcontainer" class="halfcontainer">
+                <div id="resultBox">
+                    @if (Model.RecogniseOk is not null)
                     {
-                        <div class="answer-correct">
-                            <p class="text-success">@Model.GuessResult</p>
-                            <p class="text-success">
-                                @Localizer["CorrectAnswer"] <code>@Model.RecogniseCorrect</code>
-                            </p>
-                        </div>
+
+                        @if (Model.RecogniseOk == true)
+                        {
+                            <div class="answer-correct">
+                                <p class="text-success">@Model.GuessResult</p>
+                                <p class="text-success">
+                                    @Localizer["CorrectAnswer"] <code>@Model.RecogniseCorrect</code>
+                                </p>
+                            </div>
+                        }
+                        else
+                        {
+                            <div>
+                                <p class="text-danger">@Model.GuessResult</p>
+                                <p>@Localizer["Entered"] <code>@Model.UserAnswer</code></p>
+
+                                <p class="text-danger">
+                                    @Localizer["CorrectAnswer"] <code>@Model.RecogniseCorrect</code>
+                                </p>
+                            </div>
+                        }
                     }
                     else
                     {
-                        <div>
-                            <p class="text-danger">@Model.GuessResult</p>
-                            <p>@Localizer["Entered"] <code>@Model.UserAnswer</code></p>
-
-                            <p class="text-danger">
-                                @Localizer["CorrectAnswer"] <code>@Model.RecogniseCorrect</code>
-                            </p>
-                        </div>
+                        <p id="choosemessage">@Localizer["Choose"]</p>
                     }
-                }
-                else
-                {
-                    <p id="choosemessage">@Localizer["Choose"]</p>
-                }
+                </div>
+                <p>@Model.RequestCount @Localizer["AttemptsOnSite"]</p>
             </div>
-            <p>@Model.RequestCount @Localizer["AttemptsOnSite"]</p>
-        </div>
-        
-    </div>
-    <!-- НОВИЙ АКОРД -->
-    <div id="createbox">
-        <p class="full-row">@Localizer["Try"]</p>
-        <form id="newchord" asp-page-handler="new">
-            <button type="submit">@Localizer["CreateNew"]</button>
-        </form>
 
-        <!-- Максимальна кількість звуків -->
-        <div>
-            <form id="maxsoundsform" method="post" asp-page-handler="max">
-                <input type="hidden" asp-for="Timbre" />
-                <p>@Localizer["MaxSounds"]</p>
-                <input id="maxsoundsinput" type="range" name="maxCount" min="2" max="5" value="@Model.MaxCount" />
-                <label for="maxsoundsinput">@Model.MaxCount</label>
+        </div>
+        <!-- НОВИЙ АКОРД -->
+        <div id="createbox">
+            <p class="full-row">@Localizer["Try"]</p>
+            <form id="newchord" asp-page-handler="new">
+                <button type="submit">@Localizer["CreateNew"]</button>
             </form>
+
+            <!-- Максимальна кількість звуків -->
+            <div>
+                <form id="maxsoundsform" method="post" asp-page-handler="max">
+                    <input type="hidden" asp-for="Timbre" />
+                    <p>@Localizer["MaxSounds"]</p>
+                    <input id="maxsoundsinput" type="range" name="maxCount" min="2" max="5" value="@Model.MaxCount" />
+                    <label for="maxsoundsinput">@Model.MaxCount</label>
+                </form>
+            </div>
+        </div>
+
+
+        <!--НОТИ-->
+        <div class="mt-4 d-flex">
+            <div class="chordbox">
+                <div id="notecontainer"
+                     data-barwidth="180"
+                     data-pattern="@Model.ChordCode">
+                </div>
+            </div>
         </div>
     </div>
     <!-- ТЕМБР -->
-    <div>
+    <div id="timbrebox" class="text-center">
         <form id="timbreform" method="post" asp-page-handler="timbre">
             <p>@Localizer["ChooseTimbre"]</p>
-            <div style="display:block; margin:5px">                
-                <select asp-for="Timbre" id="SelectedTimbre">                    
+            <div style="display:block; margin:5px">
+                <select asp-for="Timbre" id="SelectedTimbre">
                     @foreach (var timbre in Model.AllTimbres)
                     {
                         <option value="@timbre" selected="@(Model.Timbre == timbre)">@timbre</option>
@@ -138,18 +151,8 @@
             </div>
         </form>
     </div>
-
-    <!--НОТИ-->
-    <div class="mt-4 d-flex">
-        <div class="chordbox">
-            <div id="notecontainer"
-                 data-barwidth="180"
-                 data-pattern="@Model.ChordCode">
-            </div>
-        </div>
-    </div>
-
 </div>
+
 
 @section Scripts {
     <script>

@@ -329,6 +329,12 @@ main .whitecontainer {
     overflow-x: hidden;
     height: calc(100vh - var(--header-height));
 }
+
+
+#timbrebox {
+    position: relative;
+    bottom: 40px;
+}
 /* Responsive: on narrow screens stack columns and ensure rightcontainer is above leftcontainer */
 @media (max-width: 768px) {
     .main {
