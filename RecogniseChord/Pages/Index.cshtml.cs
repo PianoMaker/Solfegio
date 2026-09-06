@@ -18,6 +18,7 @@ namespace RecogniseChord.Pages
         private readonly IStringLocalizer _localizer;
 
         public IWebHostEnvironment _environment;
+        [BindProperty] public string ChordCode { get; set; }
 
         public IndexModel(ILogger<IndexModel> logger, IWebHostEnvironment environment, IStringLocalizerFactory localizerFactory)
         {
@@ -701,6 +702,8 @@ namespace RecogniseChord.Pages
             string notesJson = JsonSerializer.Serialize(payload);
 
             var absPitches = chord.Notes.Select(n => n.AbsPitch()).ToList();
+
+            ChordCode = chord.ChordToCode();
 
             return new ChordData
             {
