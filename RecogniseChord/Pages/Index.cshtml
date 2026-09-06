@@ -5,6 +5,8 @@
 }
 
 <div class="text-center">
+    <div id="IsNewChord" style="display:none">@Model.IsNewChord</div>
+    <div id="AfterCheck" style="display:none">@Model.AfterCheck</div>
     <h1 class="display-4">@Localizer["ChordsIntervals"]</h1>
     <div id="newChordFlag"
          data-new-chord="@Model.IsNewChord.ToString().ToLower()"
@@ -138,14 +140,14 @@
     </div>
 
     <!--НОТИ-->
-    @* <div class="mt-4 d-flex">
+    <div class="mt-4 d-flex">
         <div class="chordbox">
             <div id="notecontainer"
                  data-barwidth="180"
                  data-pattern="@Model.ChordCode">
             </div>
         </div>
-    </div> *@
+    </div>
 
 </div>
 

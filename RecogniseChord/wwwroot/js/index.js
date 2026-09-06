@@ -9,13 +9,20 @@ document.addEventListener('DOMContentLoaded', function () {
 	const recogniseform = document.getElementById('recogniseform');		// форма для кнопки "Перевірити"
 	const chordbox = document.querySelector('.chordbox');
 	const timbreform = document.getElementById('timbreform')			// форма встановлення тембру
+	const numberofsoundsselector = document.getElementById('numberOfSoundsSelector')// форма вгадування акорду
+	const isaftercheck = document.getElementById('AfterCheck').textContent.trim().toLowerCase() === 'true';	// прапорець чи виконано завантаження після перевірки акорду користувачем
+	const isnewchord = document.getElementById('IsNewChord').textContent.trim().toLowerCase() === 'true';  // прапорець чи виконано завантаження після генерації нового акорду
 
 	let radiobuttons = document.querySelectorAll('input[name="SelectedCount"]');
 	const notecontainer = document.getElementById('notecontainer');
-	if (notecontainer) {
-		const pattern = notecontainer.dataset.pattern;
-		console.log("notecontainer:", notecontainer);
-		console.log("pattern:", pattern);
+	const pattern = notecontainer.dataset.pattern;
+	console.log("notecontainer:", notecontainer);
+	console.log("pattern:", pattern);
+
+
+	if (isaftercheck) {
+
+		numberofsoundsselector.style.display = 'none';
 	}
 
 
@@ -73,7 +80,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	// приховуємо ноти
 	// ===================================
 
-	if (checkchord && chordbox)
+	if (!isaftercheck && chordbox)
 		chordbox.style.display = 'none'; 
 
 	//====================================
@@ -182,9 +189,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	// натискання скидає всі прапорці в сесії та надсилає форму розпізнавання
 	//=================================
 	if (recognisebutton) {
-
-
-		
+				
 		function updateRecogniseButton() {
 			if (!recognisebutton) return;
 
@@ -352,20 +357,21 @@ document.addEventListener('DOMContentLoaded', function () {
 			const resultBox = document.getElementById('resultBox');
 			console.log('Play button clicked.');
 			logChord();
+			if (!isaftercheck) {
+				if (resultBox) {
+					resultBox.style.display = 'none';
+					console.log('Result box hidden on play button click.');
+				}
 
-			if (resultBox) {
-				resultBox.style.display = 'none';			
-				console.log('Result box hidden on play button click.');
-			}
-			
-			const choosemessage = document.getElementById('choosemessage');
-			if (choosemessage) {
-				choosemessage.style.display = 'block';
-			}
+				const choosemessage = document.getElementById('choosemessage');
+				if (choosemessage) {
+					choosemessage.style.display = 'block';
+				}
 
-			if (recognisebox) {
-				recognisebox.style.display = 'flex';
-				console.log('Recognisebox shown on play button click.');
+				if (recognisebox) {
+					recognisebox.style.display = 'flex';
+					console.log('Recognisebox shown on play button click.');
+				}
 			}
 
 			try {
@@ -468,7 +474,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	//======================================
 	//вивоидмо нотне зображення
 	//=====================================
-	if (notecontainer && pattern) {
+	if (notecontainer) {
 		console.log("rendering sheet")
 		notecontainer.innerHTML = "";
 		window.renderPatternString(

@@ -1,12 +1,13 @@
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Localization;
-using Music;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Localization;
+using Music;
+using NAudio.SoundFont;
 using static Music.Engine;
 using static Music.Messages;
 
@@ -56,6 +57,8 @@ namespace RecogniseChord.Pages
         public bool CanPlay => !string.IsNullOrEmpty(GeneratedFileRelative);
 
         public bool IsNewChord { get; private set; }
+
+        public bool AfterCheck { get; private set; }
         public string? GuessResult { get; private set; } // "вірно" / "невірно"
         public string? GeneratedChordJson { get; private set; } // JSON payload for client playback (notes + meta)
         [BindProperty]
@@ -153,6 +156,8 @@ namespace RecogniseChord.Pages
             var chordData = GenerateRandomChord();
             ApplyChordData(chordData); // show to user
                                        // store current shown rchord so recognise can validate
+            Console.WriteLine($"OnPostNew ChordCode = '{ChordCode}'");
+            Console.WriteLine($"ChordData ChordCode = '{chordData.ChordCode}'");
             IsNewChord = true;
             TempData[CurrentChordKey] = JsonSerializer.Serialize(chordData);
 
@@ -233,6 +238,8 @@ namespace RecogniseChord.Pages
             {
                 var generated = GenerateRandomChord();
                 ApplyChordData(generated);
+                Console.WriteLine($"OnPostNew ChordCode = '{ChordCode}'");
+                Console.WriteLine($"ChordData ChordCode = '{generated.ChordCode}'");
                 TempData[CurrentChordKey] = JsonSerializer.Serialize(generated);
             }
         }
@@ -270,6 +277,7 @@ namespace RecogniseChord.Pages
             ReadInfo();
             RestoreTimbre();
             RequestCount++;
+            AfterCheck = true;
             ChordData actual = RestoreChordData();
 
             if (actual != null)
@@ -328,9 +336,11 @@ namespace RecogniseChord.Pages
         public IActionResult OnPostNew()
         {
             MessageL(14, "Index OnPostNew");
+            ReadInfo();
             var chordData = GenerateRandomChord();
             ApplyChordData(chordData);
-            IsNewChord = true;
+            Console.WriteLine($"OnPostNew ChordCode = '{ChordCode}'");
+            Console.WriteLine($"ChordData ChordCode = '{chordData.ChordCode}'");
             TempData[CurrentChordKey] = JsonSerializer.Serialize(chordData);
 
             PopulateTypes(SelectedCount);
@@ -722,6 +732,7 @@ namespace RecogniseChord.Pages
             var absPitches = chord.Notes.Select(n => n.AbsPitch()).ToList();
 
             ChordCode = chord.ChordToCode();
+            IsNewChord = true;
 
             return new ChordData
             {
@@ -732,7 +743,8 @@ namespace RecogniseChord.Pages
                 FileRelative = rel,
                 NotesDisplay = notesDisplay,
                 NotesJson = notesJson,
-                AbsPitches = absPitches
+                AbsPitches = absPitches,
+                ChordCode = ChordCode
             };
         }
 
@@ -817,7 +829,9 @@ namespace RecogniseChord.Pages
             GeneratedFileRelative = data.FileRelative;
             GeneratedNotesDisplay = data.NotesDisplay;
             GeneratedChordJson = data.NotesJson;
+            ChordCode = data.ChordCode;
             currentChord = new ChordT();
+
         }
 
         private string RelativeFromFull(string path)
@@ -914,6 +928,8 @@ namespace RecogniseChord.Pages
             public string NotesDisplay { get; set; } = string.Empty;
             public string NotesJson { get; set; } = string.Empty;
             public List<int> AbsPitches { get; set; } = new();
+
+            public string ChordCode { get; set; } = string.Empty;
         }
 
         private ChordData RestoreChordData()
