@@ -295,7 +295,10 @@
   <data name="MIN_CHORD" xml:space="preserve">
     <value>мінорний</value>
   </data>
-  <data name="String2" type="System.Resources.ResXNullRef, System.Windows.Forms">
+  <data name="CreateNew" xml:space="preserve">
+    <value>Новий акорд</value>
+  </data>
+  <data name="Lang" type="System.Resources.ResXNullRef, System.Windows.Forms">
     <value />
   </data>
 </root>

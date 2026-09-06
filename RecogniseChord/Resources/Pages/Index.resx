@@ -298,4 +298,10 @@
   <data name="String2" xml:space="preserve">
     <value />
   </data>
+  <data name="CreateNew" xml:space="preserve">
+    <value>CreateNew</value>
+  </data>
+  <data name="Lang" xml:space="preserve">
+    <value>Lang</value>
+  </data>
 </root>

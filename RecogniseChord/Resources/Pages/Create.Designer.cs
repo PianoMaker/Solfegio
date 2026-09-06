@@ -79,11 +79,83 @@ namespace RecogniseChord.Resources.Pages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 6/9 chord.
+        /// </summary>
+        internal static string CORD69 {
+            get {
+                return ResourceManager.GetString("CORD69", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Number of sounds?.
         /// </summary>
         internal static string CountQuestion {
             get {
                 return ResourceManager.GetString("CountQuestion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to CreateNew.
+        /// </summary>
+        internal static string CreateNew {
+            get {
+                return ResourceManager.GetString("CreateNew", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ninth chord.
+        /// </summary>
+        internal static string NONACORD {
+            get {
+                return ResourceManager.GetString("NONACORD", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ninth chord, first inversion.
+        /// </summary>
+        internal static string NONACORD_1i {
+            get {
+                return ResourceManager.GetString("NONACORD_1i", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ninth chord, second inversion.
+        /// </summary>
+        internal static string NONACORD_2i {
+            get {
+                return ResourceManager.GetString("NONACORD_2i", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ninth chord, third inversion.
+        /// </summary>
+        internal static string NONACORD_3i {
+            get {
+                return ResourceManager.GetString("NONACORD_3i", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ninth chord, fourth inversion.
+        /// </summary>
+        internal static string NONACORD_4i {
+            get {
+                return ResourceManager.GetString("NONACORD_4i", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to octave.
+        /// </summary>
+        internal static string OCTAVA {
+            get {
+                return ResourceManager.GetString("OCTAVA", resourceCulture);
             }
         }
         
@@ -97,6 +169,15 @@ namespace RecogniseChord.Resources.Pages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to six-four chord.
+        /// </summary>
+        internal static string QSEXT {
+            get {
+                return ResourceManager.GetString("QSEXT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Quality:.
         /// </summary>
         internal static string Quality {
@@ -106,11 +187,119 @@ namespace RecogniseChord.Resources.Pages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to fourth.
+        /// </summary>
+        internal static string QUARTA {
+            get {
+                return ResourceManager.GetString("QUARTA", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to fifth.
+        /// </summary>
+        internal static string QUINTA {
+            get {
+                return ResourceManager.GetString("QUINTA", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to seventh chord, second inversion.
+        /// </summary>
+        internal static string QUINTS {
+            get {
+                return ResourceManager.GetString("QUINTS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to From note (root note):.
         /// </summary>
         internal static string RootNote {
             get {
                 return ResourceManager.GetString("RootNote", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to second chord.
+        /// </summary>
+        internal static string SEC {
+            get {
+                return ResourceManager.GetString("SEC", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to second.
+        /// </summary>
+        internal static string SECUNDA {
+            get {
+                return ResourceManager.GetString("SECUNDA", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to sixth.
+        /// </summary>
+        internal static string SEKSTA {
+            get {
+                return ResourceManager.GetString("SEKSTA", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to seventh chord.
+        /// </summary>
+        internal static string SEPT {
+            get {
+                return ResourceManager.GetString("SEPT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to seventh.
+        /// </summary>
+        internal static string SEPTYMA {
+            get {
+                return ResourceManager.GetString("SEPTYMA", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to sixth chord.
+        /// </summary>
+        internal static string SEXT {
+            get {
+                return ResourceManager.GetString("SEXT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to third.
+        /// </summary>
+        internal static string TERZIA {
+            get {
+                return ResourceManager.GetString("TERZIA", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to seventh chord, third inversion.
+        /// </summary>
+        internal static string TERZQ {
+            get {
+                return ResourceManager.GetString("TERZQ", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to triad.
+        /// </summary>
+        internal static string TRI {
+            get {
+                return ResourceManager.GetString("TRI", resourceCulture);
             }
         }
         

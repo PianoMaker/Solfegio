@@ -142,6 +142,15 @@ namespace RecogniseChord.Resources.Pages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to CreateNew.
+        /// </summary>
+        internal static string CreateNew {
+            get {
+                return ResourceManager.GetString("CreateNew", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to diminished.
         /// </summary>
         internal static string DIM {
@@ -192,6 +201,15 @@ namespace RecogniseChord.Resources.Pages {
         internal static string HMAJ {
             get {
                 return ResourceManager.GetString("HMAJ", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Lang.
+        /// </summary>
+        internal static string Lang {
+            get {
+                return ResourceManager.GetString("Lang", resourceCulture);
             }
         }
         

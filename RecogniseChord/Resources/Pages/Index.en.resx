@@ -298,4 +298,10 @@
   <data name="String2" type="System.Resources.ResXNullRef, System.Windows.Forms">
     <value />
   </data>
+  <data name="CreateNew" xml:space="preserve">
+    <value>New chord</value>
+  </data>
+  <data name="Lang" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
 </root>
