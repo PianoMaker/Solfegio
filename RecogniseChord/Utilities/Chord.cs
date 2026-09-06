@@ -806,9 +806,9 @@ namespace Music
             string code = "";
             foreach (var note in Notes)
             {
-                code += note.LatinName;
+                code += note.LatinName;                
                 code += ConvertOct(note.Oct);
-                code += note.PrintDuration;                
+                code += (int)note.Duration.Dur;
                 code += "=";
             }
 
