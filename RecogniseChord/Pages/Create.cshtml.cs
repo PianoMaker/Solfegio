@@ -306,9 +306,8 @@ namespace RecogniseChord.Pages
                 var notes = string.Join(", ", chord.Notes.Select(n => n.ToString()));
                 MessageL(COLORS.gray, $"Built interval: {notes}");
                 ChordCode = chord.ChordToCode();
-                return chord;
             }
-            if (SelectedCount == 3)
+            else if (SelectedCount == 3)
             {
                 // triads & inversions
                 TRIADS triadQuality = Enum.TryParse<TRIADS>(qualityKey, out var tq) ? tq : TRIADS.MAJ;
@@ -317,9 +316,8 @@ namespace RecogniseChord.Pages
                 var notes = string.Join(", ", chord.Notes.Select(n => n.ToString()));
                 MessageL(COLORS.gray, $"Built triad chord: {notes}");
                 ChordCode = chord.ChordToCode();
-                return chord;
             }
-            if (SelectedCount == 4)
+            else if (SelectedCount == 4)
             {
                 SEPTS septQuality = Enum.TryParse<SEPTS>(qualityKey, out var sq) ? sq : SEPTS.MAJMAJ;
                 chord.SeventhChord(root, septQuality);
@@ -327,9 +325,9 @@ namespace RecogniseChord.Pages
                 var notes = string.Join(", ", chord.Notes.Select(n => n.ToString()));
                 MessageL(COLORS.gray, $"Built seventh chord: {notes}");
                 ChordCode = chord.ChordToCode();
-                return chord;
+
             }
-            if (SelectedCount == 5)
+            else if (SelectedCount == 5)
             {
                 NINTHS ninthQuality = Enum.TryParse<NINTHS>(qualityKey, out var nq) ? nq : NINTHS.NMAJ;
                 chord.NinthChord(root, ninthQuality);
@@ -337,13 +335,13 @@ namespace RecogniseChord.Pages
                 var notes = string.Join(", ", chord.Notes.Select(n => n.ToString()));
                 MessageL(COLORS.gray, $"Built ninth chord: {notes}");
                 ChordCode = chord.ChordToCode();
-                return chord;
             }
-            return null;
-        }
+            else return null;
 
 
-       
+                chord.SetDuration(DURATION.whole);
+                return chord;
+        }      
 
         private void ApplyTriadInversion(ChordT chord, string type)
         {

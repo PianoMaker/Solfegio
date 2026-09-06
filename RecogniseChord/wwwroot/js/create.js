@@ -169,11 +169,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		1.2,              // BASESCALING
 		1.0,              // SCALINGFACTOR
 		0               // KeySignature
-	);
-
-
-	
-	
+	);	
 
 });
 
