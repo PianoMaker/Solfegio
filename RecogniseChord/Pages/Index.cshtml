@@ -130,12 +130,15 @@
         </form>
     </div>
 
-@*     <!-- перегенерувати -->
-    <div>
-        <form id="regenerateform" method="post" asp-page-handler="regenerate">
-            <button id="regeneratebtn" type="submit">@Localizer["Regenerate"]</button>
-        </form>
-    </div> *@
+    <!--НОТИ-->
+    <div class="mt-4 d-flex">
+        <div class="chordbox">
+            <div id="notecontainer"
+                 data-barwidth="180"
+                 data-pattern="@Model.ChordCode">
+            </div>
+        </div>
+    </div>
 
 </div>
 
@@ -144,5 +147,15 @@
         window.generatedChord = @Html.Raw(Model.GeneratedChordJson ?? "null");
         window.generatedFile = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.GeneratedFileRelative ?? string.Empty));
     </script>
+    <script src="~/lib/midirender/vexflow.js"></script>
+    <script src="~/lib/midirender/melodyAudio.js" asp-append-version="true"></script>
+    <script src="~/lib/midirender/mr-beams-helper.js" asp-append-version="true"></script>
+    <script src="~/lib/midirender/mr-key-signatures-helper.js" asp-append-version="true"></script>
+    <script src="~/lib/midirender/mr-calculate-rows-helper.js" asp-append-version="true"></script>
+    <script src="~/lib/midirender/mr-svg-helper.js" asp-append-version="true"></script>
+    <script src="~/lib/midirender/midiRenderer.js" asp-append-version="true"></script>
+    <script src="~/lib/midirender/midiparser_ext.js" asp-append-version="true"></script>
+    <script src="~/lib/midirender/patternRenderer.js"
+            asp-append-version="true"></script>
     <script src="~/js/index.js" asp-append-version="true"></script>
 }
