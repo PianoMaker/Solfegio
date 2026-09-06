@@ -7,10 +7,16 @@ document.addEventListener('DOMContentLoaded', function () {
 	const selectform = document.getElementById('selectform'); 		// форма для вибору кількості звуків під час відповіді користувача
 	const maxsoundsform = document.getElementById('maxsoundsform');		// форма для вибору максимальної кількості звуків 
 	const recogniseform = document.getElementById('recogniseform');		// форма для кнопки "Перевірити"
-
+	const chordbox = document.querySelector('.chordbox');
 	const timbreform = document.getElementById('timbreform')			// форма встановлення тембру
 
 	let radiobuttons = document.querySelectorAll('input[name="SelectedCount"]');
+	const notecontainer = document.getElementById('notecontainer');
+	if (notecontainer) {
+		const pattern = notecontainer.dataset.pattern;
+		console.log("notecontainer:", notecontainer);
+		console.log("pattern:", pattern);
+	}
 
 
 	if (!radiobuttons || radiobuttons.length === 0) {
@@ -61,7 +67,14 @@ document.addEventListener('DOMContentLoaded', function () {
 	console.log('restoring session max sound count:', savedType);
 	const maxsounds = sessionStorage.getItem('maxSounds');				// макс. кількість звуків
 	console.log('restoring session max sound count:', maxsounds);
+	const checkchord = sessionStorage.getItem('checkChord');
 
+	//====================================
+	// приховуємо ноти
+	// ===================================
+
+	if (checkchord)
+		chordbox.style.display = 'none'; 
 
 	//====================================
 	// Застосовуємо відновлені значення
@@ -169,6 +182,9 @@ document.addEventListener('DOMContentLoaded', function () {
 	// натискання скидає всі прапорці в сесії та надсилає форму розпізнавання
 	//=================================
 	if (recognisebutton) {
+
+
+		
 		function updateRecogniseButton() {
 			if (!recognisebutton) return;
 
@@ -183,8 +199,12 @@ document.addEventListener('DOMContentLoaded', function () {
 		updateRecogniseButton();
 
 
+
 		recognisebutton.addEventListener('click', (e) => {
 			if (!e.isTrusted) return;
+
+			sessionStorage.setItem('checkChord', 'true');
+
 			console.log('Recognise button clicked.');
 			
 			radiobuttons.forEach(btn => { 		
@@ -328,6 +348,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 	if (playBtn) {
 		playBtn.addEventListener('click', async () => {
+			sessionStorage.removeItem('checkChord');
 			const resultBox = document.getElementById('resultBox');
 			console.log('Play button clicked.');
 			logChord();
@@ -443,6 +464,32 @@ document.addEventListener('DOMContentLoaded', function () {
 		SelectedTimbre.value = val;
 		sessionStorage.setItem('savedTimbre', val);
 	};
+
+	//======================================
+	//вивоидмо нотне зображення
+	//=====================================
+	if (notecontainer && pattern) {
+		console.log("rendering sheet")
+		notecontainer.innerHTML = "";
+		window.renderPatternString(
+			pattern,
+			'notecontainer',
+			null,
+			4,       // numerator
+			4,     // denominator
+			300,            // GENERALWIDTH
+			100,              // HEIGHT
+			10,               // TOPPADDING
+			105,			// BARWIDTH
+			30,              // CLEFZONE
+			0,              // Xmargin
+			512,              // RESPONSIVE_THRESHOLD
+			1.2,              // BASESCALING
+			1.0,              // SCALINGFACTOR
+			0               // KeySignature
+		);
+	}
+	else console.warn('no notecontainer or pattern found');
 
 });
 
