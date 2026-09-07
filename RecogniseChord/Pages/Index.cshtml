@@ -120,7 +120,7 @@
                     <input type="hidden" asp-for="Timbre" />
                     <p>@Localizer["MaxSounds"]</p>
                     <input id="maxsoundsinput" type="range" name="maxCount" min="2" max="5" value="@Model.MaxCount" />
-                    <label for="maxsoundsinput">@Model.MaxCount</label>
+                    <label id="maxsoundslabel" for="maxsoundsinput">@Model.MaxCount</label>
                 </form>
             </div>
         </div>

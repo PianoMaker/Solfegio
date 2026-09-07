@@ -140,19 +140,16 @@ namespace RecogniseChord.Pages
         public void OnGet()
         {
             ReadInfo();
+
+            RestoreMaxCount();
+
             if (SamplePathExist)
                 MessageL(COLORS.green, $"sample {SamplePath} is OK!"); 
             else
                 MessageL(COLORS.red, $"sample {SamplePath} is missing!");
 
 
-            if (TempData.Peek(MaxCountTempKey) is string maxVal && int.TryParse(maxVal, out var mc))
-            {
-                MaxCount = Math.Max(2, Math.Min(5, mc));
-                MessageL(7, $"MaxCo1unt set to {MaxCount}");
-            }
-
-            MessageL(14, "Index OnGet: generating initial rchord");
+            MessageL(14, $"Index OnGet: generating initial rchord, MaxCount={MaxCount}");
             var chordData = GenerateRandomChord();
             ApplyChordData(chordData); // show to user
                                        // store current shown rchord so recognise can validate
@@ -218,11 +215,14 @@ namespace RecogniseChord.Pages
             MessageL(14, "Index OnPostPlay: processing user play request");
             ReadInfo();
             // Play should use the current rchord stored in TempData and must NOT generate a new rchord
+            RestoreMaxCount();
             RestoreOrGenerateChord();
+            
 
             PopulateTypesForGenerated();
             PopulateQualitiesForGenerated();
             SyncLegacyLists();
+            TempData[MaxCountTempKey] = MaxCount.ToString();
             return Page();
         }
 
@@ -310,9 +310,10 @@ namespace RecogniseChord.Pages
 
                 // генеруємо відображення введеної користувачем відповіді
 
-                UserAnswer = string.Join(" ", new[] { SelectedType, SelectedQuality }
-                    .Where(x => !string.IsNullOrWhiteSpace(x))
-                    .Select(x => _localizer[x].Value));
+                var userQualityLabel = GetQualityLabels(SelectedCount)
+    .GetValueOrDefault(SelectedQuality, SelectedQuality);
+
+                UserAnswer = $"{_localizer[SelectedType].Value} {userQualityLabel}";
 
                 // keep current rchord in TempData while we display feedback
                 TempData.Keep(CurrentChordKey);
@@ -337,6 +338,7 @@ namespace RecogniseChord.Pages
         {
             MessageL(14, "Index OnPostNew");
             ReadInfo();
+            RestoreMaxCount();
             var chordData = GenerateRandomChord();
             ApplyChordData(chordData);            
             TempData[CurrentChordKey] = JsonSerializer.Serialize(chordData);
@@ -384,20 +386,14 @@ namespace RecogniseChord.Pages
         {
             MessageL(14, $"Index OnPostMax: processing user max count change to {MaxCount}");
             ReadInfo();
-            RestoreTimbre();
-            TempData[MaxCountTempKey] = MaxCount.ToString();
-
-            //var chordData = GenerateRandomChord();
-            //ApplyChordData(chordData);
-            //IsNewChord = true;
-            //TempData[CurrentChordKey] = JsonSerializer.Serialize(chordData);
+            RestoreTimbre();          
 
             RestoreOrGenerateChord();            
             // Refresh UI lists
             PopulateTypesForGenerated();
             PopulateQualitiesForGenerated();
             SyncLegacyLists();
-
+            TempData[MaxCountTempKey] = MaxCount.ToString();
             return Page();
         }
 
@@ -975,8 +971,12 @@ namespace RecogniseChord.Pages
 
         private void RestoreMaxCount()
         {
-            if (Request.Form.TryGetValue(nameof(MaxCount), out var mc) && int.TryParse(mc, out int mcvalue))
-                MaxCount = Math.Clamp(mcvalue, 2, 5);
+            if (TempData.Peek(MaxCountTempKey) is string maxVal &&
+    int.TryParse(maxVal, out var mc))
+            {
+                MaxCount = Math.Clamp(mc, 2, 5);
+                MessageL(14, $"MaxCount restored to {MaxCount}");
+            }
         }
 
         private void RestoreTimbre()
