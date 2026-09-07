@@ -84,6 +84,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	console.log('restoring session max sound count:', savedType);
 	const maxsounds = sessionStorage.getItem('maxSounds');				// макс. кількість звуків
 	console.log('restoring session max sound count:', maxsounds);
+	const maxsoundlabel = document.getElementById('maxsoundslabel');   // лейбл  макс кількості звуків
 	const checkchord = sessionStorage.getItem('checkChord');
 
 	//====================================
@@ -156,6 +157,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	if (maxsounds && maxsoundsform) {
 		maxsoundsform.value = maxsounds;
 		maxsoundsinput.value = maxsounds;
+		maxsoundlabel.textContent = maxsounds;
 	}
 	const hasCheckedRadio = Array.from(radiobuttons).some(btn => btn.checked);
 
