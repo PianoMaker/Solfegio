@@ -2,7 +2,8 @@
     --margin-bottom: 10px;
     --header-height: 60px;
     --header-color: #8e5639;
-    --footer-color: #c6b246;
+/*    --footer-color: #c6b246;*/
+    --footer-color: #a47f3c;
     --correct-answer-color: #0d5a2b;
 }
 
@@ -335,6 +336,73 @@ main .whitecontainer {
     position: relative;
     bottom: 40px;
 }
+
+
+#playBtn {
+    padding: 8px 32px;
+    font-size: 18px;
+    color: white;
+    background: var(--footer-color);
+    border: 1px solid #713a2b;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+    #playBtn:hover {
+        background: #9b5740;
+    }
+
+    #playBtn:active {
+        transform: translateY(1px);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+    }
+
+#newchord button, #recogniseButton {
+    padding: 5px 15px;
+    font-size: 18px;
+    color: #75482f;
+    background: #fff8df;
+    border: 1px solid #9b7540;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.18);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+    #newchord button:hover, #recogniseButton:hover {
+        background: #f5e8bd;
+        border-color: #80552f;
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.23);
+    }
+
+    #newchord button:active, #recogniseButton.active {
+        transform: translateY(1px);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
+    }
+
+    #recogniseButton:disabled {
+        color: #aaa;
+        background: #eee8d8;
+        border-color: #ccc5b5;
+        box-shadow: none;
+        cursor: not-allowed;
+        opacity: 0.65;
+    }
+
+.btn-icon {
+    font-size: 20px;
+    font-weight: bold;
+    line-height: 1;
+    color: #8b5a2b;
+}
+
+    .footer .container{
+        color: rgba(254, 254, 204, 0.8)
+    }
+        
+
 /* Responsive: on narrow screens stack columns and ensure rightcontainer is above leftcontainer */
 @media (max-width: 768px) {
     .main {
@@ -393,6 +461,8 @@ main .whitecontainer {
     .melody-notation, .melodyexample {
         max-width: 512px;
     }
+
+   
 }
 
 @media (max-width: 586px) {

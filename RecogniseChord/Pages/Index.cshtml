@@ -62,16 +62,17 @@
                                     </select>
                                 </div>
                                 <input type="hidden" asp-for="SelectedCount" />
-                                <button id="recogniseButton" type="submit" disabled>
-                                    @Localizer["Check"]
-                                </button>
+                                    <button id="recogniseButton" type="submit" disabled>
+                                        <span class="btn-icon">⌕</span>
+                                        @Localizer["Check"]
+                                    </button>
                             </form>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!--КОНТЕЙНЕР ПРАВОРУЧ (ЗНИЗУ)-->
+            <!--КОНТЕЙНЕР З ПЕРЕВІРКОЮ-->
             <div id="leftcontainer" class="halfcontainer">
                 <div id="resultBox">
                     @if (Model.RecogniseOk is not null)
@@ -100,7 +101,7 @@
                     }
                     else
                     {
-                        <p id="choosemessage">@Localizer["Choose"]</p>
+                        <i id="choosemessage">@Localizer["Choose"]</i>
                     }
                 </div>
                 <p>@Model.RequestCount @Localizer["AttemptsOnSite"]</p>
@@ -110,8 +111,11 @@
         <!-- НОВИЙ АКОРД -->
         <div id="createbox">
             <p class="full-row">@Localizer["Try"]</p>
-            <form id="newchord" asp-page-handler="new">
-                <button type="submit">@Localizer["CreateNew"]</button>
+            <form id="newchord" asp-page-handler="new">                
+                <button type="submit">
+                    <span class="btn-icon">⟳</span>
+                    @Localizer["CreateNew"]
+                </button>
             </form>
 
             <!-- Максимальна кількість звуків -->
