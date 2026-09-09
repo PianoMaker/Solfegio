@@ -65,9 +65,15 @@ document.addEventListener('DOMContentLoaded', function () {
 	// натискання відтворює збережений WAV-файл або синтезує тони з payload
 	// =================================
 
+	console.debug("selectedQuality.value = " + selectedQuality.value);
+	if (selectedQuality.value === '==' || selectedType.value === '==')
+		playBtn.disabled === 'disabled'
+	else
+		playBtn.disabled === 'enabled'
+
 	if (playBtn) {
 		console.debug('playbtn eventlistener is loading')
-		playBtn.disabled = false;
+		/*playBtn.disabled = false;*/
 		playBtn.addEventListener('click', function () {
 			console.debug('playbtn clicked')
 			if (!audio.src) {

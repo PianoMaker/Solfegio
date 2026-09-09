@@ -305,7 +305,7 @@ namespace RecogniseChord.Pages
                 chord.AddNote(note2);
                 var notes = string.Join(", ", chord.Notes.Select(n => n.ToString()));
                 MessageL(COLORS.gray, $"Built interval: {notes}");
-                ChordCode = chord.ChordToCode();
+                
             }
             else if (SelectedCount == 3)
             {
@@ -315,7 +315,7 @@ namespace RecogniseChord.Pages
                 ApplyTriadInversion(chord, typeKey);
                 var notes = string.Join(", ", chord.Notes.Select(n => n.ToString()));
                 MessageL(COLORS.gray, $"Built triad chord: {notes}");
-                ChordCode = chord.ChordToCode();
+                
             }
             else if (SelectedCount == 4)
             {
@@ -324,7 +324,7 @@ namespace RecogniseChord.Pages
                 ApplySeventhInversion(chord, typeKey);
                 var notes = string.Join(", ", chord.Notes.Select(n => n.ToString()));
                 MessageL(COLORS.gray, $"Built seventh chord: {notes}");
-                ChordCode = chord.ChordToCode();
+                
 
             }
             else if (SelectedCount == 5)
@@ -334,13 +334,14 @@ namespace RecogniseChord.Pages
                 ApplyNinthInversion(chord, typeKey);
                 var notes = string.Join(", ", chord.Notes.Select(n => n.ToString()));
                 MessageL(COLORS.gray, $"Built ninth chord: {notes}");
-                ChordCode = chord.ChordToCode();
+               
             }
             else return null;
 
-
-                chord.SetDuration(DURATION.whole);
-                return chord;
+            MessageL(COLORS.gray, $"set duration: WHOLE");
+            chord.SetDuration(DURATION.whole);
+            ChordCode = chord.ChordToCode();
+            return chord;
         }      
 
         private void ApplyTriadInversion(ChordT chord, string type)

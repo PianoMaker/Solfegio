@@ -362,3 +362,6 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /.github/copilot-instructions.md
+/RecogniseChord/wwwroot/info/info.txt
+/RecogniseChord/wwwroot/sound/example408.wav
+/RecogniseChord/wwwroot/info/info.txt

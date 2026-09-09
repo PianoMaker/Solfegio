@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Security.Cryptography;
 using static Music.ChordPermutation;
 using static Music.Engine;
@@ -666,7 +666,7 @@ namespace Music
             {
 
                 //зі збільшеною ноною
-                case NINTHS.HAUG: Construct(nt, 1, 2, 0, 2); break;     // зі збільшеною квінтою
+                case NINTHS.HAUG: Construct(nt, 1, 2, 1, 2); break;     // зі збільшеною квінтою
                 case NINTHS.HMAJ: Construct(nt, 1, 0, 1, 2); break;     // мажорний нонакорд зі збільшеною ноною
                 case NINTHS.HDOM: Construct(nt, 1, 0, -1, 2); break;    // домінантовий зі збільшеною ноною
                 
