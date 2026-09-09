@@ -32,8 +32,8 @@ namespace RecogniseChord.Pages
         {
 
             string FilePath = Path.Combine(_environment.WebRootPath, "info", "info.txt");
-            string SuccessPath = Path.Combine(_environment.WebRootPath, "info", "successes.txt");
-            string FailPath = Path.Combine(_environment.WebRootPath, "info", "fails.txt");
+            string SuccessPath = Path.Combine(_environment.WebRootPath, "info", "success.txt");
+            string FailPath = Path.Combine(_environment.WebRootPath, "info", "fail.txt");
             
             
            
@@ -44,7 +44,8 @@ namespace RecogniseChord.Pages
             }
             catch (Exception ex)
             {
-                ErrorMessageL(ex.ToString());
+                ErrorMessageL("file was not found\n");
+                MessageL(Music.COLORS.gray, ex.ToString());
             }
             try
             {
@@ -53,7 +54,8 @@ namespace RecogniseChord.Pages
             }
             catch (Exception ex)
             {
-                ErrorMessageL(ex.ToString());
+                ErrorMessageL("file was not found\n");
+                MessageL(Music.COLORS.gray, ex.ToString());
             }
             try
             {
@@ -62,7 +64,8 @@ namespace RecogniseChord.Pages
             }
             catch (Exception ex)
             {
-                ErrorMessageL(ex.ToString());
+                ErrorMessageL("file was not found\n");
+                MessageL(Music.COLORS.gray, ex.ToString());
             }
 
 

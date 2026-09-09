@@ -214,9 +214,20 @@ main .whitecontainer {
     list-style-type: none;
 }
 #devpage li {
-
     text-align: left;
     padding-left: 100px;
+    
+}
+
+#devpage h2{
+    font-size: 1.3rem;
+}
+#devpage p {
+    font-size: 1rem;
+}
+
+#devpage a {
+    overflow:scroll
 }
 
 .devcontainer {
@@ -224,7 +235,32 @@ main .whitecontainer {
     justify-content: end;
 }
 
-#dev {
+
+#devpage #details {
+    display: none;
+    background-color: rgba(254, 254, 224, 0.2);
+    border: 1px dashed silver;
+    font-size: smaller;
+    width: 80%;
+    margin: auto;
+}
+
+#devpage #showdetails {
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+#devpage #stats {
+    background-color: antiquewhite;
+    border: 1px dashed silver;
+    font-size: smaller;
+}
+
+#stats p {
+    font-size: smaller;
+}
+
+#devpage #dev {
     border: 1px solid var(--footer-color);
     border-radius: 25px;
     max-width: min(900px, 80vh);
@@ -232,30 +268,29 @@ main .whitecontainer {
     margin: 10px;
     background-color: rgba(254, 254, 254, 0.5);
     transition: transform 0.2s ease;
-    
-    
 }
 
-    #dev:hover {
+    #devpage #dev:hover {
         transform: translateY(-4px);
         box-shadow: rgba(40, 40, 20, 0.1) 4px 4px;
     }
 
-    #dev img {
+    #devpage #dev img {
         width: 100px;
         height: auto;
     }
 
-    #dev .inner {
+    #devpage #dev .inner {
         display: flex;
     }
 
-    #dev .leftcontainer {
+    #devpage #dev .leftcontainer {
     }
 
-    #dev .rightcontainer {
+    #devpage #dev .rightcontainer {
         padding: 0 40px;
     }
+
 
 .melodycontainer {
     display: flex;
@@ -429,7 +464,28 @@ main .whitecontainer {
         font-size: 1.8rem;
         margin:1rem;
     }
+    #devpage li {
+        text-align: left;
+        padding-left: 100px;
+        overflow: scroll;
+        font-size: 1.8rem;
+    }
 
+    #devpage h2 {
+        font-size: 2.1rem;
+    }
+
+    #devpage p {
+        font-size: 1.8rem;
+    }
+
+    #devpage #details {
+        font-size: 0.7rem;
+    }
+
+    #devpage img {
+        display:none;
+    }
 
 
     /* Each half becomes full width when stacked */
@@ -462,6 +518,16 @@ main .whitecontainer {
         max-width: 512px;
     }
 
+    #devpage li {
+        text-align: left;
+        padding-left: max(4px, 4%);
+    }
+
+    #stats {
+
+    }
+
+
    
 }
 
@@ -490,11 +556,5 @@ main .whitecontainer {
     }
 }
 
-#details {
-    display: none;
-}
 
-#showdetails {
-    cursor: pointer;
-    text-decoration: underline;
-}
+

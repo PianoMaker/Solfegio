@@ -69,9 +69,9 @@ namespace RecogniseChord.Pages
         [BindProperty]
         public int MaxCount { get; set; } = 4;
 
-        public SuccessInfo Successes { get; private set; }
+        public SuccessInfo Successes { get; private set; } = new();
 
-        public FailInfo Fails { get; private set; }
+        public FailInfo Fails { get; private set; } = new();
 
         // Feedback for recognise action
         public bool? RecogniseOk { get; private set; }
