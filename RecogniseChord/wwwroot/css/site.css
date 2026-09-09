@@ -489,3 +489,12 @@ main .whitecontainer {
         padding-left: 5px;
     }
 }
+
+#details {
+    display: none;
+}
+
+#showdetails {
+    cursor: pointer;
+    text-decoration: underline;
+}

@@ -61,7 +61,7 @@ namespace RecogniseChord.Resources.Pages {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to About.
         /// </summary>
         internal static string About {
             get {

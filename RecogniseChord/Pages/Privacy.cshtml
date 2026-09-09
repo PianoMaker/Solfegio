@@ -1,7 +1,9 @@
 @page
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
 @model PrivacyModel
 @{
-    ViewData["Title"] = @Localizer["About"];
+    ViewData["Title"] = Localizer["About"];
 }
 <div class="text-center" id="devpage">
     <h1 class ="display-4">@ViewData["Title"]</h1>
@@ -10,9 +12,55 @@
     <ul>
         <li> Генерація акордів з конфігурованою кількістю звуків (2–5).</li>
         <li> Відтворення акордів у браузері (синтезоване аудіо / WAV).</li>
+        <li> Нотний запис акордів (js -> vexflow).</li>
         <li> Вибір типу акорду та якості; перевірка відповідей із миттєвим фідбеком.</li>
         <li>Лічильник спроб; утиліти для роботи з аудіо та MIDI (папка Utilities/).</li>
     </ul>
+    <h2>Статистика</h2>
+    <p>
+        Акорди намагались вгадати @Model.Attempts разів. <span id="showdetails">Детальніше</span>
+    </p>
+    <div id="details">
+    <p>
+        Дані після 10.09.2026:
+    </p>
+
+    <ul>
+        <li>
+            Всього вгадано: @Model.Successes.successinfo
+        </li>
+        <li>
+            Всього не вгадано: @Model.Fails.failedinfo
+        </li>
+    </ul>
+
+    <p>
+        За кількістю звуків:
+    </p>
+
+    <ul>
+        <li>
+            2 звуки:
+            вгадано @Model.Successes.success2s,
+            не вгадано @Model.Fails.fail2s
+        </li>
+        <li>
+            3 звуки:
+            вгадано @Model.Successes.success3s,
+            не вгадано @Model.Fails.fail3s
+        </li>
+        <li>
+            4 звуки:
+            вгадано @Model.Successes.success4s,
+            не вгадано @Model.Fails.fail4s
+        </li>
+        <li>
+            5 звуків:
+            вгадано @Model.Successes.success5s,
+            не вгадано @Model.Fails.fail5s
+        </li>
+    </ul>
+    </div>
     <h2>Використані технології:</h2>
     <ul>
         <li>ASP.NET Core Razor Pages, C#, JavaScript, Web Audio API, NAudio.</li>
@@ -37,4 +85,4 @@
 </div>
 
 
-
+<script src="~/js/privacy.js"></script>

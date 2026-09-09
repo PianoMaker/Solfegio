@@ -10,6 +10,8 @@ using Music;
 using NAudio.SoundFont;
 using static Music.Engine;
 using static Music.Messages;
+using RecogniseChord.Models;
+using NuGet.Protocol;
 
 namespace RecogniseChord.Pages
 {
@@ -31,7 +33,10 @@ namespace RecogniseChord.Pages
 
         private const string MaxCountTempKey = "__MaxCount";
 
-        public int RequestCount;
+        // Статистика
+        public int RequestCount { get; set; }
+        public int Success { get; set; }
+        public int Fail { get; set; }
 
         public List<string> AllTimbres { get; set; } = Enum.GetNames(typeof(TIMBRE)).ToList();
 
@@ -63,6 +68,10 @@ namespace RecogniseChord.Pages
         public string? GeneratedChordJson { get; private set; } // JSON payload for client playback (notes + meta)
         [BindProperty]
         public int MaxCount { get; set; } = 4;
+
+        public SuccessInfo Successes { get; private set; }
+
+        public FailInfo Fails { get; private set; }
 
         // Feedback for recognise action
         public bool? RecogniseOk { get; private set; }
@@ -128,14 +137,20 @@ namespace RecogniseChord.Pages
             _ => new()
         };
         
-
+        
         public string FilePath => Path.Combine(_environment.WebRootPath, "info", "info.txt");
+
+        public string SuccessPath => Path.Combine(_environment.WebRootPath, "info", "success.txt");
+
+        public string FailPath => Path.Combine(_environment.WebRootPath, "info", "fail.txt");
 
         public string SoundDir => Path.Combine(_environment.WebRootPath, "sound");
 
         public string SamplePath => Path.Combine(_environment.WebRootPath, "samplesound", "a4sample.wav");
 
         public bool SamplePathExist => System.IO.File.Exists(SamplePath);
+
+       
 
         public void OnGet()
         {
@@ -169,8 +184,35 @@ namespace RecogniseChord.Pages
 
         private void ReadInfo()
         {
-            var attempts = System.IO.File.ReadAllText(FilePath);
-            RequestCount = int.Parse(attempts);           
+            
+            
+            
+            try
+            {
+                var attempts = System.IO.File.ReadAllText(FilePath);
+                RequestCount = int.Parse(attempts);
+            }
+            catch (Exception ex)
+            {
+                ErrorMessageL(ex.ToString());
+            }
+            try {
+                var successes = System.IO.File.ReadAllText(SuccessPath);
+                Successes = successes.FromJson<SuccessInfo>();
+            }
+            catch (Exception ex) {
+                ErrorMessageL(ex.ToString());
+            }
+            try
+            {
+                var fails = System.IO.File.ReadAllText(FailPath);
+                Fails = fails.FromJson<FailInfo>();
+            }
+            catch (Exception ex)
+            {
+                ErrorMessageL(ex.ToString());
+            }
+
         }
 
         private void CleanOldFiles()
@@ -305,6 +347,23 @@ namespace RecogniseChord.Pages
 
                 RecogniseCorrect = $"{correctType} {correctQuality} (від ноти {actual.Root}) — ноти: {actual.NotesDisplay}";
 
+                
+                switch(actual.Count)
+                {
+                    case 2: if (ok) Successes.success2s++;
+                        else Fails.fail2s++; break;
+                    case 3:
+                        if (ok) Successes.success3s++;
+                        else Fails.fail3s++; break;
+                    case 4:
+                        if (ok) Successes.success4s++;
+                        else Fails.fail4s++; break;
+                    case 5:
+                        if (ok) Successes.success5s++;
+                        else Fails.fail5s++; break;
+                    default: MessageL(12, "unknown result");  break; 
+                }
+
                 MessageL(ok ? COLORS.green : COLORS.red,
                          $"Recognise: user={SelectedCount}/{typeKey}/{qualityKey} actual={actual.Count}/{actual.Type}/{actual.Quality}");
 
@@ -329,6 +388,8 @@ namespace RecogniseChord.Pages
             RestoreOrGenerateChord();
 
             System.IO.File.WriteAllText(FilePath, RequestCount.ToString());
+            System.IO.File.WriteAllText(SuccessPath, Successes.Serialize());
+            System.IO.File.WriteAllText(FailPath, Fails.Serialize());
 
             return Page();
         }
