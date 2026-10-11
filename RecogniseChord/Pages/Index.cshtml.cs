@@ -752,6 +752,8 @@ namespace RecogniseChord.Pages
 
             }
 
+            // ПОСТ-ОБРОБКА: ціла нота, тембр
+
             chord.SetDuration(DURATION.whole);
             TIMBRE timbre = GetTimbre();
             string fullPath = GetFullPath();
@@ -766,7 +768,7 @@ namespace RecogniseChord.Pages
             string pitchesdisplay = string.Join(", ", chord.Notes.Select(n => n.AbsPitch()));
 
             // Log generated notes and rchord type/quality
-            MessageL(COLORS.gray, $"Generated rchord ({typeKey}/{qualityKey}) notes: {notesDisplay} pitches: {pitchesdisplay}");
+            MessageL(COLORS.gray, $"Generated chord ({typeKey}/{qualityKey}) notes: {notesDisplay} pitches: {pitchesdisplay}");
 
             // Build JSON payload for client-side playback: { notes: [{frequency,duration}], type, quality, count, root, file }
             var noteObjects = chord.Notes.Select(n => new
