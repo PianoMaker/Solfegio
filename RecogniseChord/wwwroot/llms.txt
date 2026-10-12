@@ -1,0 +1,24 @@
+# Solfegio
+
+> Solfegio (RecogniseChord) is a Ukrainian and English web app for practicing music theory by ear. It helps users recognize chords and intervals, build chords, and learn intervals from familiar melodies.
+
+The live site is hosted at https://solfegio.azurewebsites.net/.
+The source repository is https://github.com/PianoMaker/RecogniseChord.
+
+## Main pages
+
+- [Chord and interval ear training](https://solfegio.azurewebsites.net/): Listen to generated chords with 2–5 notes and identify their type and quality.
+- [Build a chord](https://solfegio.azurewebsites.net/Create): Explore chord construction by selecting notes and chord properties.
+- [Intervals in familiar melodies](https://solfegio.azurewebsites.net/Melodies): Learn interval sounds through examples from Ukrainian and international melodies.
+- [About the project](https://solfegio.azurewebsites.net/Privacy): Project information, features, and attempt statistics.
+
+## Languages
+
+The interface supports Ukrainian (default) and English. The language selector changes the interface language.
+
+## Project source
+
+- [README](https://github.com/PianoMaker/RecogniseChord/blob/master/README.md): Overview, setup, usage, and development notes.
+- [Source code](https://github.com/PianoMaker/RecogniseChord): ASP.NET Core Razor Pages application targeting .NET 8.
+
+The app generates and plays chords in the browser, renders musical notation, and includes utilities for audio and MIDI processing. It is an educational practice tool.
