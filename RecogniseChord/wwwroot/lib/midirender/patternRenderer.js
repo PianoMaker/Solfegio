@@ -1,4 +1,4 @@
-// patternRenderer.js
+﻿// patternRenderer.js
 // Утиліта для рендерингу нот з рядка шаблону (не MIDI)
 // --------------------------------------------------------
 // Вхідний рядок шаблону: послідовність нот/пауз, кожна з трьох частин:
@@ -20,9 +20,9 @@
 
 //Приклад:
 //window.renderPatternString(
-//	pattern,
-//	id,
-//	null,
+//	pattern,//string to render
+//	id,		//where to draw
+//	null,	//where to comment
 //	4,      // numerator
 //	4,      // denominator
 //	1600,   // GENERALWIDTH
@@ -38,637 +38,602 @@
 
 // --------------------------------------------------------
 
-(function () {
-	const BASE_OCTAVE = 4; // default octave for tokens without marks
 
-	function mapEuBase(letter) {
-		// EU 'h' -> 'B'
-		const m = { c: 'C', d: 'D', e: 'E', f: 'F', g: 'G', a: 'A', h: 'B' };
-		return m[letter] || null;
-	}
+const BASE_OCTAVE = 4; // default octave for tokens without marks
 
-	// Створює об'єкт ноти VexFlow
-	// Параметр: durationCode: 'w', 'h', 'q', '8', '16', '32' (може бути з крапкою, напр. 'q.')
-	function parseToken(rawToken) {
-		if (!rawToken) return null;
-		let token = String(rawToken).trim();
-		console.log("PARSE RAW:", JSON.stringify(rawToken));
-		console.log("PARSE TOKEN:", JSON.stringify(token));
-		if (!token) return null;
+function mapEuBase(letter) {
+    // EU 'h' -> 'B'
+    const m = { c: 'C', d: 'D', e: 'E', f: 'F', g: 'G', a: 'A', h: 'B' };
+    return m[letter] || null;
+}
 
-		// Extract duration (digits + optional dot) from the end
-		const match = token.match(/(\d+\.?$)/);
-		if (!match) return null; // duration is required
-		const durStr = match[1];
-		const durNum = parseInt(durStr, 10);
-		const dotted = /\.$/.test(durStr);
-		token = token.slice(0, token.length - durStr.length); // remove duration part
+// Створює об'єкт ноти VexFlow
+// Параметр: durationCode: 'w', 'h', 'q', '8', '16', '32' (може бути з крапкою, напр. 'q.')
+function parseToken(rawToken) {
+    if (!rawToken) return null;
+    let token = String(rawToken).trim();
+    console.log("PARSE RAW:", JSON.stringify(rawToken));
+    console.log("PARSE TOKEN:", JSON.stringify(token));
+    if (!token) return null;
 
-		// Rest detection: allow tokens starting with 'p'|'r' to be rests
-		const isRest = /^p|^r/i.test(token);
+    // Extract duration (digits + optional dot) from the end
+    const match = token.match(/(\d+\.?$)/);
+    if (!match) return null; // duration is required
+    const durStr = match[1];
+    const durNum = parseInt(durStr, 10);
+    const dotted = /\.$/.test(durStr);
+    token = token.slice(0, token.length - durStr.length); // remove duration part
 
-		// Count octave marks (apostrophes up, commas down)
-		const ups = (token.match(/'/g) || []).length;
-		const downs = (token.match(/,/g) || []).length;
-		const octave = BASE_OCTAVE + ups - downs;
-		token = token.replace(/[',]/g, '');
+    // Rest detection: allow tokens starting with 'p'|'r' to be rests
+    const isRest = /^p|^r/i.test(token);
 
-		// Determine accidental from suffix: 'is' -> sharp, 'es' or trailing 's' (not 'is') -> flat
-		let accidental = null;
-		let base = token.toLowerCase();
+    // Count octave marks (apostrophes up, commas down)
+    const ups = (token.match(/'/g) || []).length;
+    const downs = (token.match(/,/g) || []).length;
+    const octave = BASE_OCTAVE + ups - downs;
+    token = token.replace(/[',]/g, '');
 
-		if (base.endsWith('is')) {
-			accidental = '#';
-			base = base.slice(0, -2);
-		}
-		else if (base.endsWith('es') && base.length > 2) {
-			accidental = 'b';
-			base = base.slice(0, -2);
-		}
-		else if (base.endsWith('s')) {
-			accidental = 'b';
-			base = base.slice(0, -1);
-		}
+    // Determine accidental from suffix: 'is' -> sharp, 'es' or trailing 's' (not 'is') -> flat
+    let accidental = null;
+    let base = token.toLowerCase();
 
-		// Special-case: German notation single 'b' means Bb (B-flat)
-		// If user wrote just 'b' (without 'es'/'is'), default to B with flat accidental
-		let letterName = null;
-		if (base === 'b') {
-			letterName = 'B';
-			if (!accidental) accidental = 'b';
-		} else {
-			letterName = mapEuBase(base);
-		}
-		console.log("BEFORE LETTER CHECK:", {
-			rawToken,
-			token,
-			base,
-			letterName,
-			accidental
-		});
-
-		if (!letterName) {
-			// unknown base; treat as rest
-			return { isRest: true, durationCode: mapDurationToVex(durNum, dotted) };
-		}
-
-		const vexKey = `${letterName}/${octave}`; // VexFlow format
-		const durationCode = mapDurationToVex(durNum, dotted);
-		console.log("PARSE:", rawToken, "=>", {
-			token,
-			base,
-			letterName,
-			accidental,
-			vexKey,
-			durationCode
-		});
-		return { isRest, key: vexKey, accidental, durationCode };
-	}
-
-	function parseChordToken(rawToken) {
-		if (!rawToken) return null;
-
-		const parts = String(rawToken)
-			.split('=')
-			.map(x => x.trim())
-			.filter(x => x.length > 0);
-
-		if (parts.length < 2) {
-			return parseToken(rawToken);
-		}
-
-		const notes = parts
-			.map(part => parseToken(part))
-			.filter(Boolean);
-
-		if (notes.length < 2) {
-			return null;
-		}
-
-		return {
-			isChord: true,
-			notes: notes,
-			durationCode: notes[0].durationCode
-		};
-	}
-
-	function mapDurationToVex(num, dotted) {
-		let code;
-		switch (num) {
-			case 1: code = 'w'; break;
-			case 2: code = 'h'; break;
-			case 4: code = 'q'; break;
-			case 8: code = '8'; break;
-			case 16: code = '16'; break;
-			case 32: code = '32'; break;
-			default: code = 'q'; break; // fallback quarter
-		}
-		return dotted ? `${code}.` : code;
-	}
-
-
-	// Place near the other helpers (top of file)
-	const UNITS_PER_QUARTER = 8; // 1 quarter = 8 units (1 unit = 1/32 note)
-
-	// Core helper: convert duration code (e.g. 'q', 'h.', '16') to 1/32-based units
-	function durationToUnits(code) {
-		const s = String(code || 'q');
-		const dots = (s.match(/\./g) || []).length;   // supports multiple dots
-		const base = s.replace(/\./g, '');            // strip dots only
-
-		let units;
-		switch (base) {
-			case 'w':  units = 32; break;  // whole = 4 quarters
-			case 'h':  units = 16; break;  // half  = 2 quarters
-			case 'q':  units = 8;  break;  // quarter
-			case '8':  units = 4;  break;  // eighth
-			case '16': units = 2;  break;  // sixteenth
-			case '32': units = 1;  break;  // thirty-second
-			default:   units = 8;  break;  // fallback to quarter
-		}
-
-		// Apply dot expansion (1.5x, 1.75x, 1.875x, ...)
-		let add = Math.floor(units / 2);
-		for (let i = 0; i < dots; i++) {
-			units += add;
-			add = Math.floor(add / 2);
-		}
-		return units;
-	}
-
-
-	// Greedy decomposition of a units value to Vex duration codes. Prefer dotted codes when allowed
-	function unitsToDurationList(units, allowDotted = true) {
-		const dottedTable = [
-			[48, 'w.'], [32, 'w'],
-			[24, 'h.'], [16, 'h'],
-			[12, 'q.'], [ 8, 'q'],
-			[ 6, '8.'], [ 4, '8'],
-			[ 3, '16.'],[ 2, '16'],
-			[ 1, '32']
-		];
-		const cleanTable = [
-			[32, 'w'], [16, 'h'], [8, 'q'], [4, '8'], [2, '16'], [1, '32']
-		];
-		const table = allowDotted ? dottedTable : cleanTable;
-
-		let u = Math.max(0, Math.round(units));
-		const out = [];
-		for (const [step, code] of table) {
-			while (u >= step) { out.push(code); u -= step; }
-		}
-		return out;
-	}
-
-	// Count dots on a VexFlow StaveNote safely
-	function getDotCount(note) {
-		try {
-			if (!note) return 0;
-			if (typeof note.getDots === 'function') return (note.getDots() || []).length || 0;
-			if (typeof note.getModifiers === 'function') {
-				const mods = note.getModifiers() || [];
-				return mods.filter(m =>
-					(m && (m.getCategory?.() === 'dots' || m.category === 'dots')) ||
-					(typeof Vex !== 'undefined' && Vex.Flow && m instanceof Vex.Flow.Dot)
-				).length;
-			}
-			// fallback: direct property (older VexFlow)
-			if (Array.isArray(note.modifiers)) {
-				return note.modifiers.filter(m => (m && (m.getCategory?.() === 'dots' || m.category === 'dots'))).length;
-			}
-		} catch { /* ignore */ }
-		return 0;
-	}
-
-	// Sum measure length in units (including dotted modifiers)
-	function sumUnits(notes) {
-  console.log("PR: sumUnits is runiing")
-  if (!Array.isArray(notes)) return 0;
-  let total = 0;
-  for (const n of notes) {
-    if (!n || typeof n.getDuration !== 'function') continue;
-
-    let codeStr = typeof n.__durationCode === 'string' ? n.__durationCode : String(n.getDuration() || 'q');
-    // Strip rest suffix for base mapping (e.g. 'qr' => 'q')
-    const baseCode = codeStr.replace(/r$/, '');
-
-    // durationToUnits вже врахує крапки, якщо вони є в baseCode
-    let units = durationToUnits(baseCode);
-
-    // Додавати крапки лише якщо їх немає в коді, але VexFlow додав модифікатори
-    if (!baseCode.includes('.')) {
-      const dotCount = getDotCount(n);
-      if (dotCount > 0) {
-        const factor = 2 - Math.pow(0.5, dotCount);
-        units = Math.round(units * factor);
-      }
+    if (base.endsWith('is')) {
+        accidental = '#';
+        base = base.slice(0, -2);
+    }
+    else if (base.endsWith('es') && base.length > 2) {
+        accidental = 'b';
+        base = base.slice(0, -2);
+    }
+    else if (base.endsWith('s')) {
+        accidental = 'b';
+        base = base.slice(0, -1);
     }
 
-    total += units;
-  }
-  return total;
-	}
+    // Special-case: German notation single 'b' means Bb (B-flat)
+    // If user wrote just 'b' (without 'es'/'is'), default to B with flat accidental
+    let letterName = null;
+    if (base === 'b') {
+        letterName = 'B';
+        if (!accidental) accidental = 'b';
+    } else {
+        letterName = mapEuBase(base);
+    }
+    console.log("BEFORE LETTER CHECK:", {
+        rawToken,
+        token,
+        base,
+        letterName,
+        accidental
+    });
 
-	function fillRestsToCapacity(notes, remainingQuarters) {
-		// Fill the rest of a measure with rests using largest possible durations
-		if (remainingQuarters <= 0 || !Array.isArray(notes)) return;
-		const units = [4, 2, 1, 0.5, 0.25, 0.125];
-		const codeMap = { 4: 'w', 2: 'h', 1: 'q', 0.5: '8', 0.25: '16', 0.125: '32' };
-		let rem = remainingQuarters;
-		for (let u of units) {
-			while (rem >= u - 1e-9) {
-				const code = codeMap[u];
-				const rest = createRest(code);
-				if (rest) notes.push(rest);
-				rem -= u;
-			}
-		}
-	}
+    if (!letterName) {
+        // unknown base; treat as rest
+        return { isRest: true, durationCode: mapDurationToVex(durNum, dotted) };
+    }
 
-	/**
-	 * Renders notation from a pattern string into an element (non-MIDI path)
-	 *
-	 * Added optional last parameter: SCALE_FACTOR (number).
-	 * If provided (numeric), it will be used directly as the scale factor
-	 * (default behaviour preserved when omitted).
-	 */
-	function renderPatternString(
-		pattern,
-		ELEMENT_FOR_RENDERING,
-		ELEMENT_FOR_COMMENTS,
-		numerator = 4,
-		denominator = 4,
-		GENERALWIDTH = 1600,
-		HEIGHT = 90,
-		TOPPADDING = 0,
-		BARWIDTH = 200,
-		CLEFZONE = 40,
-		Xmargin = 10,
-		RESPONSIVE_THRESHOLD = 800,
-		BASESCALING = 1,
-		SCALINGFACTOR = 0.6,
-		keySign = "C"
+    const vexKey = `${letterName}/${octave}`; // VexFlow format
+    const durationCode = mapDurationToVex(durNum, dotted);
+    console.log("PARSE:", rawToken, "=>", {
+        token,
+        base,
+        letterName,
+        accidental,
+        vexKey,
+        durationCode
+    });
+    return { isRest, key: vexKey, accidental, durationCode };
+}
 
-	) {
-		try {
-			const notationDiv = document.getElementById(ELEMENT_FOR_RENDERING);
-			const commentsDiv = document.getElementById(ELEMENT_FOR_COMMENTS);
-			if (!notationDiv) throw new Error(`Element with id ${ELEMENT_FOR_RENDERING} not found.`);
-			if (commentsDiv) commentsDiv.innerHTML = '';
-			notationDiv.innerHTML = '';
+function parseChordToken(rawToken) {
+    if (!rawToken) return null;
 
-			const tokens = String(pattern || '')
-				.split('_')
-				.map(t => t.trim())
-				.filter(t => t.length > 0);
-			if (tokens.length === 0) {
-				if (commentsDiv) commentsDiv.innerHTML = 'Порожній шаблон нот';
-				return;
-			}
+    const parts = String(rawToken)
+        .split('=')
+        .map(x => x.trim())
+        .filter(x => x.length > 0);
 
-			// Parse tokens -> items
-			const measures = getMeasuresFromTokens(tokens, parseChordToken, numerator, denominator, UNITS_PER_QUARTER, durationToUnits, unitsToDurationList, sumUnits, keySign);
+    if (parts.length < 2) {
+        return parseToken(rawToken);
+    }
 
-			// Compute width/height
-			const MIN_SCORE_WIDTH = Math.max(320, CLEFZONE + BARWIDTH + Xmargin * 2);
-			const containerWidth = (notationDiv && notationDiv.clientWidth) ? notationDiv.clientWidth : 0;
-			const GEN_WIDTH = Math.max(MIN_SCORE_WIDTH, containerWidth || GENERALWIDTH || 1200);
+    const notes = parts
+        .map(part => parseToken(part))
+        .filter(Boolean);
 
+    if (notes.length < 2) {
+        return null;
+    }
 
-			// 1) Єдиний bar width для всієї сесії рендера
-			// МІНІМАЛЬНА ШИРИНА ТАКТУ, щоб не були вузькими
-			const MIN_BARWIDTH = Math.min(BARWIDTH, 150); // налаштовуване значення
-			const naiveBarWidth = GetMeanBarWidth(BARWIDTH, GEN_WIDTH);
-			const actualBarWidth = Math.max(MIN_BARWIDTH, naiveBarWidth);
+    return {
+        isChord: true,
+        notes: notes,
+        durationCode: notes[0].durationCode
+    };
+}
 
-			// 2) Локальний підрахунок кількості рядків за вже обчисленим actualBarWidth (спільна утиліта)
-			const rows = calculateRows(measures, GEN_WIDTH, actualBarWidth, CLEFZONE, Xmargin);
-
-			// Мінімальний запас по висоті: TOPPADDING (вгорі) + невеликий буфер 10px
-			const extra = Math.max(10, TOPPADDING || 0);
-			const totalHeight = rows * HEIGHT + extra;
-
-			console.log(`patternRenderer: ${measures.length} measures, ${rows} rows, totalHeight=${totalHeight}, GEN_WIDTH=${GEN_WIDTH}, actualBarWidth=${actualBarWidth}, keySign=${keySign}`);
-
-			
-			
-			let scaleFactor = (containerWidth > 0 && containerWidth <= RESPONSIVE_THRESHOLD) ? SCALINGFACTOR : BASESCALING;
+function mapDurationToVex(num, dotted) {
+    let code;
+    switch (num) {
+        case 1: code = 'w'; break;
+        case 2: code = 'h'; break;
+        case 4: code = 'q'; break;
+        case 8: code = '8'; break;
+        case 16: code = '16'; break;
+        case 32: code = '32'; break;
+        default: code = 'q'; break; // fallback quarter
+    }
+    return dotted ? `${code}.` : code;
+}
 
 
-			console.log("WIDTH DEBUG:", {
-				containerWidth,
-				GENERALWIDTH,
-				MIN_SCORE_WIDTH,
-				GEN_WIDTH,
-				factoryWidth: GEN_WIDTH
-			});
+// Place near the other helpers (top of file)
+const UNITS_PER_QUARTER = 8; // 1 quarter = 8 units (1 unit = 1/32 note)
 
-			// 3) Передаємо той самий actualBarWidth у рендер (щоб обтікання збігалось)
-			const factory = new Vex.Flow.Factory({
-				renderer: { elementId: ELEMENT_FOR_RENDERING, width: GEN_WIDTH, height: totalHeight }
-			});
-			const context = factory.getContext();
-			//const score = factory.EasyScore();			
-			console.log("containerWidth = ", containerWidth, "scaleFactor = ", scaleFactor);
-			scaleContext(scaleFactor, context);
+// Core helper: convert duration code (e.g. 'q', 'h.', '16') to 1/32-based units
+function durationToUnits(code) {
+    const s = String(code || 'q');
+    const dots = (s.match(/\./g) || []).length;   // supports multiple dots
+    const base = s.replace(/\./g, '');            // strip dots only
 
+    let units;
+    switch (base) {
+        case 'w': units = 32; break;  // whole = 4 quarters
+        case 'h': units = 16; break;  // half  = 2 quarters
+        case 'q': units = 8; break;  // quarter
+        case '8': units = 4; break;  // eighth
+        case '16': units = 2; break;  // sixteenth
+        case '32': units = 1; break;  // thirty-second
+        default: units = 8; break;  // fallback to quarter
+    }
 
-			// Render measure by measure similar to renderMeasures
-			let Xposition = Xmargin;
-			let Yposition = TOPPADDING;
-			let isFirstMeasureInRow = true;
-
-			//РЕНДЕР КОЖНОГО ТАКТУ
-			for (let i = 0; i < measures.length; i++) {
-				const previousY = Yposition;
-				({ Xposition, Yposition } = adjustXYposition(
-					Xposition, GEN_WIDTH, actualBarWidth, Yposition, HEIGHT, Xmargin, i, 0));
-				if (Yposition !== previousY) {
-					isFirstMeasureInRow = true;
-				}
-				console.log("keySign = ", keySign);
-				let STAVE_WIDTH = adjustStaveWidth(actualBarWidth, i, CLEFZONE, isFirstMeasureInRow, false);
-				const stave = setStave(Xposition, Yposition, STAVE_WIDTH, i, numerator, denominator, isFirstMeasureInRow, false, false, keySign);
-				stave.setContext(context).draw();
-
-				const ties = measures[i].ties || [];
-				drawMeasure(measures[i].notes, actualBarWidth, context, stave, ties, isFirstMeasureInRow, i, commentsDiv || { innerHTML: '' }, numerator, denominator, 480); // midiRenderer.js
-
-				Xposition += STAVE_WIDTH;
-				isFirstMeasureInRow = false;
-			}
-
-			// ----------------------
-			// ПІСЛЯ-ОБРОБКА SVG
-			// ----------------------
-			// Динамічно підганяє висоту SVG під фактичний вміст, щоб уникнути зайвих відступів.
-			try {
-				const container = document.getElementById(ELEMENT_FOR_RENDERING);
-				const svg = container && container.querySelector('svg');
-				adjustSVG(svg);
-			} catch (e) { console.warn('post-fix svg size failed', e); }
-
-			if (commentsDiv) {
-				commentsDiv.innerHTML += `Рядок нот успішно згенеровано (${measures.length} тактів)`;
-			}
-		} catch (e) {
-			console.error('renderPatternString error:', e);
-			const commentsDiv = document.getElementById(ELEMENT_FOR_COMMENTS);
-			if (commentsDiv) commentsDiv.innerHTML = `Error: ${e.message}`;
-		}
-	}
+    // Apply dot expansion (1.5x, 1.75x, 1.875x, ...)
+    let add = Math.floor(units / 2);
+    for (let i = 0; i < dots; i++) {
+        units += add;
+        add = Math.floor(add / 2);
+    }
+    return units;
+}
 
 
-	// expose API
-	window.renderPatternString = renderPatternString;
-	console.info('PR build loaded @', new Date().toISOString());
-})();
+// Greedy decomposition of a units value to Vex duration codes. Prefer dotted codes when allowed
+function unitsToDurationList(units, allowDotted = true) {
+    const dottedTable = [
+        [48, 'w.'], [32, 'w'],
+        [24, 'h.'], [16, 'h'],
+        [12, 'q.'], [8, 'q'],
+        [6, '8.'], [4, '8'],
+        [3, '16.'], [2, '16'],
+        [1, '32']
+    ];
+    const cleanTable = [
+        [32, 'w'], [16, 'h'], [8, 'q'], [4, '8'], [2, '16'], [1, '32']
+    ];
+    const table = allowDotted ? dottedTable : cleanTable;
+
+    let u = Math.max(0, Math.round(units));
+    const out = [];
+    for (const [step, code] of table) {
+        while (u >= step) { out.push(code); u -= step; }
+    }
+    return out;
+}
+
+// Count dots on a VexFlow StaveNote safely
+function getDotCount(note) {
+    try {
+        if (!note) return 0;
+        if (typeof note.getDots === 'function') return (note.getDots() || []).length || 0;
+        if (typeof note.getModifiers === 'function') {
+            const mods = note.getModifiers() || [];
+            return mods.filter(m =>
+                (m && (m.getCategory?.() === 'dots' || m.category === 'dots')) ||
+                (typeof Vex !== 'undefined' && Vex.Flow && m instanceof Vex.Flow.Dot)
+            ).length;
+        }
+        // fallback: direct property (older VexFlow)
+        if (Array.isArray(note.modifiers)) {
+            return note.modifiers.filter(m => (m && (m.getCategory?.() === 'dots' || m.category === 'dots'))).length;
+        }
+    } catch { /* ignore */ }
+    return 0;
+}
+
+// Sum measure length in units (including dotted modifiers)
+function sumUnits(notes) {
+    console.log("PR: sumUnits is runiing")
+    if (!Array.isArray(notes)) return 0;
+    let total = 0;
+    for (const n of notes) {
+        if (!n || typeof n.getDuration !== 'function') continue;
+
+        let codeStr = typeof n.__durationCode === 'string' ? n.__durationCode : String(n.getDuration() || 'q');
+        // Strip rest suffix for base mapping (e.g. 'qr' => 'q')
+        const baseCode = codeStr.replace(/r$/, '');
+
+        // durationToUnits вже врахує крапки, якщо вони є в baseCode
+        let units = durationToUnits(baseCode);
+
+        // Додавати крапки лише якщо їх немає в коді, але VexFlow додав модифікатори
+        if (!baseCode.includes('.')) {
+            const dotCount = getDotCount(n);
+            if (dotCount > 0) {
+                const factor = 2 - Math.pow(0.5, dotCount);
+                units = Math.round(units * factor);
+            }
+        }
+
+        total += units;
+    }
+    return total;
+}
+
+function fillRestsToCapacity(notes, remainingQuarters) {
+    // Fill the rest of a measure with rests using largest possible durations
+    if (remainingQuarters <= 0 || !Array.isArray(notes)) return;
+    const units = [4, 2, 1, 0.5, 0.25, 0.125];
+    const codeMap = { 4: 'w', 2: 'h', 1: 'q', 0.5: '8', 0.25: '16', 0.125: '32' };
+    let rem = remainingQuarters;
+    for (let u of units) {
+        while (rem >= u - 1e-9) {
+            const code = codeMap[u];
+            const rest = createRest(code);
+            if (rest) notes.push(rest);
+            rem -= u;
+        }
+    }
+}
+
+/**
+ * Renders notation from a pattern string into an element (non-MIDI path)
+ *
+ * Added optional last parameter: SCALE_FACTOR (number).
+ * If provided (numeric), it will be used directly as the scale factor
+ * (default behaviour preserved when omitted).
+ */
+function renderPatternString(
+    pattern,
+    ELEMENT_FOR_RENDERING,
+    ELEMENT_FOR_COMMENTS,
+    numerator = 4,
+    denominator = 4,
+    GENERALWIDTH = 1600,
+    HEIGHT = 90,
+    TOPPADDING = 0,
+    BARWIDTH = 200,
+    CLEFZONE = 40,
+    Xmargin = 10,
+    RESPONSIVE_THRESHOLD = 800,
+    BASESCALING = 1,
+    SCALINGFACTOR = 0.6,
+    keySign = "C"
+
+) {   
+    
+    try {
+        const notationDiv = document.getElementById(ELEMENT_FOR_RENDERING);
+        const commentsDiv = document.getElementById(ELEMENT_FOR_COMMENTS);
+        if (!notationDiv) throw new Error(`Element with id ${ELEMENT_FOR_RENDERING} not found.`);
+        if (commentsDiv) commentsDiv.innerHTML = '';
+        notationDiv.innerHTML = '';
+
+        const tokens = String(pattern || '')
+            .split('_')
+            .map(t => t.trim())
+            .filter(t => t.length > 0);
+        if (tokens.length === 0) {
+            if (commentsDiv) commentsDiv.innerHTML = 'Порожній шаблон нот';
+            return;
+        }
+
+        // Parse tokens -> items
+        const measures = getMeasuresFromTokens(tokens, parseChordToken, numerator, denominator, UNITS_PER_QUARTER, durationToUnits, unitsToDurationList, sumUnits, keySign);
+
+        // Compute width/height
+        const MIN_SCORE_WIDTH = Math.max(320, CLEFZONE + BARWIDTH + Xmargin * 2);
+        const containerWidth = (notationDiv && notationDiv.clientWidth) ? notationDiv.clientWidth : 0;
+        const GEN_WIDTH = Math.max(MIN_SCORE_WIDTH, containerWidth || GENERALWIDTH || 1200);
+
+
+        // 1) Єдиний bar width для всієї сесії рендера
+        // МІНІМАЛЬНА ШИРИНА ТАКТУ, щоб не були вузькими
+        const MIN_BARWIDTH = Math.min(BARWIDTH, 150); // налаштовуване значення
+        const naiveBarWidth = GetMeanBarWidth(BARWIDTH, GEN_WIDTH);
+        const actualBarWidth = Math.max(MIN_BARWIDTH, naiveBarWidth);
+
+        // 2) Локальний підрахунок кількості рядків за вже обчисленим actualBarWidth (спільна утиліта)
+        const rows = calculateRows(measures, GEN_WIDTH, actualBarWidth, CLEFZONE, Xmargin);
+
+        // Мінімальний запас по висоті: TOPPADDING (вгорі) + невеликий буфер 10px
+        const extra = Math.max(10, TOPPADDING || 0);
+        const totalHeight = rows * HEIGHT + extra;
+
+        logEvent(`patternRenderer: ${measures.length} measures, ${rows} rows, totalHeight=${totalHeight}, GEN_WIDTH=${GEN_WIDTH}, actualBarWidth=${actualBarWidth}, keySign=${keySign}`);
+
+
+
+        let scaleFactor = (containerWidth > 0 && containerWidth <= RESPONSIVE_THRESHOLD) ? SCALINGFACTOR : BASESCALING;
+
+
+        logEvent("WIDTH DEBUG:", {
+            containerWidth,
+            GENERALWIDTH,
+            MIN_SCORE_WIDTH,
+            GEN_WIDTH,
+            factoryWidth: GEN_WIDTH
+        });
+
+        // 3) Передаємо той самий actualBarWidth у рендер (щоб обтікання збігалось)
+        const factory = new Vex.Flow.Factory({
+            renderer: { elementId: ELEMENT_FOR_RENDERING, width: GEN_WIDTH, height: totalHeight }
+        });
+        const context = factory.getContext();
+        //const score = factory.EasyScore();			
+        console.log("containerWidth = ", containerWidth, "scaleFactor = ", scaleFactor);
+        scaleContext(scaleFactor, context);
+
+
+        // Render measure by measure similar to renderMeasures
+        let Xposition = Xmargin;
+        let Yposition = TOPPADDING;
+        let isFirstMeasureInRow = true;
+
+        //РЕНДЕР КОЖНОГО ТАКТУ
+        for (let i = 0; i < measures.length; i++) {
+            const previousY = Yposition;
+            ({ Xposition, Yposition } = adjustXYposition(
+                Xposition, GEN_WIDTH, actualBarWidth, Yposition, HEIGHT, Xmargin, i, 0));
+            if (Yposition !== previousY) {
+                isFirstMeasureInRow = true;
+            }
+            console.log("keySign = ", keySign);
+            let STAVE_WIDTH = adjustStaveWidth(actualBarWidth, i, CLEFZONE, isFirstMeasureInRow, false);
+            const stave = setStave(Xposition, Yposition, STAVE_WIDTH, i, numerator, denominator, isFirstMeasureInRow, false, false, keySign);
+            stave.setContext(context).draw();
+
+            const ties = measures[i].ties || [];
+            drawMeasure(measures[i].notes, actualBarWidth, context, stave, ties, i, commentsDiv || { innerHTML: '' }, numerator, denominator, 480); // midiRenderer.js
+
+            Xposition += STAVE_WIDTH;
+            isFirstMeasureInRow = false;
+        }
+
+        // ----------------------
+        // ПІСЛЯ-ОБРОБКА SVG
+        // ----------------------
+        // Динамічно підганяє висоту SVG під фактичний вміст, щоб уникнути зайвих відступів.
+        try {
+            const container = document.getElementById(ELEMENT_FOR_RENDERING);
+            const svg = container && container.querySelector('svg');
+            adjustSVG(svg);
+        } catch (e) { console.warn('post-fix svg size failed', e); }
+
+        if (commentsDiv) {
+            commentsDiv.innerHTML += `Рядок нот успішно згенеровано (${measures.length} тактів)`;
+        }
+    } catch (e) {
+        console.error('renderPatternString error:', e);
+        const commentsDiv = document.getElementById(ELEMENT_FOR_COMMENTS);
+        if (commentsDiv) commentsDiv.innerHTML = `Error: ${e.message}`;
+    }
+}
 
 
 function getMeasuresFromTokens(
-	tokens,
-	parseChordToken,
-	numerator,
-	denominator,
-	UNITS_PER_QUARTER,
-	durationToUnits,
-	unitsToDurationList,
-	sumUnits,
-	keySign
+    tokens,
+    parseChordToken,
+    numerator,
+    denominator,
+    UNITS_PER_QUARTER,
+    durationToUnits,
+    unitsToDurationList,
+    sumUnits,
+    keySign
 ) {
-	const items = tokens.map(parseChordToken).filter(Boolean);
 
-	// Тривалість одного такту в units
-	const capacityQuarters = numerator * (4 / denominator);
-	const capacityUnits = Math.round(
-		capacityQuarters * UNITS_PER_QUARTER
-	);
+    const items = tokens.map(parseChordToken).filter(Boolean);
 
-	const measures = [];
+    // Тривалість одного такту в units
+    const capacityQuarters = numerator * (4 / denominator);
+    const capacityUnits = Math.round(
+        capacityQuarters * UNITS_PER_QUARTER
+    );
 
-	let cur = {
-		notes: [],
-		ties: []
-	};
+    const measures = [];
 
-	measures.push(cur);
+    let cur = {
+        notes: [],
+        ties: []
+    };
 
-	let usedUnits = 0;
+    measures.push(cur);
 
-	// ---------------------------------------------------------
-	// Стан випадкових знаків ПОТОЧНОГО ТАКТУ
-	//
-	// Він скидається при переході на новий такт.
-	// ---------------------------------------------------------
-	let measureAccState = {};
+    let usedUnits = 0;
 
-	for (const it of items) {
+    // ---------------------------------------------------------
+    // Стан випадкових знаків ПОТОЧНОГО ТАКТУ
+    //
+    // Він скидається при переході на новий такт.
+    // ---------------------------------------------------------
+    let measureAccState = {};
 
-		let remaining = durationToUnits(it.durationCode);
+    for (const it of items) {
 
-		// Остання частина тієї самої логічної ноти.
-		// Потрібно для ліги при переході через тактову риску.
-		let prevPieceNote = null;
+        let remaining = durationToUnits(it.durationCode);
 
-		while (remaining > 0) {
+        // Остання частина тієї самої логічної ноти.
+        // Потрібно для ліги при переході через тактову риску.
+        let prevPieceNote = null;
 
-			// -------------------------------------------------
-			// Якщо попередній такт заповнений —
-			// починаємо новий такт.
-			// -------------------------------------------------
-			if (usedUnits >= capacityUnits) {
+        while (remaining > 0) {
 
-				cur = {
-					notes: [],
-					ties: []
-				};
+            // -------------------------------------------------
+            // Якщо попередній такт заповнений —
+            // починаємо новий такт.
+            // -------------------------------------------------
+            if (usedUnits >= capacityUnits) {
 
-				measures.push(cur);
+                cur = {
+                    notes: [],
+                    ties: []
+                };
 
-				usedUnits = 0;
+                measures.push(cur);
 
-				// НОВИЙ ТАКТ -> нова пам'ять альтерацій
-				measureAccState = {};
-			}
+                usedUnits = 0;
 
-			const room = capacityUnits - usedUnits;
+                // НОВИЙ ТАКТ -> нова пам'ять альтерацій
+                measureAccState = {};
+            }
 
-			const pieceUnits = Math.min(
-				remaining,
-				room
-			);
+            const room = capacityUnits - usedUnits;
 
-			const pieceCodes = unitsToDurationList(
-				pieceUnits,
-				true
-			);
+            const pieceUnits = Math.min(
+                remaining,
+                room
+            );
 
-			// -------------------------------------------------
-			// Створюємо частини ноти
-			// -------------------------------------------------
-			for (let i = 0; i < pieceCodes.length; i++) {
+            const pieceCodes = unitsToDurationList(
+                pieceUnits,
+                true
+            );
 
-				const code = pieceCodes[i];
+            // -------------------------------------------------
+            // Створюємо частини ноти
+            // -------------------------------------------------
+            for (let i = 0; i < pieceCodes.length; i++) {
 
-				if (it.isRest) {
+                const code = pieceCodes[i];
 
-					const r = createRest(code);
+                if (it.isRest) {
 
-					if (r) {
-						r.__durationCode = code;
-						cur.notes.push(r);
-					}
+                    const r = createRest(code);
 
-					// Пауза перериває лігу
-					prevPieceNote = null;
+                    if (r) {
+                        r.__durationCode = code;
+                        cur.notes.push(r);
+                    }
 
-				} else {
+                    // Пауза перериває лігу
+                    prevPieceNote = null;
 
-					// -------------------------------------------------
-					// ВИЗНАЧАЄМО, ЧИ ПОТРІБНО ДРУКУВАТИ ACCIDENTAL
-					//
-					// decideAccidentalForNote() вже враховує:
-					// - accidental самої ноти;
-					// - попередню альтерацію в цьому такті;
-					// - зміну # / b / natural.
-					//
-					// currentKeySig тут null, оскільки
-					// patternRenderer поки не отримує тональність.
-					// -------------------------------------------------
+                } else {
 
-					let n;
+                    // -------------------------------------------------
+                    // ВИЗНАЧАЄМО, ЧИ ПОТРІБНО ДРУКУВАТИ ACCIDENTAL
+                    //
+                    // decideAccidentalForNote() вже враховує:
+                    // - accidental самої ноти;
+                    // - попередню альтерацію в цьому такті;
+                    // - зміну # / b / natural.
+                    //
+                    // currentKeySig тут null, оскільки
+                    // patternRenderer поки не отримує тональність.
+                    // -------------------------------------------------
 
-					if (it.isChord) {
+                    let n;
 
-						const keys = [];
-						const accidentals = [];
+                    if (it.isChord) {
 
-						for (const note of it.notes) {
+                        const keys = [];
+                        const accidentals = [];
 
-							const accToDraw = decideAccidentalForNote(
-								note.key,
-								note.accidental,
-								keySign,
-								measureAccState,
-								i
-							);
+                        for (const note of it.notes) {
 
-							keys.push(note.key);
-							accidentals.push(accToDraw);
-						}
-						console.log("CHORD KEYS:", keys);
-						console.log("CHORD ACCIDENTALS:", accidentals);
-						n = new Vex.Flow.StaveNote({
-							keys: keys,
-							duration: code
-						});
+                            const accToDraw = decideAccidentalForNote(
+                                note.key,
+                                note.accidental,
+                                keySign,
+                                measureAccState,
+                                i
+                            );
 
-						for (let k = 0; k < accidentals.length; k++) {
-							if (accidentals[k]) {
-								n.addAccidental(
-									k,
-									new Vex.Flow.Accidental(accidentals[k])
-								);
-							}
-						}
+                            keys.push(note.key);
+                            accidentals.push(accToDraw);
+                        }
+                        console.log("CHORD KEYS:", keys);
+                        console.log("CHORD ACCIDENTALS:", accidentals);
+                        n = new Vex.Flow.StaveNote({
+                            keys: keys,
+                            duration: code
+                        });
 
-						applyAutoStem(n, code);
+                        for (let k = 0; k < accidentals.length; k++) {
+                            if (accidentals[k]) {
+                                n.addAccidental(k, new Vex.Flow.Accidental(accidentals[k]));
+                            }
+                        }
 
-					} else {
+                        applyAutoStem(n, code);
 
-						const accToDraw = decideAccidentalForNote(
-							it.key,
-							it.accidental,
-							keySign,
-							measureAccState,
-							i
-						);
+                    } else {
 
-						n = processNoteElement(
-							code,
-							it.key,
-							accToDraw
-						);
-					}
+                        const accToDraw = decideAccidentalForNote(it.key, it.accidental, keySign, measureAccState, i);
+                        n = processNoteElement(code, it.key, accToDraw);
+                    }
 
-					if (n) {
-						n.__durationCode = code;
-					}
+                    if (n) {
+                        n.__durationCode = code;
+                    }
 
-					cur.notes.push(n);
+                    cur.notes.push(n);
 
-					// -------------------------------------------------
-					// Ліга між частинами ноти, яка перетнула
-					// межу такту або була розкладена на кілька частин.
-					// -------------------------------------------------
-					if (prevPieceNote && n) {
-						cur.ties.push(
-							new Vex.Flow.StaveTie({
-								first_note: prevPieceNote,
-								last_note: n
-							})
-						);
-					}
+                    // -------------------------------------------------
+                    // Ліга між частинами ноти, яка перетнула
+                    // межу такту або була розкладена на кілька частин.
+                    // -------------------------------------------------
+                    if (prevPieceNote && n) {
+                        cur.ties.push(
+                            new Vex.Flow.StaveTie({
+                                first_note: prevPieceNote,
+                                last_note: n
+                            })
+                        );
+                        logTies(`PR: Added tie between previousNote and note`);
+                    }
 
-					prevPieceNote = n;
-				}
-			}
+                    prevPieceNote = n;
+                }
+            }
 
-			usedUnits += pieceUnits;
-			remaining -= pieceUnits;
-		}
-	}
+            usedUnits += pieceUnits;
+            remaining -= pieceUnits;
+        }
+    }
 
-	// ---------------------------------------------------------
-	// Видаляємо останній порожній такт
-	// ---------------------------------------------------------
-	if (
-		measures.length &&
-		measures[measures.length - 1].notes.length === 0
-	) {
-		measures.pop();
-	}
+    // ---------------------------------------------------------
+    // Видаляємо останній порожній такт
+    // ---------------------------------------------------------
+    if (measures.length && measures[measures.length - 1].notes.length === 0) {
+        measures.pop();
+    }
 
-	// ---------------------------------------------------------
-	// Заповнюємо незаповнений кінець кожного такту паузами
-	// ---------------------------------------------------------
-	for (const m of measures) {
+    // ---------------------------------------------------------
+    // Заповнюємо незаповнений кінець кожного такту паузами
+    // ---------------------------------------------------------
+    for (const m of measures) {
+        console.info('PR: calling sumUnits for fill check');
+        const used = sumUnits(m.notes);
+        const leftUnits = Math.max(0, capacityUnits - used);
+        console.info('PR: leftUnits', leftUnits, 'capacityUnits', capacityUnits, 'used', used);
+        const restCodes = unitsToDurationList(leftUnits, false);
+        for (const rc of restCodes) {
+            const r = createRest(rc);
+            if (r) {
+                r.__durationCode = rc;
+                m.notes.push(r);
+            }
+        }
+    }
 
-		console.info(
-			'PR: calling sumUnits for fill check'
-		);
 
-		const used = sumUnits(m.notes);
-
-		const leftUnits = Math.max(
-			0,
-			capacityUnits - used
-		);
-
-		console.info(
-			'PR: leftUnits',
-			leftUnits,
-			'capacityUnits',
-			capacityUnits,
-			'used',
-			used
-		);
-
-		const restCodes = unitsToDurationList(
-			leftUnits,
-			false
-		);
-
-		for (const rc of restCodes) {
-
-			const r = createRest(rc);
-
-			if (r) {
-				r.__durationCode = rc;
-				m.notes.push(r);
-			}
-		}
-	}
-
-	return measures;
+    return measures;
 }
+
+
+
+// expose API
+window.renderPatternString = renderPatternString;
+console.info('PR build loaded @', new Date().toISOString());
+
