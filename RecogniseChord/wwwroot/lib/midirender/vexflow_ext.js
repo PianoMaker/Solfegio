@@ -530,3 +530,15 @@ function scaleContext(scaleFactor, context) {
         console.warn("Scaling failed:", e);
     }
 }
+
+function adjustSVG(svg) {
+    if (svg && typeof svg.getBBox === 'function') {
+        const adjust = () => {
+            const bbox = svg.getBBox();
+            svg.setAttribute('height', bbox.height);
+        };
+        adjust();
+        if (typeof requestAnimationFrame === 'function') requestAnimationFrame(adjust);
+        setTimeout(adjust, 50);
+    }
+}
