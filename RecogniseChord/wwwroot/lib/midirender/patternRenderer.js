@@ -7,7 +7,8 @@
 // 2) Маркери октави: апострофи (') для підвищення, коми (,) для пониження
 // 3) Код тривалості: цифра (1,2,4,8,16,32) з необов'язковою крапкою (.) для подовження
 //	- 1 = ціла, 2 = половинна, 4 = чверть, 8 = восьма, 16 = шістнадцята, 32 = тридцять друга
-// 4) Необов'язковий суфікс для альтерації: 'is' для диеза (#), 'es' або 's' для бемоля (b)
+// 4) Необов'язковий суфікс для альтерації: 'isis'/'eses' для подвійних знаків,
+//    'is' для дієза (#), 'es' або 's' для бемоля (b)
 //    - 'b' самостійно означає 'H' з бемолем (Bb)
 // Параметри:
 // - pattern: рядок шаблону, наприклад "c4_d4_e4_f4_g4_a4_h4_c'4"
@@ -73,11 +74,27 @@ function parseToken(rawToken) {
     const octave = BASE_OCTAVE + ups - downs;
     token = token.replace(/[',]/g, '');
 
-    // Determine accidental from suffix: 'is' -> sharp, 'es' or trailing 's' (not 'is') -> flat
+    // Recognize German suffixes and ASCII accidental suffixes.
     let accidental = null;
     let base = token.toLowerCase();
 
-    if (base.endsWith('is')) {
+    if (base.endsWith('##') && base.length > 2) {
+        accidental = '##';
+        base = base.slice(0, -2);
+    }
+    else if (base.endsWith('bb') && base.length > 2) {
+        accidental = 'bb';
+        base = base.slice(0, -2);
+    }
+    else if (base.endsWith('isis')) {
+        accidental = '##';
+        base = base.slice(0, -4);
+    }
+    else if (base.endsWith('eses') && base.length > 4) {
+        accidental = 'bb';
+        base = base.slice(0, -4);
+    }
+    else if (base.endsWith('is')) {
         accidental = '#';
         base = base.slice(0, -2);
     }
@@ -123,6 +140,27 @@ function parseToken(rawToken) {
         durationCode
     });
     return { isRest, key: vexKey, accidental, durationCode };
+}
+
+// Track full accidental values (including doubles) by note and octave in each measure.
+function decidePatternAccidental(key, accidental, measureAccState, pieceIdx = 0) {
+    if (pieceIdx > 0) return null;
+
+    const [letter = 'c', octave = '4'] = (key || 'c/4').split('/');
+    const id = `${letter.replace(/[#b]/g, '').toLowerCase()}/${octave}`;
+    const prev = measureAccState[id];
+    const spelled = accidental || null;
+    let toPrint = null;
+
+    if (prev === undefined) {
+        if (spelled) toPrint = spelled;
+    } else if (prev !== spelled) {
+        // A natural cancels any earlier accidental in this measure.
+        toPrint = spelled || 'n';
+    }
+
+    if (toPrint) measureAccState[id] = spelled || 'n';
+    return toPrint;
 }
 
 function parseChordToken(rawToken) {
@@ -541,10 +579,9 @@ function getMeasuresFromTokens(
 
                         for (const note of it.notes) {
 
-                            const accToDraw = decideAccidentalForNote(
+                            const accToDraw = decidePatternAccidental(
                                 note.key,
                                 note.accidental,
-                                keySign,
                                 measureAccState,
                                 i
                             );
@@ -569,7 +606,7 @@ function getMeasuresFromTokens(
 
                     } else {
 
-                        const accToDraw = decideAccidentalForNote(it.key, it.accidental, keySign, measureAccState, i);
+                        const accToDraw = decidePatternAccidental(it.key, it.accidental, measureAccState, i);
                         n = processNoteElement(code, it.key, accToDraw);
                     }
 
