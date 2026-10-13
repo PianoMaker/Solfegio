@@ -163,7 +163,19 @@
     <value>Якість:</value>
   </data>
   <data name="RootNote" xml:space="preserve">
-    <value>Від ноти (root note):</value>
+    <value>Основний тон:</value>
+  </data>
+  <data name="RootAccidental" xml:space="preserve">
+    <value>Знак альтерації основного тону</value>
+  </data>
+  <data name="Natural" xml:space="preserve">
+    <value>бекар</value>
+  </data>
+  <data name="Flat" xml:space="preserve">
+    <value>бемоль</value>
+  </data>
+  <data name="Sharp" xml:space="preserve">
+    <value>дієз</value>
   </data>
   <data name="SEC" xml:space="preserve">
     <value>секундакорд</value>

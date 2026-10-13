@@ -19,6 +19,7 @@ namespace RecogniseChord.Pages
         [BindProperty] public string SelectedType { get; set; } = string.Empty; // internal key
         [BindProperty] public string SelectedQuality { get; set; } = string.Empty; // українська назва
         [BindProperty] public string RootNote { get; set; } = "C"; // основний тон
+        [BindProperty] public int RootAlteration { get; set; } = 0; // -1 бемоль, 0 бекар, 1 дієз
         [BindProperty] public string Timbre { get; set; }
 
         [BindProperty] public string ChordCode { get; set; }
@@ -117,7 +118,9 @@ namespace RecogniseChord.Pages
             return map.ToDictionary(kv => kv.Value, kv => kv.Key);
         }
 
-        private Note MakeRoot() => new(GetNoteByLetter(RootNote), ALTER.NATURAL, 1);
+        private Note MakeRoot() => new(GetNoteByLetter(RootNote), (ALTER)Math.Clamp(RootAlteration, -1, 1), 1);
+
+        public string RootDisplay => RootNote + (RootAlteration switch { -1 => "♭", 1 => "♯", _ => "♮" });
 
         private NOTES GetNoteByLetter(string l)
         {

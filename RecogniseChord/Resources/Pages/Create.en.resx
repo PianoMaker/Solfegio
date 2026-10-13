@@ -165,6 +165,18 @@
   <data name="RootNote" xml:space="preserve">
     <value>From note (root note):</value>
   </data>
+  <data name="RootAccidental" xml:space="preserve">
+    <value>Root note accidental</value>
+  </data>
+  <data name="Natural" xml:space="preserve">
+    <value>natural</value>
+  </data>
+  <data name="Flat" xml:space="preserve">
+    <value>flat</value>
+  </data>
+  <data name="Sharp" xml:space="preserve">
+    <value>sharp</value>
+  </data>
   <data name="SEC" xml:space="preserve">
     <value>second chord</value>
   </data>
