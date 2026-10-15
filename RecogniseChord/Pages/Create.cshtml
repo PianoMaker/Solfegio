@@ -49,7 +49,7 @@
                     @{
                         var displayCount = Model.SelectedCount;
                     }
-                    <select asp-for="SelectedQuality" id="SelectedQuality" class="select-chord" onchange="document.getElementById('qualityForm')?.submit();">
+                    <select asp-for="SelectedQuality" id="selectedQuality" class="select-chord" onchange="document.getElementById('qualityForm')?.submit();">
                         <option value="">--</option>
                         @foreach (var q in Model.QualityOptions)
                         {
@@ -103,6 +103,7 @@
                     </div>
                     <input type="hidden" asp-for="SelectedCount" />
                     <input type="hidden" asp-for="SelectedType" />
+                    <input type="hidden" asp-for="SelectedQuality" />
                     <input type="hidden" asp-for="RootNote" />
                     <input type="hidden" asp-for="RootAlteration" />
                 </form>
@@ -119,7 +120,7 @@
             <div class="mt-4 d-flex">
                 <div class="chordbox">
                     <div id="notecontainer"
-                         data-barwidth="180"
+                         data-barwidth="140"
                          data-pattern="@Model.ChordCode">
                     </div>
                 </div>

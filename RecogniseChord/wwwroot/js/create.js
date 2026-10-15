@@ -14,10 +14,11 @@ document.addEventListener('DOMContentLoaded', function () {
 	const genInput = document.getElementById('generatedRel');
 	const timbreform = document.getElementById('timbreform')
 	const selectedTimbre = document.getElementById('SelectedTimbre');
-	const selectedQuality = document.getElementById('SelectedQuality');
+	const selectedQuality = document.getElementById('selectedQuality');
 	const selectedType = document.getElementById('SelectedType');
 	const notecontainer = document.getElementById('notecontainer');
 	const pattern = notecontainer.dataset.pattern;
+	const barWidth = Number(notecontainer.dataset.barwidth) || 105;
 	console.log("notecontainer:", notecontainer);
 	console.log("pattern:", pattern);
 
@@ -44,7 +45,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	const savedTimbre = sessionStorage.getItem('savedTimbre')				//тембр
 	console.log('restoring session timbre:', savedTimbre);
 	const savedQuality = sessionStorage.getItem('selectedQuality');		// якість інтервалу
-	console.log('restoring session quality:', savedQuality);
+	console.log('saved session quality:', savedQuality);
 	const savedType = sessionStorage.getItem('selectedType');			// тип акорду
 	console.log('restoring session type', savedType);
 
@@ -53,8 +54,6 @@ document.addEventListener('DOMContentLoaded', function () {
 	// ============================
 	// значення якості і типу інтервалів
 	// ============================
-	if (savedQuality && selectedQuality) selectedQuality.value = savedQuality;
-
 	if (savedType && selectedType) selectedType.value = savedType;
 
 
@@ -65,8 +64,8 @@ document.addEventListener('DOMContentLoaded', function () {
 	// натискання відтворює збережений WAV-файл або синтезує тони з payload
 	// =================================
 
-	console.debug("selectedQuality.value = " + selectedQuality.value);
-	if (selectedQuality.value === '==' || selectedType.value === '==')
+	console.debug("selectedQuality.value = " + selectedQuality?.value);
+	if (selectedQuality?.value === '==' || selectedType?.value === '==')
 		playBtn.disabled === 'disabled'
 	else
 		playBtn.disabled === 'enabled'
@@ -168,7 +167,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		300,            // GENERALWIDTH
 		100,              // HEIGHT
 		10,               // TOPPADDING
-		105,			// BARWIDTH
+		barWidth,       // BARWIDTH from data-barwidth
 		30,              // CLEFZONE
 		0,              // Xmargin
 		512,              // RESPONSIVE_THRESHOLD

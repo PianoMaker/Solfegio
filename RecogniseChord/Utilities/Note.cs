@@ -341,6 +341,7 @@ namespace Music
 
         public int AbsDuration() { return duration.AbsDuration(); }
 
+        // абсолютна висота ноти, C4=0
         public int AbsPitch()
         {
             if (rest == true) return -1; 

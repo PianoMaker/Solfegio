@@ -162,7 +162,7 @@ namespace RecogniseChord.Pages
         {
             MessageL(14, $"OnPostQuality: SelectedQuality={SelectedQuality}");
             PopulateTypes();
-            PopulateQualities();
+            PopulateQualities(); GeneratedFileRelative = null;
             try
             {
                 if (SelectedCount >= 2 && !string.IsNullOrEmpty(SelectedType) && !string.IsNullOrEmpty(SelectedQuality))
@@ -343,7 +343,13 @@ namespace RecogniseChord.Pages
 
             MessageL(COLORS.gray, $"set duration: WHOLE");
             chord.SetDuration(DURATION.whole);
+            if (chord.GetHighestAbsPitch() > 24)
+                chord.OctDown();
+
             ChordCode = chord.ChordToCode();
+
+
+
             return chord;
         }      
 
