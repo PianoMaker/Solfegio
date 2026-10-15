@@ -20,7 +20,7 @@ namespace RecogniseChord.Pages
         [BindProperty] public string SelectedQuality { get; set; } = string.Empty; // українська назва
         [BindProperty] public string RootNote { get; set; } = "C"; // основний тон
         [BindProperty] public int RootAlteration { get; set; } = 0; // -1 бемоль, 0 бекар, 1 дієз
-        [BindProperty] public string Timbre { get; set; }
+        [BindProperty] public string Timbre { get; set; } = TIMBRE.piano.ToString();
 
         [BindProperty] public string ChordCode { get; set; }
 
@@ -42,6 +42,8 @@ namespace RecogniseChord.Pages
         }
 
         public string SoundDir => Path.Combine(_environment.WebRootPath, "sound");
+        public string SamplePath => Path.Combine(_environment.WebRootPath, "samplesound", "a4sample.wav");
+        public bool SamplePathExist => System.IO.File.Exists(SamplePath);
 
         public List<string> CountOptions { get; } = new() { "2", "3", "4", "5" };
         public List<string> TypeOptions { get; private set; } = new();
@@ -173,7 +175,7 @@ namespace RecogniseChord.Pages
                         string fullPath = GetFullPath();
                         TIMBRE timbre = GetTimbre();
                         MessageL(8, $"timbre = {timbre}");
-                        chord.SaveWave(fullPath, timbre);
+                        SaveChordWave(chord, fullPath, timbre);
                         GetRelativePath(fullPath);
                         MessageL(8, $"path = {GeneratedFileRelative} vs {fullPath}");
                     }
@@ -209,7 +211,7 @@ namespace RecogniseChord.Pages
             GetRelativePath(fullPath);
             try
             {
-                chord.SaveWave(fullPath, timbre);
+                SaveChordWave(chord, fullPath, timbre);
 
             }
             catch (Exception ex)
@@ -220,12 +222,27 @@ namespace RecogniseChord.Pages
             return Page();
         }
 
+        private void SaveChordWave(ChordT chord, string fullPath, TIMBRE timbre)
+        {
+            if (timbre == TIMBRE.piano && SamplePathExist)
+            {
+                MessageL(COLORS.gray, $"Using piano sample: {SamplePath}");
+                chord.SaveSampleWave(fullPath, SamplePath);
+            }
+            else
+            {
+                if (timbre == TIMBRE.piano)
+                    MessageL(COLORS.gray, $"Piano sample not found at {SamplePath}; using synthesized piano");
+                chord.SaveWave(fullPath, timbre);
+            }
+        }
+
         private TIMBRE GetTimbre()
         {
             TIMBRE timbreEnum;
             if (string.IsNullOrWhiteSpace(Timbre) || !Enum.TryParse<TIMBRE>(Timbre, ignoreCase: true, out timbreEnum))
             {
-                timbreEnum = TIMBRE.sin;
+                timbreEnum = TIMBRE.piano;
                 MessageL(COLORS.gray, $"Timbre parse failed or empty ('{Timbre}'), defaulting to {timbreEnum}");
             }
             else
