@@ -154,6 +154,66 @@ function playPianodisplay() {
 window.playPianodisplay = playPianodisplay;
 
 
+// Sustain a piano key while it is held, then release it smoothly.
+const activePianoNotes = new Map();
+
+async function startNoteFromKey(key) {
+	if (activePianoNotes.has(key)) return true;
+
+	const midi = pianoTokenToMidi(key);
+	if (midi === null) return false;
+
+	const note = { oscillator: null, gain: null };
+	activePianoNotes.set(key, note);
+
+	try {
+		const ctx = ensureAudioContext();
+		if (!ctx) {
+			activePianoNotes.delete(key);
+			return false;
+		}
+		if (ctx.state === 'suspended') await ctx.resume();
+		// The key may have been released while the browser resumed audio.
+		if (activePianoNotes.get(key) !== note) return false;
+
+		const oscillator = ctx.createOscillator();
+		const gain = ctx.createGain();
+		const now = ctx.currentTime;
+		oscillator.type = 'sine';
+		oscillator.frequency.value = midiToFrequency(midi);
+		gain.gain.setValueAtTime(0.0001, now);
+		gain.gain.exponentialRampToValueAtTime(0.82, now + 0.01);
+		oscillator.connect(gain);
+		gain.connect(ctx.destination);
+		note.oscillator = oscillator;
+		note.gain = gain;
+		oscillator.start(now);
+		return true;
+	} catch (e) {
+		activePianoNotes.delete(key);
+		console.warn('[createMelody][piano] startNoteFromKey failed', e);
+		return false;
+	}
+}
+
+function stopNoteFromKey(key) {
+	const note = activePianoNotes.get(key);
+	if (!note) return;
+	activePianoNotes.delete(key);
+	if (!note.oscillator || !note.gain) return;
+
+	try {
+		const now = __audioCtx.currentTime;
+		note.gain.gain.cancelScheduledValues(now);
+		note.gain.gain.setValueAtTime(Math.max(note.gain.gain.value, 0.0001), now);
+		note.gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.04);
+		note.oscillator.stop(now + 0.05);
+	} catch (e) {
+		console.warn('[createMelody][piano] stopNoteFromKey failed', e);
+	}
+}
+
+
 function playNoteFromKey(key) {
 	try {
 		console.debug('[createMelody][piano] playNoteFromKey token=', key);
@@ -208,3 +268,5 @@ window.pianoTokenToMidi = pianoTokenToMidi;
 window.midiToFrequency = midiToFrequency;
 window.playTone = playTone;
 window.playNoteFromKey = playNoteFromKey;
+window.startNoteFromKey = startNoteFromKey;
+window.stopNoteFromKey = stopNoteFromKey;

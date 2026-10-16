@@ -135,6 +135,9 @@
   <data name="MetaDescription" xml:space="preserve">
     <value>Online solfeggio trainer for developing musical hearing and practicing chord construction.</value>
   </data>
+  <data name="Piano" xml:space="preserve">
+    <value>Piano</value>
+  </data>
   <data name="Recognise" xml:space="preserve">
     <value>Recognise a chord</value>
   </data>

@@ -1,38 +1,38 @@
 @page
 @model RecogniseChord.Pages.PianoModel
 @{
-    ViewData["Title"] = "Piano";
+    ViewData["Title"] = Localizer["PianoTitle"];
 }
 
 <div class="container py-4">
-    <h1 class="text-center mb-4">Фортепіанна клавіатура</h1>
-    <p class="text-center text-muted">Натисніть клавішу, щоб почути звук.</p>
+    <h1 class="text-center mb-4">@Localizer["PianoTitle"]</h1>
+    <p class="text-center text-muted">@Localizer["PianoInstructions"]</p>
 
     <div class="piano-scroll-wrapper" aria-label="Фортепіанна клавіатура">
-        <div id="pianoroll" class="piano-keyboard" role="group" aria-label="Дві октави фортепіано">
+        <div id="pianoroll" class="piano-keyboard" role="group" aria-label="@Localizer["PianoKeyboard"]">
             <button type="button" data-key="c" class="piano-key white-key">C1</button>
-            <button type="button" data-key="cis" class="piano-key black-key" aria-label="Cis1">C♯</button>
+            <button type="button" data-key="cis" class="piano-key black-key" aria-label="@Localizer["CSharp"] 1">C♯</button>
             <button type="button" data-key="d" class="piano-key white-key">D1</button>
-            <button type="button" data-key="dis" class="piano-key black-key" aria-label="Dis1">D♯</button>
+            <button type="button" data-key="dis" class="piano-key black-key" aria-label="@Localizer["DSharp"] 1">D♯</button>
             <button type="button" data-key="e" class="piano-key white-key">E1</button>
             <button type="button" data-key="f" class="piano-key white-key">F1</button>
-            <button type="button" data-key="fis" class="piano-key black-key" aria-label="Fis1">F♯</button>
+            <button type="button" data-key="fis" class="piano-key black-key" aria-label="@Localizer["FSharp"] 1">F♯</button>
             <button type="button" data-key="g" class="piano-key white-key">G1</button>
-            <button type="button" data-key="gis" class="piano-key black-key" aria-label="Gis1">G♯</button>
+            <button type="button" data-key="gis" class="piano-key black-key" aria-label="@Localizer["GSharp"] 1">G♯</button>
             <button type="button" data-key="a" class="piano-key white-key">A1</button>
-            <button type="button" data-key="b" class="piano-key black-key" aria-label="B1">B♭</button>
+            <button type="button" data-key="b" class="piano-key black-key" aria-label="@Localizer["BFlat"] 1">B♭</button>
             <button type="button" data-key="h" class="piano-key white-key">H1</button>
             <button type="button" data-key="c'" class="piano-key white-key">C2</button>
-            <button type="button" data-key="cis'" class="piano-key black-key" aria-label="Cis2">C♯</button>
+            <button type="button" data-key="cis'" class="piano-key black-key" aria-label="@Localizer["CSharp"] 2">C♯</button>
             <button type="button" data-key="d'" class="piano-key white-key">D2</button>
-            <button type="button" data-key="dis'" class="piano-key black-key" aria-label="Dis2">D♯</button>
+            <button type="button" data-key="dis'" class="piano-key black-key" aria-label="@Localizer["DSharp"] 2">D♯</button>
             <button type="button" data-key="e'" class="piano-key white-key">E2</button>
             <button type="button" data-key="f'" class="piano-key white-key">F2</button>
-            <button type="button" data-key="fis'" class="piano-key black-key" aria-label="Fis2">F♯</button>
+            <button type="button" data-key="fis'" class="piano-key black-key" aria-label="@Localizer["FSharp"] 2">F♯</button>
             <button type="button" data-key="g'" class="piano-key white-key">G2</button>
-            <button type="button" data-key="gis'" class="piano-key black-key" aria-label="Gis2">G♯</button>
+            <button type="button" data-key="gis'" class="piano-key black-key" aria-label="@Localizer["GSharp"] 2">G♯</button>
             <button type="button" data-key="a'" class="piano-key white-key">A2</button>
-            <button type="button" data-key="b'" class="piano-key black-key" aria-label="B2">B♭</button>
+            <button type="button" data-key="b'" class="piano-key black-key" aria-label="@Localizer["BFlat"] 2">B♭</button>
             <button type="button" data-key="h'" class="piano-key white-key">H2</button>
             <button type="button" data-key="c''" class="piano-key white-key">C3</button>
         </div>
@@ -53,16 +53,32 @@
 @section Scripts {
     <script src="~/js/audioHelpers.js" asp-append-version="true"></script>
     <script>
-        document.getElementById('pianoroll')?.addEventListener('click', function (event) {
-            const key = event.target.closest('button[data-key]');
-            if (!key) return;
+        const piano = document.getElementById('pianoroll');
+        const heldPointers = new Map();
 
-            const audio = window.ensureAudioContext();
-            if (audio?.state === 'suspended') {
-                audio.resume().then(() => window.playNoteFromKey(key.dataset.key));
-            } else {
-                window.playNoteFromKey(key.dataset.key);
-            }
+        piano?.addEventListener('pointerdown', function (event) {
+            const keyButton = event.target.closest('button[data-key]');
+            if (!keyButton || event.button !== 0) return;
+
+            event.preventDefault();
+            const key = keyButton.dataset.key;
+            heldPointers.set(event.pointerId, key);
+            keyButton.setPointerCapture(event.pointerId);
+            window.startNoteFromKey(key);
+        });
+
+        function releasePointer(event) {
+            const key = heldPointers.get(event.pointerId);
+            if (key === undefined) return;
+            heldPointers.delete(event.pointerId);
+            window.stopNoteFromKey(key);
+        }
+
+        window.addEventListener('pointerup', releasePointer);
+        window.addEventListener('pointercancel', releasePointer);
+        window.addEventListener('blur', function () {
+            for (const key of heldPointers.values()) window.stopNoteFromKey(key);
+            heldPointers.clear();
         });
     </script>
 }

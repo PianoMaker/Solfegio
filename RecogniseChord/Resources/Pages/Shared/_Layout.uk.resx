@@ -135,6 +135,9 @@
   <data name="MetaDescription" xml:space="preserve">
     <value>Онлайн-тренувальник сольфеджіо для розвитку музичного слуху та практики побудови акордів.</value>
   </data>
+  <data name="Piano" xml:space="preserve">
+    <value>Фортепіано</value>
+  </data>
   <data name="Recognise" xml:space="preserve">
     <value>Вгадай акорд</value>
   </data>

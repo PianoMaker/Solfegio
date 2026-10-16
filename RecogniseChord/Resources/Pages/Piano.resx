@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="PianoTitle" xml:space="preserve"><value>Piano keyboard</value></data>
+  <data name="PianoInstructions" xml:space="preserve"><value>Press and hold a key to hear its sound.</value></data>
+  <data name="PianoKeyboard" xml:space="preserve"><value>Two-octave piano keyboard</value></data>
+  <data name="CSharp" xml:space="preserve"><value>C sharp</value></data>
+  <data name="DSharp" xml:space="preserve"><value>D sharp</value></data>
+  <data name="FSharp" xml:space="preserve"><value>F sharp</value></data>
+  <data name="GSharp" xml:space="preserve"><value>G sharp</value></data>
+  <data name="BFlat" xml:space="preserve"><value>B flat</value></data>
+</root>
