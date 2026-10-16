@@ -1,0 +1,68 @@
+@page
+@model RecogniseChord.Pages.PianoModel
+@{
+    ViewData["Title"] = "Piano";
+}
+
+<div class="container py-4">
+    <h1 class="text-center mb-4">Фортепіанна клавіатура</h1>
+    <p class="text-center text-muted">Натисніть клавішу, щоб почути звук.</p>
+
+    <div class="piano-scroll-wrapper" aria-label="Фортепіанна клавіатура">
+        <div id="pianoroll" class="piano-keyboard" role="group" aria-label="Дві октави фортепіано">
+            <button type="button" data-key="c" class="piano-key white-key">C1</button>
+            <button type="button" data-key="cis" class="piano-key black-key" aria-label="Cis1">C♯</button>
+            <button type="button" data-key="d" class="piano-key white-key">D1</button>
+            <button type="button" data-key="dis" class="piano-key black-key" aria-label="Dis1">D♯</button>
+            <button type="button" data-key="e" class="piano-key white-key">E1</button>
+            <button type="button" data-key="f" class="piano-key white-key">F1</button>
+            <button type="button" data-key="fis" class="piano-key black-key" aria-label="Fis1">F♯</button>
+            <button type="button" data-key="g" class="piano-key white-key">G1</button>
+            <button type="button" data-key="gis" class="piano-key black-key" aria-label="Gis1">G♯</button>
+            <button type="button" data-key="a" class="piano-key white-key">A1</button>
+            <button type="button" data-key="b" class="piano-key black-key" aria-label="B1">B♭</button>
+            <button type="button" data-key="h" class="piano-key white-key">H1</button>
+            <button type="button" data-key="c'" class="piano-key white-key">C2</button>
+            <button type="button" data-key="cis'" class="piano-key black-key" aria-label="Cis2">C♯</button>
+            <button type="button" data-key="d'" class="piano-key white-key">D2</button>
+            <button type="button" data-key="dis'" class="piano-key black-key" aria-label="Dis2">D♯</button>
+            <button type="button" data-key="e'" class="piano-key white-key">E2</button>
+            <button type="button" data-key="f'" class="piano-key white-key">F2</button>
+            <button type="button" data-key="fis'" class="piano-key black-key" aria-label="Fis2">F♯</button>
+            <button type="button" data-key="g'" class="piano-key white-key">G2</button>
+            <button type="button" data-key="gis'" class="piano-key black-key" aria-label="Gis2">G♯</button>
+            <button type="button" data-key="a'" class="piano-key white-key">A2</button>
+            <button type="button" data-key="b'" class="piano-key black-key" aria-label="B2">B♭</button>
+            <button type="button" data-key="h'" class="piano-key white-key">H2</button>
+            <button type="button" data-key="c''" class="piano-key white-key">C3</button>
+        </div>
+    </div>
+</div>
+
+<style>
+    .piano-scroll-wrapper { overflow-x: auto; padding: 1rem 0; }
+    .piano-keyboard { position: relative; display: flex; width: max-content; min-width: 100%; height: 14rem; margin: auto; }
+    .piano-key { border: 1px solid #333; border-radius: 0 0 5px 5px; cursor: pointer; }
+    .white-key { position: relative; z-index: 1; flex: 0 0 3.5rem; height: 14rem; padding-top: 11.5rem; color: #222; background: linear-gradient(#fff 85%, #eee); }
+    .white-key:active { background: #ddd; }
+    .black-key { position: relative; z-index: 2; flex: 0 0 2.2rem; height: 8.5rem; margin: 0 -1.1rem; padding: 0; color: #fff; background: linear-gradient(#333, #080808); }
+    .black-key:active { background: #555; }
+    .piano-key:focus-visible { outline: 3px solid #0d6efd; outline-offset: 2px; }
+</style>
+
+@section Scripts {
+    <script src="~/js/audioHelpers.js" asp-append-version="true"></script>
+    <script>
+        document.getElementById('pianoroll')?.addEventListener('click', function (event) {
+            const key = event.target.closest('button[data-key]');
+            if (!key) return;
+
+            const audio = window.ensureAudioContext();
+            if (audio?.state === 'suspended') {
+                audio.resume().then(() => window.playNoteFromKey(key.dataset.key));
+            } else {
+                window.playNoteFromKey(key.dataset.key);
+            }
+        });
+    </script>
+}
