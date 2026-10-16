@@ -1,6 +1,16 @@
 document.addEventListener("DOMContentLoaded", function () {
     console.log("melodies.js starts.");
 
+    document.querySelectorAll(".interval-toggle").forEach(function (button) {
+        button.addEventListener("click", function () {
+            const section = button.closest(".interval-section");
+            if (!section) return;
+
+            const isOpen = section.classList.toggle("is-open");
+            button.setAttribute("aria-expanded", String(isOpen));
+        });
+    });
+
     const melodyNotation = document.querySelectorAll(".melody-notation");
 
 

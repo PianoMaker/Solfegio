@@ -2,9 +2,13 @@
     --margin-bottom: 10px;
     --header-height: 60px;
     --header-color: #8e5639;
-/*    --footer-color: #c6b246;*/
+    /*    --footer-color: #c6b246;*/
     --footer-color: #a47f3c;
     --correct-answer-color: #0d5a2b;
+    --dissonans-color: #fcd8c6;
+    --consonans-color: #fcfac6;
+    --dissonans-border-color: #c1abab;
+    --consonans-border-color: #acac67;
 }
 
 html {
@@ -132,7 +136,7 @@ header {
         background-color: var(--header-color);
     }
 
-.navbar-coloured {
+.navbar-colored {
     background-color: var(--header-color);
 }
 
@@ -296,7 +300,91 @@ main .whitecontainer {
     display: flex;
     flex-direction: column;
     width: 100%;
-    gap: 5px;
+    gap: 12px;
+}
+
+.interval-section {
+    width: min(80%, 940px);
+    margin: 10px auto;
+    padding: 0.45rem;
+    border-radius: 20px;
+    box-shadow: 0 3px 9px rgba(75, 49, 32, 0.14);
+    transition: border-radius 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+
+    .interval-section.consonant {
+        border: 1px solid var(--consonans-border-color);
+        background-color: var(--consonans-color) !important;
+    }
+
+    .interval-section.dissonant {
+        border: 1px solid var(--dissonans-border-color);
+        background-color: var(--dissonans-color) !important;
+    }
+
+.interval-section.is-open {
+    border-radius: 28px;
+    box-shadow: 0 6px 16px rgba(75, 49, 32, 0.2);
+}
+
+.interval-section > h2 {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.interval-toggle {
+    width: 100%;
+    min-height: 3.25rem;
+    padding: 0.65rem 1.25rem;
+    border: 0;
+    border-radius: 999px;
+    color: #4f3b16;
+    font: inherit;
+    font-weight: 600;
+    letter-spacing: 0.015em;
+    cursor: pointer;
+    transition: filter 160ms ease, transform 160ms ease;
+}
+
+.interval-toggle:hover {
+    filter: brightness(1.08);
+}
+
+.interval-section.consonant .interval-toggle {
+    background: var(--consonans-color);
+}
+
+.interval-section.dissonant .interval-toggle {
+    background: var(--dissonans-color);
+    color: #54283a;
+}
+
+.interval-toggle:active {
+    transform: scale(0.99);
+}
+
+.interval-toggle:focus-visible {
+    outline: 3px solid #fffdf7;
+    outline-offset: 2px;
+}
+
+.interval-section.consonant .interval-toggle:focus-visible {
+    box-shadow: 0 0 0 5px var(--consonans-color);
+}
+
+.interval-section.dissonant .interval-toggle:focus-visible {
+    box-shadow: 0 0 0 5px var(--dissonans-color);
+}
+
+.interval-content {
+    display: none;
+    padding: 0.65rem 0.25rem 0.25rem;
+}
+
+.interval-section.is-open .interval-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
 }
 
 .chordbox {
@@ -340,13 +428,6 @@ main .whitecontainer {
     overflow: hidden;
 }
 
-.melodycontainer h2 {
-    color: darkred;
-    font-size: 1.2rem;    
-    margin-top: 2rem;
-    margin-bottom: 0;
-    padding-bottom: 0;
-}
 .melodycontainer h3 {
     color: var(--header-color);
     font-size: 1.1rem;
