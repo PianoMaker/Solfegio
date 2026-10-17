@@ -1,22 +1,23 @@
 @page
 @model RecogniseChord.Pages.MelodiesModel
 @{
+    ViewData["Title"] = Localizer["PageTitle"];
 }
 <div class="mover">
-    <div class="text-center" id="devpage">
-        <h1 class="display-4">Інтервали у відомих мелодіях</h1>
+    <div class="text-center" id="devpage" data-play-label="@Localizer["Play"]" data-stop-label="@Localizer["Stop"]" data-play-aria="@Localizer["PlayMelody"]" data-stop-aria="@Localizer["StopPlayback"]">
+        <h1 class="display-4">@Localizer["PageTitle"]</h1>
 
         <div class="melodycontainer">
 
             <!-- МАЛА СЕКУНДА -->
             <div class="interval-section dissonant" id="minsecond">
-                <div class="interval-heading-with-keyboard-between"><h2><button type="button" class="interval-toggle" aria-expanded="false" aria-controls="minsecond-content">Мала секунда</button></h2><img src="~/images/intervals/minor-second.svg" alt="Клавіатура фортепіано: інтервал Мала секунда" style="height:4em" /></div>
+                <div class="interval-heading-with-keyboard-between"><h2><button type="button" class="interval-toggle" aria-expanded="false" aria-controls="minsecond-content">@Localizer["MinorSecond"]</button></h2><img src="~/images/intervals/minor-second.svg" alt="@Localizer["PianoKeyboardInterval"]" style="height:4em" /></div>
                 <div class="interval-content" id="minsecond-content">
 
                     <div class="melody-card">
                         <div class="melody-info">
-                            <h3>Fur Elise</h3>
-                            <p>Людвіг ван Бетховен</p>
+                            <h3>@Localizer["FurElise"]</h3>
+                            <p>@Localizer["Beethoven"]</p>
                         </div>
                         <div class="melody-notation"
                              data-barwidth="230"
@@ -25,8 +26,8 @@
 
                     <div class="melody-card">
                         <div class="melody-info">
-                            <h3>Гуцулка Ксеня</h3>
-                            <p>Українська народна пісня</p>
+                            <h3>@Localizer["HutsulkaKsenia"]</h3>
+                            <p>@Localizer["UkrainianFolkSong"]</p>
                         </div>
                         <div class="melody-notation"
                              data-barwidth="230"
@@ -40,15 +41,15 @@
             <!-- ВЕЛИКА СЕКУНДА -->
             <div class="interval-section dissonant" id="majorsecond">
                 <div class="interval-heading-with-keyboard-between">
-                    <h2><button type="button" class="interval-toggle" aria-expanded="false" aria-controls="majorsecond-content">Велика секунда</button></h2>
-                    <img src="~/images/intervals/major-second.svg" alt="Клавіатура фортепіано: інтервал Велика секунда" style="height:4em" />
+                    <h2><button type="button" class="interval-toggle" aria-expanded="false" aria-controls="majorsecond-content">@Localizer["MajorSecond"]</button></h2>
+                    <img src="~/images/intervals/major-second.svg" alt="@Localizer["PianoKeyboardInterval"]" style="height:4em" />
                 </div>
                 <div class="interval-content" id="majorsecond-content">
 
                     <div class="melody-card">
                         <div class="melody-info">
-                            <h3>Вийди вийди сонечко</h3>
-                            <p>Українська народна пісня</p>
+                            <h3>@Localizer["SunshineComeOut"]</h3>
+                            <p>@Localizer["UkrainianFolkSong"]</p>
                         </div>
                         <div class="melody-notation"
                              data-barwidth="230"
@@ -57,8 +58,8 @@
 
                     <div class="melody-card">
                         <div class="melody-info">
-                            <h3>Пісня Петрика П'яточкина'</h3>
-                            <p>Володимир Бистряков</p>
+                            <h3>@Localizer["PetrykPyatochkinSong"]</h3>
+                            <p>@Localizer["VolodymyrBistryakov"]</p>
                         </div>
                         <div class="melody-notation"
                              data-barwidth="145"
@@ -70,13 +71,13 @@
                 </div>
             </div>
             <div class="interval-section consonant" id="minorthird">
-                <div class="interval-heading-with-keyboard-between"><h2><button type="button" class="interval-toggle" aria-expanded="false" aria-controls="minorthird-content">Мала терція</button></h2><img src="~/images/intervals/minor-third.svg" alt="Клавіатура фортепіано: інтервал Мала терція" style="height:4em" /></div>
+                <div class="interval-heading-with-keyboard-between"><h2><button type="button" class="interval-toggle" aria-expanded="false" aria-controls="minorthird-content">@Localizer["MinorThird"]</button></h2><img src="~/images/intervals/minor-third.svg" alt="@Localizer["PianoKeyboardInterval"]" style="height:4em" /></div>
                 <div class="interval-content" id="minorthird-content">
 
                     <div class="melody-card">
                         <div class="melody-info">
-                            <h3>Ой у лузі червона калина</h3>
-                            <p>Українська народна пісня</p>
+                            <h3>@Localizer["RedViburnumSong"]</h3>
+                            <p>@Localizer["UkrainianFolkSong"]</p>
                         </div>
                         <div class="melody-notation"
                              data-barwidth="230"
@@ -88,13 +89,13 @@
                 </div>
             </div>
             <div class="interval-section consonant" id="majorthird">
-                <div class="interval-heading-with-keyboard-between"><h2><button type="button" class="interval-toggle" aria-expanded="false" aria-controls="majorthird-content">Велика терція</button></h2><img src="~/images/intervals/major-third.svg" alt="Клавіатура фортепіано: інтервал Велика терція" style="height:4em" /></div>
+                <div class="interval-heading-with-keyboard-between"><h2><button type="button" class="interval-toggle" aria-expanded="false" aria-controls="majorthird-content">@Localizer["MajorThird"]</button></h2><img src="~/images/intervals/major-third.svg" alt="@Localizer["PianoKeyboardInterval"]" style="height:4em" /></div>
                 <div class="interval-content" id="majorthird-content">
 
                     <div class="melody-card">
                         <div class="melody-info">
-                            <h3>Ой ходить сон</h3>
-                            <p>Українська народна пісня</p>
+                            <h3>@Localizer["SleepWalksSong"]</h3>
+                            <p>@Localizer["UkrainianFolkSong"]</p>
                         </div>
                         <div class="melody-notation"
                              data-key="G"
@@ -105,8 +106,8 @@
 
                     <div class="melody-card">
                         <div class="melody-info">
-                            <h3>When the Saints Go Marching In</h3>
-                            <p>Спірічуелс</p>
+                            <h3>@Localizer["WhenTheSaints"]</h3>
+                            <p>@Localizer["Spiritual"]</p>
                         </div>
                         <div class="melody-notation"
                              data-barwidth="120"
@@ -115,8 +116,8 @@
 
                     <div class="melody-card">
                         <div class="melody-info">
-                            <h3>Harry Potter theme 2</h3>
-                            <p>Nicholas Hooper</p>
+                            <h3>@Localizer["HarryPotterTheme"]</h3>
+                            <p>@Localizer["NicholasHooper"]</p>
                         </div>
                         <div class="melody-notation"
                              data-barwidth="100"
@@ -129,13 +130,13 @@
                 </div>
             </div>
             <div class="interval-section consonant" id="perfectfourth">
-                <div class="interval-heading-with-keyboard-between"><h2><button type="button" class="interval-toggle" aria-expanded="false" aria-controls="perfectfourth-content">Чиста кварта</button></h2><img src="~/images/intervals/perfect-fourth.svg" alt="Клавіатура фортепіано: інтервал Чиста кварта" style="height:4em" /></div>
+                <div class="interval-heading-with-keyboard-between"><h2><button type="button" class="interval-toggle" aria-expanded="false" aria-controls="perfectfourth-content">@Localizer["PerfectFourth"]</button></h2><img src="~/images/intervals/perfect-fourth.svg" alt="@Localizer["PianoKeyboardInterval"]" style="height:4em" /></div>
                 <div class="interval-content" id="perfectfourth-content">
 
                     <div class="melody-card">
                         <div class="melody-info">
-                            <h3>Ой на горі та й женці жнуть</h3>
-                            <p>Українська народна пісня</p>
+                            <h3>@Localizer["OyNaHori"]</h3>
+                            <p>@Localizer["UkrainianFolkSong"]</p>
                         </div>
                         <div class="melody-notation"
                              data-barwidth="240"
@@ -144,8 +145,8 @@
 
                     <div class="melody-card">
                         <div class="melody-info">
-                            <h3>Ой Марічко, Чичері</h3>
-                            <p>Українська народна пісня</p>
+                            <h3>@Localizer["OyMarichko"]</h3>
+                            <p>@Localizer["UkrainianFolkSong"]</p>
                         </div>
                         <div class="melody-notation"
                              data-barwidth="240"
@@ -155,8 +156,8 @@
 
                     <div class="melody-card">
                         <div class="melody-info">
-                            <h3>Увертюра до опери «Тарас Бульба»</h3>
-                            <p>Микола Лисенко</p>
+                            <h3>@Localizer["TarasBulbaOverture"]</h3>
+                            <p>@Localizer["MykolaLysenko"]</p>
                         </div>
                         <div class="melody-notation"
                              data-barwidth="180"
@@ -169,17 +170,17 @@
                 </div>
             </div>
             <div class="interval-section dissonant" id="tritone">
-                <div class="interval-heading-with-keyboard-between"><h2><button type="button" class="interval-toggle" aria-expanded="false" aria-controls="tritone-content">Тритон</button></h2><img src="~/images/intervals/tritone.svg" alt="Клавіатура фортепіано: інтервал Тритон" style="height:4em" /></div>
+                <div class="interval-heading-with-keyboard-between"><h2><button type="button" class="interval-toggle" aria-expanded="false" aria-controls="tritone-content">@Localizer["Tritone"]</button></h2><img src="~/images/intervals/tritone.svg" alt="@Localizer["PianoKeyboardInterval"]" style="height:4em" /></div>
                 <div class="interval-content" id="tritone-content">
 
                     <div class="melody-card" data-audio="/samplesound/s8crryce.mp3">
                         <div class="melody-info">
                             <h3>Prélude à l'après-midi d'un faune</h3>
-                            <p>Claude Debussi</p>
+                            <p>@Localizer["ClaudeDebussy"]</p>
                         </div>
 
                         <div class="melodyexample">
-                            <img src="https://upload.wikimedia.org/score/s/8/s8crrycesbyym1mol7uphf5o9efbgf9/s8crryce.svg" alt="Debussi." />
+                            <img src="https://upload.wikimedia.org/score/s/8/s8crrycesbyym1mol7uphf5o9efbgf9/s8crryce.svg" alt="@Localizer["DebussyScoreAlt"]" />
                         </div>
                     </div>
 
@@ -188,13 +189,13 @@
                 </div>
             </div>
             <div class="interval-section consonant" id="perfectfifth">
-                <div class="interval-heading-with-keyboard-between"><h2><button type="button" class="interval-toggle" aria-expanded="false" aria-controls="perfectfifth-content">Чиста квінта</button></h2><img src="~/images/intervals/perfect-fifth.svg" alt="Клавіатура фортепіано: інтервал Чиста квінта" style="height:4em" /></div>
+                <div class="interval-heading-with-keyboard-between"><h2><button type="button" class="interval-toggle" aria-expanded="false" aria-controls="perfectfifth-content">@Localizer["PerfectFifth"]</button></h2><img src="~/images/intervals/perfect-fifth.svg" alt="@Localizer["PianoKeyboardInterval"]" style="height:4em" /></div>
                 <div class="interval-content" id="perfectfifth-content">
 
                     <div class="melody-card">
                         <div class="melody-info">
-                            <h3>Twinkle, Twinkle, Little Star</h3>
-                            <p>народна</p>
+                            <h3>@Localizer["TwinkleTwinkle"]</h3>
+                            <p>@Localizer["FolkSong"]</p>
                         </div>
                         <div class="melody-notation"
                              data-barwidth="120"
@@ -203,8 +204,8 @@
 
                     <div class="melody-card">
                         <div class="melody-info">
-                            <h3>Бандуристе, орле сизий</h3>
-                            <p>Українська народна пісня</p>
+                            <h3>@Localizer["Banduryste"]</h3>
+                            <p>@Localizer["UkrainianFolkSong"]</p>
                         </div><div class="melody-notation"
                                    data-key="F"
                                    data-barwidth="240"
@@ -216,13 +217,13 @@
                 </div>
             </div>
             <div class="interval-section consonant" id="minorsixth">
-                <div class="interval-heading-with-keyboard-between"><h2><button type="button" class="interval-toggle" aria-expanded="false" aria-controls="minorsixth-content">Мала секста</button></h2><img src="~/images/intervals/minor-sixth.svg" alt="Клавіатура фортепіано: інтервал Мала секста" style="height:4em" /></div>
+                <div class="interval-heading-with-keyboard-between"><h2><button type="button" class="interval-toggle" aria-expanded="false" aria-controls="minorsixth-content">@Localizer["MinorSixth"]</button></h2><img src="~/images/intervals/minor-sixth.svg" alt="@Localizer["PianoKeyboardInterval"]" style="height:4em" /></div>
                 <div class="interval-content" id="minorsixth-content">
 
                     <div class="melody-card">
                         <div class="melody-info">
-                            <h3>Ой на горі два дубки</h3>
-                            <p>Українська народна пісня</p>
+                            <h3>@Localizer["TwoOakTrees"]</h3>
+                            <p>@Localizer["UkrainianFolkSong"]</p>
                         </div>
                         <div class="melody-notation"
                              data-key="Bb"
@@ -234,13 +235,13 @@
                 </div>
             </div>
             <div class="interval-section consonant" id="majorsixth">
-                <div class="interval-heading-with-keyboard-between"><h2><button type="button" class="interval-toggle" aria-expanded="false" aria-controls="majorsixth-content">Велика секста</button></h2><img src="~/images/intervals/major-sixth.svg" alt="Клавіатура фортепіано: інтервал Велика секста" style="height:4em" /></div>
+                <div class="interval-heading-with-keyboard-between"><h2><button type="button" class="interval-toggle" aria-expanded="false" aria-controls="majorsixth-content">@Localizer["MajorSixth"]</button></h2><img src="~/images/intervals/major-sixth.svg" alt="@Localizer["PianoKeyboardInterval"]" style="height:4em" /></div>
                 <div class="interval-content" id="majorsixth-content">
 
                     <div class="melody-card">
                         <div class="melody-info">
-                            <h3>Україна</h3>
-                            <p>Тарас Петриненко</p>
+                            <h3>@Localizer["UkraineSong"]</h3>
+                            <p>@Localizer["TarasPetrynenko"]</p>
                         </div>
                         <div class="melody-notation"
                              data-key="F"
@@ -253,14 +254,14 @@
                 </div>
             </div>
             <div class="interval-section dissonant" id="minorseventh">
-                <div class="interval-heading-with-keyboard-between"><h2><button type="button" class="interval-toggle" aria-expanded="false" aria-controls="minorseventh-content">Мала септима</button></h2><img src="~/images/intervals/minor-seventh.svg" alt="Клавіатура фортепіано: інтервал Мала септима" style="height:4em" /></div>
+                <div class="interval-heading-with-keyboard-between"><h2><button type="button" class="interval-toggle" aria-expanded="false" aria-controls="minorseventh-content">@Localizer["MinorSeventh"]</button></h2><img src="~/images/intervals/minor-seventh.svg" alt="@Localizer["PianoKeyboardInterval"]" style="height:4em" /></div>
                 <div class="interval-content" id="minorseventh-content">
 
 
                     <div class="melody-card">
                         <div class="melody-info">
-                            <h3>Ой на плаю</h3>
-                            <p>Українська народна пісня</p>
+                            <h3>@Localizer["OyNaPlayu"]</h3>
+                            <p>@Localizer["UkrainianFolkSong"]</p>
                         </div>
                         <div class="melody-notation"
                              data-key="F"
@@ -270,8 +271,8 @@
 
                     <div class="melody-card">
                         <div class="melody-info">
-                            <h3>"Тепер я турок не козак""</h3>
-                            <p>С.Гулак-Артемовський (арія Уарася з опери "Запорожець за Дунаєм")</p>
+                            <h3>@Localizer["TurkNotCossack"]</h3>
+                            <p>@Localizer["HulakArtemovskyCredit"]</p>
                         </div>
                         <div class="melody-notation"
                              data-key="F"
@@ -283,7 +284,7 @@
                 </div>
             </div>
             <div class="interval-section dissonant" id="majorseventh">
-                <div class="interval-heading-with-keyboard-between"><h2><button type="button" class="interval-toggle" aria-expanded="false" aria-controls="majorseventh-content">Велика септима</button></h2><img src="~/images/intervals/major-seventh.svg" alt="Клавіатура фортепіано: інтервал Велика септима" style="height:4em" /></div>
+                <div class="interval-heading-with-keyboard-between"><h2><button type="button" class="interval-toggle" aria-expanded="false" aria-controls="majorseventh-content">@Localizer["MajorSeventh"]</button></h2><img src="~/images/intervals/major-seventh.svg" alt="@Localizer["PianoKeyboardInterval"]" style="height:4em" /></div>
                 <div class="interval-content" id="majorseventh-content">
 
 
@@ -291,13 +292,13 @@
                 </div>
             </div>
             <div class="interval-section consonant" id="octave">
-                <div class="interval-heading-with-keyboard-between"><h2><button type="button" class="interval-toggle" aria-expanded="false" aria-controls="octave-content">Октава</button></h2><img src="~/images/intervals/octave.svg" alt="Клавіатура фортепіано: інтервал Октава" style="height:3.5em" /></div>
+                <div class="interval-heading-with-keyboard-between"><h2><button type="button" class="interval-toggle" aria-expanded="false" aria-controls="octave-content">@Localizer["Octave"]</button></h2><img src="~/images/intervals/octave.svg" alt="@Localizer["PianoKeyboardInterval"]" style="height:3.5em" /></div>
                 <div class="interval-content" id="octave-content">
 
                     <div class="melody-card">
                         <div class="melody-info">
-                            <h3>Somewhere Over the Rainbow</h3>
-                            <p>Гарольд Арлен</p>
+                            <h3>@Localizer["SomewhereOverRainbow"]</h3>
+                            <p>@Localizer["HaroldArlen"]</p>
                         </div>
                         <div class="melody-notation"
                              data-barwidth="240"

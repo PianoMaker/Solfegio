@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="PageTitle" xml:space="preserve"><value>Intervals in Famous Melodies</value></data>
+  <data name="MinorSecond" xml:space="preserve"><value>Minor second</value></data>
+  <data name="MajorSecond" xml:space="preserve"><value>Major second</value></data>
+  <data name="MinorThird" xml:space="preserve"><value>Minor third</value></data>
+  <data name="MajorThird" xml:space="preserve"><value>Major third</value></data>
+  <data name="PerfectFourth" xml:space="preserve"><value>Perfect fourth</value></data>
+  <data name="Tritone" xml:space="preserve"><value>Tritone</value></data>
+  <data name="PerfectFifth" xml:space="preserve"><value>Perfect fifth</value></data>
+  <data name="MinorSixth" xml:space="preserve"><value>Minor sixth</value></data>
+  <data name="MajorSixth" xml:space="preserve"><value>Major sixth</value></data>
+  <data name="MinorSeventh" xml:space="preserve"><value>Minor seventh</value></data>
+  <data name="MajorSeventh" xml:space="preserve"><value>Major seventh</value></data>
+  <data name="Octave" xml:space="preserve"><value>Octave</value></data>
+  <data name="PianoKeyboardInterval" xml:space="preserve"><value>Piano keyboard showing the highlighted notes for this interval</value></data>
+  <data name="FurElise" xml:space="preserve"><value>Für Elise</value></data>
+  <data name="Beethoven" xml:space="preserve"><value>Ludwig van Beethoven</value></data>
+  <data name="HutsulkaKsenia" xml:space="preserve"><value>Hutsulka Ksenia</value></data>
+  <data name="UkrainianFolkSong" xml:space="preserve"><value>Ukrainian folk song</value></data>
+  <data name="SunshineComeOut" xml:space="preserve"><value>Come Out, Come Out, Little Sun</value></data>
+  <data name="PetrykPyatochkinSong" xml:space="preserve"><value>Petryk Pyatochkin’s Song</value></data>
+  <data name="VolodymyrBistryakov" xml:space="preserve"><value>Volodymyr Bistryakov</value></data>
+  <data name="RedViburnumSong" xml:space="preserve"><value>Oh, the Red Viburnum in the Meadow</value></data>
+  <data name="SleepWalksSong" xml:space="preserve"><value>Oh, the Sleep Walks</value></data>
+  <data name="WhenTheSaints" xml:space="preserve"><value>When the Saints Go Marching In</value></data>
+  <data name="Spiritual" xml:space="preserve"><value>Spiritual</value></data>
+  <data name="HarryPotterTheme" xml:space="preserve"><value>Harry Potter Theme 2</value></data>
+  <data name="NicholasHooper" xml:space="preserve"><value>Nicholas Hooper</value></data>
+  <data name="OyNaHori" xml:space="preserve"><value>Oh, on the Mountain the Reapers Reap</value></data>
+  <data name="OyMarichko" xml:space="preserve"><value>Oh, Marichko, Chicheri</value></data>
+  <data name="TarasBulbaOverture" xml:space="preserve"><value>Overture to the opera Taras Bulba</value></data>
+  <data name="MykolaLysenko" xml:space="preserve"><value>Mykola Lysenko</value></data>
+  <data name="ClaudeDebussy" xml:space="preserve"><value>Claude Debussy</value></data>
+  <data name="TwinkleTwinkle" xml:space="preserve"><value>Twinkle, Twinkle, Little Star</value></data>
+  <data name="FolkSong" xml:space="preserve"><value>Folk song</value></data>
+  <data name="Banduryste" xml:space="preserve"><value>Banduryste, Grey Eagle</value></data>
+  <data name="TwoOakTrees" xml:space="preserve"><value>Two Little Oak Trees on the Hill</value></data>
+  <data name="UkraineSong" xml:space="preserve"><value>Ukraine</value></data>
+  <data name="TarasPetrynenko" xml:space="preserve"><value>Taras Petrynenko</value></data>
+  <data name="OyNaPlayu" xml:space="preserve"><value>Oy na playu</value></data>
+  <data name="TurkNotCossack" xml:space="preserve"><value>Now I’m a Turk, Not a Cossack</value></data>
+  <data name="HulakArtemovskyCredit" xml:space="preserve"><value>S. Hulak-Artemovsky (Karas’s aria from the opera A Cossack Beyond the Danube)</value></data>
+  <data name="SomewhereOverRainbow" xml:space="preserve"><value>Somewhere Over the Rainbow</value></data>
+  <data name="HaroldArlen" xml:space="preserve"><value>Harold Arlen</value></data>
+  <data name="Play" xml:space="preserve"><value>Play</value></data>
+  <data name="Stop" xml:space="preserve"><value>Stop</value></data>
+  <data name="PlayMelody" xml:space="preserve"><value>Play melody</value></data>
+  <data name="StopPlayback" xml:space="preserve"><value>Stop playback</value></data>
+  <data name="DebussyScoreAlt" xml:space="preserve"><value>Debussy score excerpt: Prelude to the Afternoon of a Faun</value></data>
+</root>

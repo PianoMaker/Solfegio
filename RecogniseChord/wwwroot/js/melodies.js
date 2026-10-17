@@ -292,21 +292,22 @@ document.addEventListener("DOMContentLoaded", function () {
         if (!info) return;
 
         const controls = document.createElement("div");
+        const melodyPage = document.getElementById("devpage");
         controls.className = "melody-playback-controls";
 
         const playButton = document.createElement("button");
         playButton.type = "button";
         playButton.className = "melody-play-button";
         playButton.textContent = "▶";
-        playButton.setAttribute("aria-label", "Відтворити мелодію");
-        playButton.title = "Відтворити";
+        playButton.setAttribute("aria-label", melodyPage?.dataset.playAria || "Play melody");
+        playButton.title = melodyPage?.dataset.playLabel || "Play";
 
         const stopButton = document.createElement("button");
         stopButton.type = "button";
         stopButton.className = "melody-stop-button";
         stopButton.textContent = "■";
-        stopButton.setAttribute("aria-label", "Зупинити відтворення");
-        stopButton.title = "Зупинити";
+        stopButton.setAttribute("aria-label", melodyPage?.dataset.stopAria || "Stop playback");
+        stopButton.title = melodyPage?.dataset.stopLabel || "Stop";
 
         playButton.addEventListener("click", function (event) {
             event.stopPropagation();

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="PageTitle" xml:space="preserve"><value>Інтервали у відомих мелодіях</value></data>
+  <data name="MinorSecond" xml:space="preserve"><value>Мала секунда</value></data>
+  <data name="MajorSecond" xml:space="preserve"><value>Велика секунда</value></data>
+  <data name="MinorThird" xml:space="preserve"><value>Мала терція</value></data>
+  <data name="MajorThird" xml:space="preserve"><value>Велика терція</value></data>
+  <data name="PerfectFourth" xml:space="preserve"><value>Чиста кварта</value></data>
+  <data name="Tritone" xml:space="preserve"><value>Тритон</value></data>
+  <data name="PerfectFifth" xml:space="preserve"><value>Чиста квінта</value></data>
+  <data name="MinorSixth" xml:space="preserve"><value>Мала секста</value></data>
+  <data name="MajorSixth" xml:space="preserve"><value>Велика секста</value></data>
+  <data name="MinorSeventh" xml:space="preserve"><value>Мала септима</value></data>
+  <data name="MajorSeventh" xml:space="preserve"><value>Велика септима</value></data>
+  <data name="Octave" xml:space="preserve"><value>Октава</value></data>
+  <data name="PianoKeyboardInterval" xml:space="preserve"><value>Клавіатура фортепіано з підсвіченими нотами цього інтервалу</value></data>
+  <data name="FurElise" xml:space="preserve"><value>До Елізи</value></data>
+  <data name="Beethoven" xml:space="preserve"><value>Людвіг ван Бетховен</value></data>
+  <data name="HutsulkaKsenia" xml:space="preserve"><value>Гуцулка Ксеня</value></data>
+  <data name="UkrainianFolkSong" xml:space="preserve"><value>Українська народна пісня</value></data>
+  <data name="SunshineComeOut" xml:space="preserve"><value>Вийди, вийди, сонечко</value></data>
+  <data name="PetrykPyatochkinSong" xml:space="preserve"><value>Пісня Петрика П’яточкина</value></data>
+  <data name="VolodymyrBistryakov" xml:space="preserve"><value>Володимир Бистряков</value></data>
+  <data name="RedViburnumSong" xml:space="preserve"><value>Ой у лузі червона калина</value></data>
+  <data name="SleepWalksSong" xml:space="preserve"><value>Ой ходить сон</value></data>
+  <data name="WhenTheSaints" xml:space="preserve"><value>Коли святі марширують</value></data>
+  <data name="Spiritual" xml:space="preserve"><value>Спірічуелс</value></data>
+  <data name="HarryPotterTheme" xml:space="preserve"><value>Тема з Гаррі Поттера 2</value></data>
+  <data name="NicholasHooper" xml:space="preserve"><value>Ніколас Гупер</value></data>
+  <data name="OyNaHori" xml:space="preserve"><value>Ой на горі та й женці жнуть</value></data>
+  <data name="OyMarichko" xml:space="preserve"><value>Ой Марічко, Чичері</value></data>
+  <data name="TarasBulbaOverture" xml:space="preserve"><value>Увертюра до опери «Тарас Бульба»</value></data>
+  <data name="MykolaLysenko" xml:space="preserve"><value>Микола Лисенко</value></data>
+  <data name="ClaudeDebussy" xml:space="preserve"><value>Клод Дебюссі</value></data>
+  <data name="TwinkleTwinkle" xml:space="preserve"><value>Блимає, блимає, зіронько</value></data>
+  <data name="FolkSong" xml:space="preserve"><value>Народна пісня</value></data>
+  <data name="Banduryste" xml:space="preserve"><value>Бандуристе, орле сизий</value></data>
+  <data name="TwoOakTrees" xml:space="preserve"><value>Ой на горі два дубки</value></data>
+  <data name="UkraineSong" xml:space="preserve"><value>Україна</value></data>
+  <data name="TarasPetrynenko" xml:space="preserve"><value>Тарас Петриненко</value></data>
+  <data name="OyNaPlayu" xml:space="preserve"><value>Ой на плаю</value></data>
+  <data name="TurkNotCossack" xml:space="preserve"><value>Тепер я турок, не козак</value></data>
+  <data name="HulakArtemovskyCredit" xml:space="preserve"><value>С. Гулак-Артемовський (арія Карася з опери «Запорожець за Дунаєм»)</value></data>
+  <data name="SomewhereOverRainbow" xml:space="preserve"><value>Десь над веселкою</value></data>
+  <data name="HaroldArlen" xml:space="preserve"><value>Гарольд Арлен</value></data>
+  <data name="Play" xml:space="preserve"><value>Відтворити</value></data>
+  <data name="Stop" xml:space="preserve"><value>Зупинити</value></data>
+  <data name="PlayMelody" xml:space="preserve"><value>Відтворити мелодію</value></data>
+  <data name="StopPlayback" xml:space="preserve"><value>Зупинити відтворення</value></data>
+  <data name="DebussyScoreAlt" xml:space="preserve"><value>Фрагмент партитури «Прелюд до післяполуденного відпочинку фавна»</value></data>
+</root>
