@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -29,6 +29,16 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Create.resx</DependentUpon>
     </Compile>
+    <Compile Update="Resources\Pages\Melodies.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Melodies.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Resources\Pages\Piano.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Piano.resx</DependentUpon>
+    </Compile>
     <Compile Update="Resources\Pages\Privacy.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -49,6 +59,12 @@
   <ItemGroup>
     <EmbeddedResource Update="Resources\Pages\Create.resx">
       <LastGenOutput>Create.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Pages\Melodies.resx">
+      <LastGenOutput>Melodies.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Pages\Piano.resx">
+      <LastGenOutput>Piano.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Update="Resources\Pages\Privacy.resx">
       <LastGenOutput>Privacy.Designer.cs</LastGenOutput>
