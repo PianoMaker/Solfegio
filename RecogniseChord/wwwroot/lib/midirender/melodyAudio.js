@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", function () {
     let audioContext = null;
     let activeSources = [];
     let isPlaying = false;
+    let playbackTimer = null;
 
     // ------------------------------------------------------------
     // Ініціалізація AudioContext
@@ -328,6 +329,11 @@ document.addEventListener("DOMContentLoaded", function () {
     // ------------------------------------------------------------
     function stopMelody() {
 
+        if (playbackTimer !== null) {
+            clearTimeout(playbackTimer);
+            playbackTimer = null;
+        }
+
         activeSources.forEach(source => {
             try {
                 source.stop();
@@ -392,15 +398,19 @@ document.addEventListener("DOMContentLoaded", function () {
         const totalDuration =
             (currentTime - ctx.currentTime) * 1000;
 
-        setTimeout(() => {
+        playbackTimer = setTimeout(() => {
             if (isPlaying) {
                 isPlaying = false;
                 activeSources = [];
             }
+            playbackTimer = null;
         }, totalDuration + 100);
     }
 
     // ------------------------------------------------------------
+    window.playMelodyPattern = playPattern;
+    window.stopMelodyPattern = stopMelody;
+
     // Клік по melody-card
     // ------------------------------------------------------------
     document
@@ -433,6 +443,11 @@ document.addEventListener("DOMContentLoaded", function () {
                     "Playing melody:",
                     pattern
                 );
+
+
+                if (typeof window.stopMelodiesAudioFile === "function") {
+                    window.stopMelodiesAudioFile();
+                }
 
                 playPattern(
                     pattern,

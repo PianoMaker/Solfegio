@@ -1,4 +1,4 @@
-﻿// patternRenderer.js
+// patternRenderer.js
 // Утиліта для рендерингу нот з рядка шаблону (не MIDI)
 // --------------------------------------------------------
 // Вхідний рядок шаблону: послідовність нот/пауз, кожна з трьох частин:
@@ -307,6 +307,24 @@ function sumUnits(notes) {
     return total;
 }
 
+function createPatternNoteElement(durationCode, key, accidental) {
+    const dotted = String(durationCode).endsWith(".");
+    const vexDuration = dotted ? String(durationCode).slice(0, -1) : durationCode;
+    const note = new Vex.Flow.StaveNote({ keys: [key], duration: vexDuration });
+
+    if (accidental) {
+        note.addAccidental(0, new Vex.Flow.Accidental(accidental));
+    }
+    if (dotted) {
+        note.addDot(0);
+    }
+    if (typeof applyAutoStem === "function") {
+        applyAutoStem(note, durationCode);
+    }
+
+    return note;
+}
+
 function fillRestsToCapacity(notes, remainingQuarters) {
     // Fill the rest of a measure with rests using largest possible durations
     if (remainingQuarters <= 0 || !Array.isArray(notes)) return;
@@ -345,8 +363,8 @@ function renderPatternString(
     RESPONSIVE_THRESHOLD = 800,
     BASESCALING = 1,
     SCALINGFACTOR = 0.6,
-    keySign = "C"
-
+    keySign = "C",
+    FIT_TO_WIDTH = false
 ) {   
     
     try {
@@ -371,7 +389,9 @@ function renderPatternString(
         // Compute width/height
         const MIN_SCORE_WIDTH = Math.max(320, CLEFZONE + BARWIDTH + Xmargin * 2);
         const containerWidth = (notationDiv && notationDiv.clientWidth) ? notationDiv.clientWidth : 0;
-        const GEN_WIDTH = Math.max(MIN_SCORE_WIDTH, containerWidth || GENERALWIDTH || 1200);
+        const GEN_WIDTH = FIT_TO_WIDTH
+            ? Math.max(160, containerWidth || GENERALWIDTH || 1200)
+            : Math.max(MIN_SCORE_WIDTH, containerWidth || GENERALWIDTH || 1200);
 
 
         // 1) Єдиний bar width для всієї сесії рендера
@@ -607,7 +627,7 @@ function getMeasuresFromTokens(
                     } else {
 
                         const accToDraw = decidePatternAccidental(it.key, it.accidental, measureAccState, i);
-                        n = processNoteElement(code, it.key, accToDraw);
+                        n = createPatternNoteElement(code, it.key, accToDraw);
                     }
 
                     if (n) {
@@ -627,7 +647,7 @@ function getMeasuresFromTokens(
                                 last_note: n
                             })
                         );
-                        logTies(`PR: Added tie between previousNote and note`);
+                        if (typeof logTies === "function") logTies(`PR: Added tie between previousNote and note`);
                     }
 
                     prevPieceNote = n;

@@ -8,6 +8,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
             const isOpen = section.classList.toggle("is-open");
             button.setAttribute("aria-expanded", String(isOpen));
+
+            if (isOpen) {
+                window.requestAnimationFrame(function () {
+                    section.querySelectorAll(".melody-notation[data-pattern]").forEach(function (notation) {
+                        applyMelodyLayout(notation.parentElement);
+                        renderMelodyNotation(notation);
+                    });
+                });
+            }
         });
     });
 
@@ -15,7 +24,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     function applyMelodyLayout(card) {
-        const padLeft = Math.min((window.innerWidth - 768), 100);
+        const padLeft = 12;
         console.log(
             "window.innerWidth = ",
             window.innerWidth,
@@ -28,7 +37,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             // Вузький екран
             card.style.display = "grid";
-            card.style.gridTemplateColumns = "1fr";
+            card.style.gridTemplateColumns = "minmax(0, 1fr)";
             card.style.paddingLeft = "0";
             card.style.overflowX = "hidden";
 
@@ -46,7 +55,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             // Широкий екран
             card.style.display = "grid";
-            card.style.gridTemplateColumns = "211px 600px";
+            card.style.gridTemplateColumns = "minmax(0, 211px) minmax(0, 1fr)";
             card.style.paddingLeft = `${padLeft}px`;
             card.style.alignItems = "center";
             card.style.overflowX = "hidden";
@@ -58,7 +67,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             const notation = card.querySelector(".melody-notation");
             if (notation) {
-                notation.style.width = "800px";
+                notation.style.width = "100%";
             }
         }
     }
@@ -68,73 +77,44 @@ document.addEventListener("DOMContentLoaded", function () {
     // РЕНДЕРИНГ НОТ
     // ============================================================
 
-    melodyNotation.forEach(function (element, index) {
-
-        console.log(
-            "time signature from dataset = ",
-            element.dataset.numerator,
-            "/",
-            element.dataset.denominator
-        );
-
-        const card = element.parentElement;
-
+    function renderMelodyNotation(element) {
         const pattern = element.dataset.pattern;
-
-        const id = "melody-notation-" + index;
-
-        const numerator =
-            element.dataset.numerator || 4;
-
-        const denominator =
-            element.dataset.denominator || 4;
-
-        const barwidth =
-            element.dataset.barwidth || 160;
-
-        const key =
-            element.dataset.key || "C";
-
-
-        element.id = id;
-
-        applyMelodyLayout(card);
-
-
-        // --------------------------------------------------------
-        // Якщо немає data-pattern — нічого не рендеримо
-        // --------------------------------------------------------
-
-        if (!pattern) {
-            console.log(
-                "No data-pattern for:",
-                card
-            );
+        if (!pattern) return;
+        if (typeof window.renderPatternString !== "function") {
+            console.error("patternRenderer.js did not load; cannot render notation.");
             return;
         }
 
-
-        // --------------------------------------------------------
-        // Рендер нотного запису
-        // --------------------------------------------------------
+        const notationWidth = element.clientWidth || element.parentElement?.clientWidth || 320;
+        if (!notationWidth) return;
 
         window.renderPatternString(
             pattern,
-            id,
+            element.id,
             null,
-            numerator,       // numerator
-            denominator,     // denominator
-            1600,            // GENERALWIDTH
-            90,              // HEIGHT
-            0,               // TOPPADDING
-            barwidth,        // BARWIDTH
-            40,              // CLEFZONE
-            10,              // Xmargin
-            512,              // RESPONSIVE_THRESHOLD
-            0.7,              // BASESCALING
-            0.6,              // SCALINGFACTOR
-            key               // KeySignature
+            element.dataset.numerator || 4,
+            element.dataset.denominator || 4,
+            notationWidth,
+            90,
+            0,
+            element.dataset.barwidth || 160,
+            40,
+            10,
+            512,
+            0.85,
+            0.75,
+            element.dataset.key || "C",
+            true
         );
+    }
+
+    melodyNotation.forEach(function (element, index) {
+        element.id = "melody-notation-" + index;
+        applyMelodyLayout(element.parentElement);
+
+        if (element.closest(".interval-section")?.classList.contains("is-open")) {
+            renderMelodyNotation(element);
+        }
     });
 
 
@@ -151,6 +131,14 @@ document.addEventListener("DOMContentLoaded", function () {
     // ============================================================
 
     let activeAudio = null;
+
+    window.stopMelodiesAudioFile = function () {
+        if (activeAudio) {
+            activeAudio.pause();
+            activeAudio.currentTime = 0;
+            activeAudio = null;
+        }
+    };
 
 
     const audioCards =
@@ -202,6 +190,8 @@ document.addEventListener("DOMContentLoaded", function () {
             // ----------------------------------------------------
             // Створюємо Audio
             // ----------------------------------------------------
+
+            if (typeof window.stopMelodyPattern === "function") window.stopMelodyPattern();
 
             const audio =
                 new Audio(audioFile);
@@ -293,14 +283,74 @@ document.addEventListener("DOMContentLoaded", function () {
     // RESIZE
     // ============================================================
 
+    // Add transport controls while keeping the existing audio implementations.
+    document.querySelectorAll(".melody-card").forEach(function (card) {
+        const notation = card.querySelector(".melody-notation[data-pattern]");
+        if (!notation && !card.dataset.audio) return;
+
+        const info = card.querySelector(".melody-info");
+        if (!info) return;
+
+        const controls = document.createElement("div");
+        controls.className = "melody-playback-controls";
+
+        const playButton = document.createElement("button");
+        playButton.type = "button";
+        playButton.className = "melody-play-button";
+        playButton.textContent = "▶";
+        playButton.setAttribute("aria-label", "Відтворити мелодію");
+        playButton.title = "Відтворити";
+
+        const stopButton = document.createElement("button");
+        stopButton.type = "button";
+        stopButton.className = "melody-stop-button";
+        stopButton.textContent = "■";
+        stopButton.setAttribute("aria-label", "Зупинити відтворення");
+        stopButton.title = "Зупинити";
+
+        playButton.addEventListener("click", function (event) {
+            event.stopPropagation();
+
+            if (notation) {
+                if (activeAudio) {
+                    activeAudio.pause();
+                    activeAudio.currentTime = 0;
+                    activeAudio = null;
+                }
+                if (typeof window.playMelodyPattern === "function") {
+                    window.playMelodyPattern(notation.dataset.pattern, 100);
+                }
+            } else {
+                card.click();
+            }
+        });
+
+        stopButton.addEventListener("click", function (event) {
+            event.stopPropagation();
+
+            if (activeAudio) {
+                activeAudio.pause();
+                activeAudio.currentTime = 0;
+                activeAudio = null;
+            }
+            if (typeof window.stopMelodyPattern === "function") {
+                window.stopMelodyPattern();
+            }
+        });
+
+        controls.append(playButton, stopButton);
+        info.appendChild(controls);
+    });
+
+
     window.addEventListener("resize", function () {
 
         melodyNotation.forEach(function (element) {
 
-            applyMelodyLayout(
-                element.parentElement
-            );
-
+            applyMelodyLayout(element.parentElement);
+            if (element.closest(".interval-section")?.classList.contains("is-open")) {
+                renderMelodyNotation(element);
+            }
         });
 
     });
