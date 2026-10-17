@@ -5,7 +5,7 @@
     /*    --footer-color: #c6b246;*/
     --footer-color: #a47f3c;
     --correct-answer-color: #0d5a2b;
-    --dissonans-color: #fcd8c6;
+    --dissonans-color: #ffe5b3;
     --consonans-color: #fcfac6;
     --dissonans-border-color: #c1abab;
     --consonans-border-color: #acac67;
@@ -118,6 +118,8 @@ a {
 /* Прив'язати реальну висоту header до змінної і вирівняти вміст по центру */
 header {
     height: var(--header-height);
+    min-height: var(--header-height);
+    flex: 0 0 var(--header-height);
     background-color: var(--header-color);
 }
 
@@ -300,13 +302,14 @@ main .whitecontainer {
     display: flex;
     flex-direction: column;
     width: 100%;
-    gap: 12px;
+    gap: 1px;
+    margin-top: 50px;
 }
 
 .interval-section {
     width: min(80%, 940px);
-    margin: 10px auto;
-    padding: 0.45rem;
+    margin: 1px auto;
+    padding: 0.05rem;
     border-radius: 20px;
     box-shadow: 0 3px 9px rgba(75, 49, 32, 0.14);
     transition: border-radius 180ms ease, box-shadow 180ms ease, transform 180ms ease;
