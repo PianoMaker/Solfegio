@@ -330,6 +330,22 @@ main .whitecontainer {
     box-shadow: 0 6px 16px rgba(75, 49, 32, 0.2);
 }
 
+.interval-heading-with-keyboard-between {
+    display: inline-flex;
+    align-content: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    width: 75%;
+}
+
+.interval-heading-with-keyboard {
+    display: inline-flex;
+    align-content: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 75%;
+}
+
 .interval-section > h2 {
     margin: 0;
     font-size: 1.1rem;
