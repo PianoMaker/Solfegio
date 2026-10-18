@@ -107,6 +107,7 @@ namespace RecogniseChord.Pages
             public int Correct { get; set; }
             public int Incorrect { get; set; }
             public DateTime ChordStartedAtUtc { get; set; }
+            public string? CertificateNumber { get; set; }
         }
 
         public IActionResult OnGetQuizNext(string level, bool reset = false)

@@ -6,20 +6,25 @@ namespace RecogniseChord.Pages
 {
     public class LangModel : PageModel
     {
-        public void OnGet()
+        public IActionResult OnGet(string? culture, string? returnUrl)
         {
-            string? culture = Request.Query["culture"];
-            if (!string.IsNullOrEmpty(culture))
+            if (culture is "uk" or "en")
             {
                 Response.Cookies.Append(
                     CookieRequestCultureProvider.DefaultCookieName,
                     CookieRequestCultureProvider.MakeCookieValue(new Microsoft.AspNetCore.Localization.RequestCulture(culture)),
-                    new CookieOptions { Expires = DateTimeOffset.UtcNow.AddYears(1) }
+                    new CookieOptions { Expires = DateTimeOffset.UtcNow.AddYears(1), IsEssential = true, SameSite = SameSiteMode.Lax, Secure = Request.IsHttps }
                 );
             }
 
-            string returnUrl = Request.Headers["Referer"].ToString();
-            Response.Redirect(string.IsNullOrEmpty(returnUrl) ? "/" : returnUrl);
+            if (Url.IsLocalUrl(returnUrl)) return LocalRedirect(returnUrl);
+
+            var referer = Request.Headers.Referer.ToString();
+            if (Uri.TryCreate(referer, UriKind.Absolute, out var refererUri) &&
+                string.Equals(refererUri.Host, Request.Host.Host, StringComparison.OrdinalIgnoreCase))
+                return LocalRedirect(refererUri.PathAndQuery);
+
+            return RedirectToPage("/Index");
         }
     }
 }

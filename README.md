@@ -31,6 +31,7 @@ Configuration / Налаштування
 - Параметри генерації та списки типів/якостей знаходяться в `RecogniseChord/Utilities/` (класи: `Chord`, `ChordT`, `Collections` тощо).
 - Клієнтські змінні для відтворення: `window.generatedChord` і `window.generatedFile`.
 - Для Google Sign-In задайте `Google__ClientId` і `Google__ClientSecret` у змінних середовища (або `Google:ClientId` і `Google:ClientSecret` у локальній конфігурації). У Google Cloud OAuth налаштуйте redirect URI `https://<домен>/signin-google`.
+- Видані сертифікати зберігаються у `RecogniseChord/App_Data/certificates.json`. За потреби шлях можна змінити параметром `Certificates:StoragePath`.
 
 Project Structure / Структура проекту
 - `Pages/` — Razor Pages (UI). Головна сторінка — `Pages/Index.cshtml`.

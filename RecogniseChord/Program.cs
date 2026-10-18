@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc.Razor;
 using System.Globalization;
+using RecogniseChord.Services;
 
 public class Program
 {
@@ -13,6 +14,7 @@ public class Program
         builder.Services.AddRazorPages()
             .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
             .AddDataAnnotationsLocalization();
+        builder.Services.AddSingleton<ICertificateStore, CertificateJsonStore>();
         var googleClientId = builder.Configuration["Google:ClientId"];
         var googleClientSecret = builder.Configuration["Google:ClientSecret"];
         var authentication = builder.Services.AddAuthentication(options =>

@@ -1,0 +1,26 @@
+@page
+@model RecogniseChord.Pages.VerifyCertificateModel
+@using System.Globalization
+@{
+    ViewData["Title"] = Localizer["VerifyCertificateTitle"];
+}
+
+<main class="container py-5 text-center" id="certificateVerification" data-culture="@CultureInfo.CurrentUICulture.Name">
+    <h1>@Localizer["VerifyCertificateTitle"]</h1>
+    @if (Model.Certificate is not null)
+    {
+        <div class="alert alert-success mx-auto mt-4" style="max-width:640px" role="status">
+            <h2>@Localizer["CertificateIsValid"]</h2>
+            <p>@Localizer["VerificationNumber"]: <strong>@Model.Certificate.Number</strong></p>
+            <p>@Localizer["CertificateRecipient"]: <strong>@Model.Certificate.RecipientName</strong></p>
+            <p>@Localizer["VerificationLevel"]: <strong>@Localizer[Model.Certificate.Level]</strong></p>
+            <p>@Localizer["Score"]: <strong>@Model.Certificate.CorrectCount / @Model.Certificate.Total</strong></p>
+            <p>@Localizer["IssuedOn"]: <strong>@Model.Certificate.IssuedAtUtc.ToLocalTime().ToString("D", CultureInfo.CurrentCulture)</strong></p>
+        </div>
+    }
+    else if (!string.IsNullOrEmpty(Model.Number))
+    {
+        <p class="alert alert-danger mx-auto mt-4" style="max-width:640px" role="alert">@Localizer["CertificateNotFound"]</p>
+    }
+    <a class="btn btn-outline-primary mt-3" asp-page="/GetCertified">@Localizer["BackToCertificates"]</a>
+</main>

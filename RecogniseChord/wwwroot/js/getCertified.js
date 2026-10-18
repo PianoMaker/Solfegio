@@ -24,9 +24,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const certificateLevel = document.getElementById('certificateLevel');
     const certificateScore = document.getElementById('certificateScore');
     const certificateDate = document.getElementById('certificateDate');
+    const certificateNumber = document.getElementById('certificateNumber');
+    const certificateQr = document.getElementById('certificateQr');
+    const certificateVerificationLink = document.getElementById('certificateVerificationLink');
+    const verifyForm = document.getElementById('verifyCertificateForm');
+    const lookupNumber = document.getElementById('certificateLookupNumber');
+    const lookupResult = document.getElementById('certificateLookupResult');
     let finalResult = null;
     const isAuthenticated = root.dataset.authenticated === 'true';
     const token = document.querySelector('#quizTokenForm input[name="__RequestVerificationToken"]')?.value;
+    const text = root.dataset;
+
+    function format(template, ...values) {
+        return values.reduce((result, value, index) => result.replace(`{${index}}`, value), template);
+    }
 
     let level = '';
     let secondsLeft = 0;
@@ -68,12 +79,12 @@ document.addEventListener('DOMContentLoaded', () => {
             count: countSelect.value || (level === 'advanced' ? 3 : 2),
             type: typeSelect.value
         }));
-        if (!response.ok) throw new Error('Не вдалося завантажити варіанти відповіді.');
+        if (!response.ok) throw new Error(text.errorOptions);
         const options = await response.json();
         const oldType = typeSelect.value;
-        fillSelect(typeSelect, options.types, 'Оберіть тип');
+        fillSelect(typeSelect, options.types, text.placeholderType);
         if (options.types.some(option => option.value === oldType)) typeSelect.value = oldType;
-        fillSelect(qualitySelect, options.qualities, 'Оберіть якість');
+        fillSelect(qualitySelect, options.qualities, text.placeholderQuality);
     }
 
     async function loadChord(reset = false) {
@@ -90,10 +101,10 @@ document.addEventListener('DOMContentLoaded', () => {
         qualitySelect.disabled = false;
 
         const result = await fetch(endpoint(root.dataset.nextUrl, { level, reset }));
-        if (!result.ok) throw new Error('Не вдалося створити наступний акорд.');
+        if (!result.ok) throw new Error(text.errorNext);
         const chord = await result.json();
 
-        progress.textContent = `Акорд ${chord.question} із ${chord.total}`;
+        progress.textContent = format(text.labelChord, chord.question, chord.total);
         audio.src = new URL(chord.audioUrl, window.location.href).href;
         audio.load();
 
@@ -102,17 +113,17 @@ document.addEventListener('DOMContentLoaded', () => {
         fillSelect(countSelect, Array.from({ length: maxCount - minCount + 1 }, (_, i) => {
             const value = String(minCount + i);
             return { value, label: value };
-        }), 'Кількість');
+        }), text.placeholderCount);
         countSelect.value = String(minCount);
         typeSelect.value = '';
         await updateAnswerOptions();
 
         secondsLeft = chord.timeLimitSeconds;
-        timer.textContent = `${secondsLeft} сек`;
+        timer.textContent = `${secondsLeft} ${text.seconds}`;
         clearInterval(timerId);
         timerId = setInterval(() => {
             secondsLeft--;
-            timer.textContent = `${Math.max(0, secondsLeft)} сек`;
+            timer.textContent = `${Math.max(0, secondsLeft)} ${text.seconds}`;
             if (secondsLeft <= 0) submitAnswer(true).catch(showError);
         }, 1000);
     }
@@ -138,12 +149,12 @@ document.addEventListener('DOMContentLoaded', () => {
             },
             body
         });
-        if (!response.ok) throw new Error('Не вдалося зарахувати відповідь. Оновіть сторінку й почніть тест знову.');
+        if (!response.ok) throw new Error(text.errorAnswer);
         const result = await response.json();
 
         correctCount.textContent = result.correctCount;
         incorrectCount.textContent = result.incorrectCount;
-        feedback.textContent = `${result.correct ? 'Правильно!' : (result.timedOut ? 'Час вичерпано.' : 'Неправильно.')} Правильна відповідь: ${result.answer}.`;
+        feedback.textContent = `${result.correct ? text.feedbackCorrect : (result.timedOut ? text.feedbackTimeout : text.feedbackIncorrect)} ${text.feedbackAnswer} ${result.answer}.`;
         feedback.className = result.correct ? 'mt-3 text-success' : 'mt-3 text-danger';
         countSelect.disabled = true;
         typeSelect.disabled = true;
@@ -152,9 +163,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (result.complete) {
             submitButton.style.display = 'none';
             nextButton.style.display = 'none';
-            progress.textContent = `Тест завершено: ${result.total} акордів.`;
+            progress.textContent = format(text.finished, result.total);
             finalResult = result;
-            outcome.textContent = result.passed ? 'тест пройдено' : 'тест не пройдено';
+            outcome.textContent = result.passed ? text.outcomePassed : text.outcomeFailed;
             outcome.className = result.passed ? 'mt-4 text-success' : 'mt-4 text-danger';
             outcome.style.display = '';
             if (result.passed) {
@@ -179,7 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
     submitButton.addEventListener('click', () => submitAnswer(false).catch(showError));
     nextButton.addEventListener('click', () => loadChord().catch(showError));
 
-    document.getElementById('generateCertificate').addEventListener('click', () => {
+    document.getElementById('generateCertificate').addEventListener('click', async () => {
         const name = certificateName.value.trim();
         if (!name) {
             certificateName.reportValidity();
@@ -187,11 +198,63 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (!finalResult?.passed) return;
 
-        certificateRecipient.textContent = name;
-        certificateLevel.textContent = level === 'easy' ? 'Easy' : (level === 'base' ? 'Base' : 'Advanced');
-        certificateScore.textContent = `${finalResult.correctCount} / ${finalResult.total}`;
-        certificateDate.textContent = new Intl.DateTimeFormat('uk-UA', { dateStyle: 'long' }).format(new Date());
-        certificatePreview.style.display = '';
+        const button = document.getElementById('generateCertificate');
+        button.disabled = true;
+        try {
+            const response = await fetch(root.dataset.issueUrl, {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+                    'RequestVerificationToken': token
+                },
+                body: new URLSearchParams()
+            });
+            if (!response.ok) throw new Error(text.errorIssue);
+            const issued = await response.json();
+            finalResult = { ...finalResult, passed: true, correctCount: issued.correctCount, total: issued.total };
+            certificateRecipient.textContent = issued.recipientName;
+            certificateLevel.textContent = issued.level === 'easy' ? text.levelEasy : (issued.level === 'base' ? text.levelBase : text.levelAdvanced);
+            certificateScore.textContent = `${issued.correctCount} / ${issued.total}`;
+            certificateDate.textContent = new Intl.DateTimeFormat(text.culture.startsWith('en') ? 'en-US' : 'uk-UA', { dateStyle: 'long' }).format(new Date(issued.issuedAtUtc));
+            certificateNumber.textContent = issued.number;
+            certificateQr.src = issued.qrUrl;
+            certificateVerificationLink.href = issued.verificationUrl;
+            certificateVerificationLink.textContent = text.verifyTitle;
+            certificatePreview.style.display = '';
+        } catch (error) {
+            showError(error);
+        } finally {
+            button.disabled = false;
+        }
+    });
+
+    verifyForm.addEventListener('submit', async event => {
+        event.preventDefault();
+        if (!verifyForm.reportValidity()) return;
+        lookupResult.replaceChildren();
+        try {
+            const url = new URL(root.dataset.lookupUrl, window.location.href);
+            url.searchParams.set('number', lookupNumber.value.trim());
+            const response = await fetch(url, { credentials: 'same-origin' });
+            if (!response.ok) throw new Error(text.verifyError);
+            const result = await response.json();
+            const message = document.createElement('p');
+            if (!result.valid) {
+                message.className = 'alert alert-danger';
+                message.textContent = text.verifyInvalid;
+            } else {
+                message.className = 'alert alert-success';
+                const date = new Intl.DateTimeFormat(text.culture.startsWith('en') ? 'en-US' : 'uk-UA', { dateStyle: 'long' }).format(new Date(result.issuedAtUtc));
+                message.textContent = `${text.verifyName}: ${result.recipientName} · ${text.verifyLevel}: ${result.level === 'easy' ? text.levelEasy : (result.level === 'base' ? text.levelBase : text.levelAdvanced)} · ${text.verifyScore}: ${result.correctCount} / ${result.total} · ${text.verifyDate}: ${date}`;
+            }
+            lookupResult.append(message);
+        } catch {
+            const message = document.createElement('p');
+            message.className = 'alert alert-danger';
+            message.textContent = text.verifyError;
+            lookupResult.append(message);
+        }
     });
 
     document.getElementById('googleLoginButton').addEventListener('click', () => {
@@ -210,8 +273,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     finalResult = pending.result;
                     panel.style.display = '';
                     levelPicker.style.display = 'none';
-                    progress.textContent = `Тест завершено: ${finalResult.total} акордів.`;
-                    outcome.textContent = 'тест пройдено';
+                    progress.textContent = format(text.finished, finalResult.total);
+                    outcome.textContent = text.outcomePassed;
                     outcome.className = 'mt-4 text-success';
                     outcome.style.display = '';
                     correctCount.textContent = finalResult.correctCount;

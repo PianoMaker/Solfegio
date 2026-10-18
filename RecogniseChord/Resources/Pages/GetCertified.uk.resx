@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="Certificates" xml:space="preserve"><value>Сертифікати</value></data>
+  <data name="GoogleNotConfigured" xml:space="preserve"><value>Вхід через Google ще не налаштовано. Додайте Google:ClientId і Google:ClientSecret до конфігурації сервера.</value></data>
+  <data name="QuizIntroduction" xml:space="preserve"><value>Easy містить 10 акордів, Base — 15, Advanced — 20. За кожен акорд зараховується правильна або неправильна відповідь.</value></data>
+  <data name="ChooseLevel" xml:space="preserve"><value>Оберіть рівень:</value></data>
+  <data name="EasyDescription" xml:space="preserve"><value>Easy · 10 акордів · 2–3 звуки · 60 сек</value></data>
+  <data name="BaseDescription" xml:space="preserve"><value>Base · 15 акордів · 2–4 звуки · 30 сек</value></data>
+  <data name="AdvancedDescription" xml:space="preserve"><value>Advanced · 20 акордів · 3–5 звуків · 20 сек</value></data>
+  <data name="Correct" xml:space="preserve"><value>Правильно</value></data>
+  <data name="Incorrect" xml:space="preserve"><value>Неправильно</value></data>
+  <data name="Time" xml:space="preserve"><value>Час</value></data>
+  <data name="Seconds" xml:space="preserve"><value>сек</value></data>
+  <data name="CountLabel" xml:space="preserve"><value>Кількість звуків</value></data>
+  <data name="TypeLabel" xml:space="preserve"><value>Тип акорду</value></data>
+  <data name="QualityLabel" xml:space="preserve"><value>Якість / різновид</value></data>
+  <data name="ChooseCount" xml:space="preserve"><value>Оберіть кількість</value></data>
+  <data name="ChooseType" xml:space="preserve"><value>Оберіть тип</value></data>
+  <data name="ChooseQuality" xml:space="preserve"><value>Оберіть якість</value></data>
+  <data name="Check" xml:space="preserve"><value>Перевірити</value></data>
+  <data name="NextChord" xml:space="preserve"><value>Наступний акорд</value></data>
+  <data name="GoogleLoginPrompt" xml:space="preserve"><value>Щоб отримати сертифікат, увійдіть через Google.</value></data>
+  <data name="GoogleLogin" xml:space="preserve"><value>Увійти через Google</value></data>
+  <data name="CertificateName" xml:space="preserve"><value>Ім’я для сертифіката</value></data>
+  <data name="GenerateCertificate" xml:space="preserve"><value>Згенерувати сертифікат</value></data>
+  <data name="CertificateHeading" xml:space="preserve"><value>СЕРТИФІКАТ</value></data>
+  <data name="CertificateTitle" xml:space="preserve"><value>Тест із розпізнавання акордів пройдено</value></data>
+  <data name="CertificateConfirmation" xml:space="preserve"><value>Цим підтверджується, що</value></data>
+  <data name="CertificatePassedLevel" xml:space="preserve"><value>успішно пройшов(ла) рівень</value></data>
+  <data name="Score" xml:space="preserve"><value>Результат</value></data>
+  <data name="PrintCertificate" xml:space="preserve"><value>Друкувати / зберегти як PDF</value></data>
+  <data name="ErrorOptions" xml:space="preserve"><value>Не вдалося завантажити варіанти відповіді.</value></data>
+  <data name="ErrorNext" xml:space="preserve"><value>Не вдалося створити наступний акорд.</value></data>
+  <data name="ErrorAnswer" xml:space="preserve"><value>Не вдалося зарахувати відповідь. Оновіть сторінку й почніть тест знову.</value></data>
+  <data name="ChordProgress" xml:space="preserve"><value>Акорд {{0}} із {{1}}</value></data>
+  <data name="FeedbackCorrect" xml:space="preserve"><value>Правильно!</value></data>
+  <data name="FeedbackTimeout" xml:space="preserve"><value>Час вичерпано.</value></data>
+  <data name="FeedbackIncorrect" xml:space="preserve"><value>Неправильно.</value></data>
+  <data name="FeedbackAnswer" xml:space="preserve"><value>Правильна відповідь:</value></data>
+  <data name="OutcomePassed" xml:space="preserve"><value>тест пройдено</value></data>
+  <data name="OutcomeFailed" xml:space="preserve"><value>тест не пройдено</value></data>
+  <data name="QuizFinished" xml:space="preserve"><value>Тест завершено: {{0}} акордів.</value></data>
+  <data name="Easy" xml:space="preserve"><value>Easy</value></data>
+  <data name="Base" xml:space="preserve"><value>Base</value></data>
+  <data name="Advanced" xml:space="preserve"><value>Advanced</value></data>
+  <data name="ErrorIssue" xml:space="preserve"><value>Не вдалося видати сертифікат. Увійдіть і успішно завершіть тест.</value></data>
+  <data name="VerificationNumber" xml:space="preserve"><value>Номер сертифіката</value></data>
+  <data name="VerifyCertificateTitle" xml:space="preserve"><value>Перевірити сертифікат</value></data>
+  <data name="VerifyCertificate" xml:space="preserve"><value>Перевірити сертифікат</value></data>
+  <data name="CertificateNotFound" xml:space="preserve"><value>Сертифікат із таким номером не знайдено.</value></data>
+  <data name="VerificationError" xml:space="preserve"><value>Не вдалося перевірити сертифікат. Спробуйте ще раз.</value></data>
+  <data name="CertificateRecipient" xml:space="preserve"><value>Власник</value></data>
+  <data name="VerificationLevel" xml:space="preserve"><value>Рівень</value></data>
+  <data name="IssuedOn" xml:space="preserve"><value>Дата видачі</value></data>
+  <data name="CertificateQrAlt" xml:space="preserve"><value>QR-код для перевірки сертифіката</value></data>
+  <data name="Close" xml:space="preserve"><value>Закрити</value></data>
+  <data name="GoogleNameOnly" xml:space="preserve"><value>Ім’я для сертифіката береться з вашого профілю Google.</value></data>
+</root>

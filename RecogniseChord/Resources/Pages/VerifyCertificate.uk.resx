@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="VerifyCertificateTitle" xml:space="preserve"><value>Перевірити сертифікат</value></data>
+  <data name="CertificateIsValid" xml:space="preserve"><value>Сертифікат дійсний</value></data>
+  <data name="VerificationNumber" xml:space="preserve"><value>Номер сертифіката</value></data>
+  <data name="CertificateRecipient" xml:space="preserve"><value>Власник</value></data>
+  <data name="VerificationLevel" xml:space="preserve"><value>Рівень</value></data>
+  <data name="Score" xml:space="preserve"><value>Результат</value></data>
+  <data name="IssuedOn" xml:space="preserve"><value>Дата видачі</value></data>
+  <data name="CertificateNotFound" xml:space="preserve"><value>Сертифікат із таким номером не знайдено.</value></data>
+  <data name="BackToCertificates" xml:space="preserve"><value>До сертифікатів</value></data>
+  <data name="Easy" xml:space="preserve"><value>Easy</value></data>
+  <data name="Base" xml:space="preserve"><value>Base</value></data>
+  <data name="Advanced" xml:space="preserve"><value>Advanced</value></data>
+</root>

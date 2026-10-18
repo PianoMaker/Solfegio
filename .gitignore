@@ -17,6 +17,8 @@
 mono_crash.*
 
 # Build results
+[Rr]ecogniseChord/App_Data/certificates.json
+[Rr]ecogniseChord/App_Data/certificates.json.tmp
 [Dd]ebug/
 [Dd]ebugPublic/
 [Rr]elease/
