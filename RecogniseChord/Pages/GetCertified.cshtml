@@ -1,0 +1,98 @@
+@page
+@model RecogniseChord.Pages.GetCertifiedModel
+@{
+    ViewData["Title"] = Localizer["Certified"];
+}
+
+<main id="certifiedQuiz"
+      class="container py-4 text-center"
+      data-next-url="@Url.Page("/Index", "QuizNext")"
+      data-options-url="@Url.Page("/Index", "QuizOptions")"
+      data-answer-url="@Url.Page("/Index", "QuizAnswer")">
+    <h1>@Localizer["Certified"]</h1>
+    <p>Base містить 15 акордів, Advanced — 20. За кожен акорд зараховується правильна або неправильна відповідь.</p>
+
+    <div id="quizLevelPicker" class="my-4">
+        <p>Оберіть рівень:</p>
+        <button type="button" class="btn btn-primary m-2" data-level="base">Base · 15 акордів · 2–4 звуки · 30 сек</button>
+        <button type="button" class="btn btn-primary m-2" data-level="advanced">Advanced · 20 акордів · 3–5 звуків · 20 сек</button>
+    </div>
+
+    <section id="quizPanel" class="mx-auto" style="display:none; max-width:640px">
+        <p id="quizProgress"></p>
+        <p>Правильно: <span id="quizCorrect">0</span> · Неправильно: <span id="quizIncorrect">0</span></p>
+        <p>Час: <strong id="quizTimer"></strong></p>
+        <audio id="quizAudio" controls preload="none" class="w-100"></audio>
+
+        <div class="my-3">
+            <label for="quizCount">Кількість звуків</label>
+            <select id="quizCount" class="form-select mx-auto" style="max-width:220px"></select>
+        </div>
+        <div class="my-3">
+            <label for="quizType">Тип акорду</label>
+            <select id="quizType" class="form-select mx-auto" style="max-width:320px"></select>
+        </div>
+        <div class="my-3">
+            <label for="quizQuality">Якість / різновид</label>
+            <select id="quizQuality" class="form-select mx-auto" style="max-width:320px"></select>
+        </div>
+
+        <button id="quizSubmit" type="button" class="btn btn-success">Перевірити</button>
+        <button id="quizNext" type="button" class="btn btn-primary" style="display:none">Наступний акорд</button>
+        <p id="quizFeedback" class="mt-3" aria-live="polite"></p>
+        <h2 id="quizOutcome" class="mt-4" aria-live="polite" style="display:none"></h2>
+
+        <section id="certificateForm" class="my-4" style="display:none">
+            <label for="certificateName" class="form-label">Ім’я для сертифіката</label>
+            <input id="certificateName" class="form-control mx-auto" style="max-width:320px" maxlength="100" required />
+            <button id="generateCertificate" type="button" class="btn btn-success mt-3">Згенерувати сертифікат</button>
+        </section>
+
+        <section id="certificatePreview" class="certificate-preview" style="display:none">
+            <p class="certificate-kicker">СЕРТИФІКАТ</p>
+            <h2>Тест із розпізнавання акордів пройдено</h2>
+            <p>Цим підтверджується, що</p>
+            <h1 id="certificateRecipient"></h1>
+            <p>успішно пройшов(ла) рівень <strong id="certificateLevel"></strong></p>
+            <p>Результат: <strong id="certificateScore"></strong></p>
+            <p id="certificateDate"></p>
+            <button id="printCertificate" type="button" class="btn btn-outline-primary">Друкувати / зберегти як PDF</button>
+        </section>
+    </section>
+
+    <form id="quizTokenForm" class="d-none">@Html.AntiForgeryToken()</form>
+</main>
+
+@section Scripts {
+    <script src="~/js/getCertified.js" asp-append-version="true"></script>
+}
+
+<style>
+    .certificate-preview {
+        margin: 2rem auto;
+        padding: 3rem 2rem;
+        max-width: 760px;
+        border: 6px double #8c6b20;
+        background: #fffdf5;
+        color: #262116;
+    }
+    .certificate-kicker { letter-spacing: .3em; font-weight: 700; color: #8c6b20; }
+    #certificateRecipient { margin: 1.5rem 0; font-family: Georgia, serif; }
+    @@media print {
+        body.certified-print-mode * { visibility: hidden !important; }
+        body.certified-print-mode #certificatePreview,
+        body.certified-print-mode #certificatePreview * { visibility: visible !important; }
+        body.certified-print-mode #certificatePreview {
+            display: block !important;
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            max-width: none;
+            min-height: 100vh;
+            margin: 0;
+            padding: 15vh 3rem;
+            border: 8px double #8c6b20;
+        }
+        body.certified-print-mode #printCertificate { display: none !important; }
+    }
+</style>

@@ -97,6 +97,100 @@ namespace RecogniseChord.Pages
 
         // TempData key for the current rchord
         private const string CurrentChordKey = "__currentChord";
+        private const string QuizProgressKey = "__CertifiedQuizProgress";
+
+        private sealed class CertifiedQuizProgress
+        {
+            public string Level { get; set; } = string.Empty;
+            public int Total { get; set; }
+            public int Answered { get; set; }
+            public int Correct { get; set; }
+            public int Incorrect { get; set; }
+            public DateTime ChordStartedAtUtc { get; set; }
+        }
+
+        public IActionResult OnGetQuizNext(string level, bool reset = false)
+        {
+            var bounds = level?.ToLowerInvariant() switch
+            {
+                "base" => (Min: 2, Max: 4, Seconds: 30, Total: 15),
+                "advanced" => (Min: 3, Max: 5, Seconds: 20, Total: 20),
+                _ => (Min: 0, Max: 0, Seconds: 0, Total: 0)
+            };
+            if (bounds.Min == 0) return BadRequest();
+
+            CertifiedQuizProgress? progress = null;
+            if (!reset && TempData.Peek(QuizProgressKey) is string progressJson)
+            {
+                try { progress = JsonSerializer.Deserialize<CertifiedQuizProgress>(progressJson); }
+                catch { /* start a fresh quiz if saved state is invalid */ }
+            }
+
+            if (reset || progress == null || progress.Level != level.ToLowerInvariant() || progress.Total != bounds.Total)
+                progress = new CertifiedQuizProgress { Level = level.ToLowerInvariant(), Total = bounds.Total };
+            if (progress.Answered >= progress.Total) return BadRequest();
+
+            var chord = GenerateRandomChord(bounds.Min, bounds.Max);
+            progress.ChordStartedAtUtc = DateTime.UtcNow;
+            TempData[CurrentChordKey] = JsonSerializer.Serialize(chord);
+            TempData[QuizProgressKey] = JsonSerializer.Serialize(progress);
+
+            return new JsonResult(new
+            {
+                audioUrl = chord.FileRelative,
+                question = progress.Answered + 1,
+                total = progress.Total,
+                timeLimitSeconds = bounds.Seconds
+            });
+        }
+
+        public IActionResult OnGetQuizOptions(int count, string? type = null)
+        {
+            if (count < 2 || count > 5) return BadRequest();
+            PopulateTypes(count);
+            PopulateQualities(count, type);
+            return new JsonResult(new
+            {
+                types = TypeOptions.Select(key => new { value = key, label = _localizer[key].Value }),
+                qualities = QualityOptions.Select(option => new { value = option.Key, label = option.Label })
+            });
+        }
+
+        public IActionResult OnPostQuizAnswer(int count, string? type, string? quality, bool timedOut = false)
+        {
+            if (TempData.Peek(QuizProgressKey) is not string progressJson) return BadRequest();
+            CertifiedQuizProgress? progress;
+            try { progress = JsonSerializer.Deserialize<CertifiedQuizProgress>(progressJson); }
+            catch { return BadRequest(); }
+            if (progress == null || progress.Answered >= progress.Total) return BadRequest();
+
+            var actual = RestoreChordData();
+            if (actual == null) return BadRequest();
+            var timeLimit = progress.Level == "base" ? 30 : 20;
+            var timeExpired = timedOut || DateTime.UtcNow - progress.ChordStartedAtUtc > TimeSpan.FromSeconds(timeLimit);
+            var correct = !timeExpired && count == actual.Count
+                && string.Equals(type, actual.Type, StringComparison.OrdinalIgnoreCase)
+                && string.Equals(quality, actual.Quality, StringComparison.OrdinalIgnoreCase);
+
+            progress.Answered++;
+            if (correct) progress.Correct++;
+            else progress.Incorrect++;
+            TempData[QuizProgressKey] = JsonSerializer.Serialize(progress);
+
+            var qualityLabel = GetQualityLabels(actual.Count).GetValueOrDefault(actual.Quality, actual.Quality);
+            return new JsonResult(new
+            {
+                correct,
+                timedOut = timeExpired,
+                answer = $"{_localizer[actual.Type].Value} {qualityLabel}",
+                answered = progress.Answered,
+                correctCount = progress.Correct,
+                incorrectCount = progress.Incorrect,
+                complete = progress.Answered == progress.Total,
+                passed = progress.Answered == progress.Total && progress.Incorrect <= 1,
+                total = progress.Total
+            });
+        }
 
         private Dictionary<string, string> GetQualityLabels(int count) => count switch
         {
@@ -612,10 +706,10 @@ namespace RecogniseChord.Pages
         }
 
 
-        private ChordData GenerateRandomChord()
+        private ChordData GenerateRandomChord(int minCount = 2, int? maxCount = null)
         {
             var rnd = new Random();
-            int count = rnd.Next(2, MaxCount + 1); //кількість звуків (2..5)
+            int count = rnd.Next(minCount, (maxCount ?? MaxCount) + 1); //кількість звуків
             string typeKey = string.Empty;
             string qualityKey = string.Empty;
             string rootLetter = RootOptions[rnd.Next(RootOptions.Count)];

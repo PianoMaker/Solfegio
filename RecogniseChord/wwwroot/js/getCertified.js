@@ -1,0 +1,208 @@
+document.addEventListener('DOMContentLoaded', () => {
+    const root = document.getElementById('certifiedQuiz');
+    if (!root) return;
+
+    const levelPicker = document.getElementById('quizLevelPicker');
+    const panel = document.getElementById('quizPanel');
+    const audio = document.getElementById('quizAudio');
+    const progress = document.getElementById('quizProgress');
+    const timer = document.getElementById('quizTimer');
+    const correctCount = document.getElementById('quizCorrect');
+    const incorrectCount = document.getElementById('quizIncorrect');
+    const countSelect = document.getElementById('quizCount');
+    const typeSelect = document.getElementById('quizType');
+    const qualitySelect = document.getElementById('quizQuality');
+    const submitButton = document.getElementById('quizSubmit');
+    const nextButton = document.getElementById('quizNext');
+    const feedback = document.getElementById('quizFeedback');
+    const outcome = document.getElementById('quizOutcome');
+    const certificateForm = document.getElementById('certificateForm');
+    const certificateName = document.getElementById('certificateName');
+    const certificatePreview = document.getElementById('certificatePreview');
+    const certificateRecipient = document.getElementById('certificateRecipient');
+    const certificateLevel = document.getElementById('certificateLevel');
+    const certificateScore = document.getElementById('certificateScore');
+    const certificateDate = document.getElementById('certificateDate');
+    let finalResult = null;
+    const token = document.querySelector('#quizTokenForm input[name="__RequestVerificationToken"]')?.value;
+
+    let level = '';
+    let secondsLeft = 0;
+    let timerId = null;
+    let answered = false;
+
+    function endpoint(base, params = {}) {
+        const url = new URL(base, window.location.href);
+        for (const [key, value] of Object.entries(params)) url.searchParams.set(key, value);
+        return url;
+    }
+
+    function fillSelect(select, items, placeholder) {
+        select.replaceChildren(new Option(placeholder, ''));
+        for (const item of items) select.add(new Option(item.label, item.value));
+    }
+
+    countSelect.addEventListener('keydown', event => {
+        if (!/^[2-5]$/.test(event.key)) return;
+        const option = Array.from(countSelect.options).find(item => item.value === event.key);
+        if (!option) return;
+        event.preventDefault();
+        countSelect.value = option.value;
+        countSelect.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+
+    typeSelect.addEventListener('keydown', event => {
+        if (countSelect.value !== '2' || !/^[1-8]$/.test(event.key)) return;
+        const intervalOptions = Array.from(typeSelect.options).filter(option => option.value);
+        const option = intervalOptions[Number(event.key) - 1];
+        if (!option) return;
+        event.preventDefault();
+        typeSelect.value = option.value;
+        typeSelect.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+
+    async function updateAnswerOptions() {
+        const response = await fetch(endpoint(root.dataset.optionsUrl, {
+            count: countSelect.value || (level === 'base' ? 2 : 3),
+            type: typeSelect.value
+        }));
+        if (!response.ok) throw new Error('Не вдалося завантажити варіанти відповіді.');
+        const options = await response.json();
+        const oldType = typeSelect.value;
+        fillSelect(typeSelect, options.types, 'Оберіть тип');
+        if (options.types.some(option => option.value === oldType)) typeSelect.value = oldType;
+        fillSelect(qualitySelect, options.qualities, 'Оберіть якість');
+    }
+
+    async function loadChord(reset = false) {
+        answered = false;
+        feedback.textContent = '';
+        outcome.style.display = 'none';
+        certificateForm.style.display = 'none';
+        certificatePreview.style.display = 'none';
+        submitButton.disabled = false;
+        submitButton.style.display = '';
+        nextButton.style.display = 'none';
+        countSelect.disabled = false;
+        typeSelect.disabled = false;
+        qualitySelect.disabled = false;
+
+        const result = await fetch(endpoint(root.dataset.nextUrl, { level, reset }));
+        if (!result.ok) throw new Error('Не вдалося створити наступний акорд.');
+        const chord = await result.json();
+
+        progress.textContent = `Акорд ${chord.question} із ${chord.total}`;
+        audio.src = new URL(chord.audioUrl, window.location.href).href;
+        audio.load();
+
+        const minCount = level === 'base' ? 2 : 3;
+        const maxCount = level === 'base' ? 4 : 5;
+        fillSelect(countSelect, Array.from({ length: maxCount - minCount + 1 }, (_, i) => {
+            const value = String(minCount + i);
+            return { value, label: value };
+        }), 'Кількість');
+        countSelect.value = String(minCount);
+        typeSelect.value = '';
+        await updateAnswerOptions();
+
+        secondsLeft = chord.timeLimitSeconds;
+        timer.textContent = `${secondsLeft} сек`;
+        clearInterval(timerId);
+        timerId = setInterval(() => {
+            secondsLeft--;
+            timer.textContent = `${Math.max(0, secondsLeft)} сек`;
+            if (secondsLeft <= 0) submitAnswer(true).catch(showError);
+        }, 1000);
+    }
+
+    async function submitAnswer(timedOut = false) {
+        if (answered) return;
+        answered = true;
+        clearInterval(timerId);
+        submitButton.disabled = true;
+
+        const body = new URLSearchParams({
+            count: countSelect.value || '0',
+            type: timedOut ? '' : typeSelect.value,
+            quality: timedOut ? '' : qualitySelect.value,
+            timedOut: String(timedOut)
+        });
+        const response = await fetch(root.dataset.answerUrl, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+                'RequestVerificationToken': token
+            },
+            body
+        });
+        if (!response.ok) throw new Error('Не вдалося зарахувати відповідь. Оновіть сторінку й почніть тест знову.');
+        const result = await response.json();
+
+        correctCount.textContent = result.correctCount;
+        incorrectCount.textContent = result.incorrectCount;
+        feedback.textContent = `${result.correct ? 'Правильно!' : (result.timedOut ? 'Час вичерпано.' : 'Неправильно.')} Правильна відповідь: ${result.answer}.`;
+        feedback.className = result.correct ? 'mt-3 text-success' : 'mt-3 text-danger';
+        countSelect.disabled = true;
+        typeSelect.disabled = true;
+        qualitySelect.disabled = true;
+
+        if (result.complete) {
+            submitButton.style.display = 'none';
+            nextButton.style.display = 'none';
+            progress.textContent = `Тест завершено: ${result.total} акордів.`;
+            finalResult = result;
+            outcome.textContent = result.passed ? 'тест пройдено' : 'тест не пройдено';
+            outcome.className = result.passed ? 'mt-4 text-success' : 'mt-4 text-danger';
+            outcome.style.display = '';
+            certificateForm.style.display = result.passed ? '' : 'none';
+            levelPicker.style.display = '';
+        } else {
+            nextButton.style.display = '';
+        }
+    }
+
+    function showError(error) {
+        clearInterval(timerId);
+        feedback.textContent = error.message || String(error);
+        feedback.className = 'mt-3 text-danger';
+    }
+
+    countSelect.addEventListener('change', () => updateAnswerOptions().catch(showError));
+    typeSelect.addEventListener('change', () => updateAnswerOptions().catch(showError));
+    submitButton.addEventListener('click', () => submitAnswer(false).catch(showError));
+    nextButton.addEventListener('click', () => loadChord().catch(showError));
+
+    document.getElementById('generateCertificate').addEventListener('click', () => {
+        const name = certificateName.value.trim();
+        if (!name) {
+            certificateName.reportValidity();
+            return;
+        }
+        if (!finalResult?.passed) return;
+
+        certificateRecipient.textContent = name;
+        certificateLevel.textContent = level === 'base' ? 'Base' : 'Advanced';
+        certificateScore.textContent = `${finalResult.correctCount} / ${finalResult.total}`;
+        certificateDate.textContent = new Intl.DateTimeFormat('uk-UA', { dateStyle: 'long' }).format(new Date());
+        certificatePreview.style.display = '';
+    });
+
+    document.getElementById('printCertificate').addEventListener('click', () => {
+        document.body.classList.add('certified-print-mode');
+        window.print();
+    });
+    window.addEventListener('afterprint', () => document.body.classList.remove('certified-print-mode'));
+
+    levelPicker.querySelectorAll('[data-level]').forEach(button => {
+        button.addEventListener('click', async () => {
+            level = button.dataset.level;
+            correctCount.textContent = '0';
+            incorrectCount.textContent = '0';
+            levelPicker.style.display = 'none';
+            panel.style.display = '';
+            try { await loadChord(true); }
+            catch (error) { showError(error); levelPicker.style.display = ''; }
+        });
+    });
+});
