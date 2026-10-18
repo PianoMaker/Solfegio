@@ -113,6 +113,7 @@ namespace RecogniseChord.Pages
         {
             var bounds = level?.ToLowerInvariant() switch
             {
+                "easy" => (Min: 2, Max: 3, Seconds: 60, Total: 10),
                 "base" => (Min: 2, Max: 4, Seconds: 30, Total: 15),
                 "advanced" => (Min: 3, Max: 5, Seconds: 20, Total: 20),
                 _ => (Min: 0, Max: 0, Seconds: 0, Total: 0)
@@ -166,7 +167,12 @@ namespace RecogniseChord.Pages
 
             var actual = RestoreChordData();
             if (actual == null) return BadRequest();
-            var timeLimit = progress.Level == "base" ? 30 : 20;
+            var timeLimit = progress.Level switch
+            {
+                "easy" => 60,
+                "base" => 30,
+                _ => 20
+            };
             var timeExpired = timedOut || DateTime.UtcNow - progress.ChordStartedAtUtc > TimeSpan.FromSeconds(timeLimit);
             var correct = !timeExpired && count == actual.Count
                 && string.Equals(type, actual.Type, StringComparison.OrdinalIgnoreCase)
