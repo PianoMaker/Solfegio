@@ -8,9 +8,15 @@
       class="container py-4 text-center"
       data-next-url="@Url.Page("/Index", "QuizNext")"
       data-options-url="@Url.Page("/Index", "QuizOptions")"
-      data-answer-url="@Url.Page("/Index", "QuizAnswer")">
+      data-answer-url="@Url.Page("/Index", "QuizAnswer")"
+      data-authenticated="@Model.IsAuthenticated.ToString().ToLowerInvariant()"
+      data-display-name="@Model.DisplayName">
     <h1>@Localizer["Certified"]</h1>
-    <p>Base містить 15 акордів, Advanced — 20. За кожен акорд зараховується правильна або неправильна відповідь.</p>
+    @if (!string.IsNullOrEmpty(Model.LoginError))
+    {
+        <p class="alert alert-danger" role="alert">@Model.LoginError</p>
+    }
+    <p>Easy містить 10 акордів, Base — 15, Advanced — 20. За кожен акорд зараховується правильна або неправильна відповідь.</p>
 
     <div id="quizLevelPicker" class="my-4">
         <p>Оберіть рівень:</p>
@@ -42,6 +48,11 @@
         <button id="quizNext" type="button" class="btn btn-primary" style="display:none">Наступний акорд</button>
         <p id="quizFeedback" class="mt-3" aria-live="polite"></p>
         <h2 id="quizOutcome" class="mt-4" aria-live="polite" style="display:none"></h2>
+
+        <section id="googleLoginPrompt" class="my-4" style="display:none">
+            <p>Щоб отримати сертифікат, увійдіть через Google.</p>
+            <a id="googleLoginButton" class="btn btn-outline-primary" href="@Url.Page("/GetCertified", "GoogleLogin", new { returnUrl = Url.Page("/GetCertified") })">Увійти через Google</a>
+        </section>
 
         <section id="certificateForm" class="my-4" style="display:none">
             <label for="certificateName" class="form-label">Ім’я для сертифіката</label>

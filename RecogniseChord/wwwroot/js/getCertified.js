@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const feedback = document.getElementById('quizFeedback');
     const outcome = document.getElementById('quizOutcome');
     const certificateForm = document.getElementById('certificateForm');
+    const googleLoginPrompt = document.getElementById('googleLoginPrompt');
     const certificateName = document.getElementById('certificateName');
     const certificatePreview = document.getElementById('certificatePreview');
     const certificateRecipient = document.getElementById('certificateRecipient');
@@ -24,6 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const certificateScore = document.getElementById('certificateScore');
     const certificateDate = document.getElementById('certificateDate');
     let finalResult = null;
+    const isAuthenticated = root.dataset.authenticated === 'true';
     const token = document.querySelector('#quizTokenForm input[name="__RequestVerificationToken"]')?.value;
 
     let level = '';
@@ -63,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function updateAnswerOptions() {
         const response = await fetch(endpoint(root.dataset.optionsUrl, {
-            count: countSelect.value || (level === 'base' ? 2 : 3),
+            count: countSelect.value || (level === 'advanced' ? 3 : 2),
             type: typeSelect.value
         }));
         if (!response.ok) throw new Error('Не вдалося завантажити варіанти відповіді.');
@@ -95,8 +97,8 @@ document.addEventListener('DOMContentLoaded', () => {
         audio.src = new URL(chord.audioUrl, window.location.href).href;
         audio.load();
 
-        const minCount = level === 'base' ? 2 : 3;
-        const maxCount = level === 'base' ? 4 : 5;
+        const minCount = level === 'advanced' ? 3 : 2;
+        const maxCount = level === 'easy' ? 3 : (level === 'base' ? 4 : 5);
         fillSelect(countSelect, Array.from({ length: maxCount - minCount + 1 }, (_, i) => {
             const value = String(minCount + i);
             return { value, label: value };
@@ -155,7 +157,11 @@ document.addEventListener('DOMContentLoaded', () => {
             outcome.textContent = result.passed ? 'тест пройдено' : 'тест не пройдено';
             outcome.className = result.passed ? 'mt-4 text-success' : 'mt-4 text-danger';
             outcome.style.display = '';
-            certificateForm.style.display = result.passed ? '' : 'none';
+            if (result.passed) {
+                googleLoginPrompt.style.display = isAuthenticated ? 'none' : '';
+                certificateForm.style.display = isAuthenticated ? '' : 'none';
+                if (isAuthenticated && root.dataset.displayName) certificateName.value = root.dataset.displayName;
+            }
             levelPicker.style.display = '';
         } else {
             nextButton.style.display = '';
@@ -182,11 +188,39 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!finalResult?.passed) return;
 
         certificateRecipient.textContent = name;
-        certificateLevel.textContent = level === 'base' ? 'Base' : 'Advanced';
+        certificateLevel.textContent = level === 'easy' ? 'Easy' : (level === 'base' ? 'Base' : 'Advanced');
         certificateScore.textContent = `${finalResult.correctCount} / ${finalResult.total}`;
         certificateDate.textContent = new Intl.DateTimeFormat('uk-UA', { dateStyle: 'long' }).format(new Date());
         certificatePreview.style.display = '';
     });
+
+    document.getElementById('googleLoginButton').addEventListener('click', () => {
+        if (finalResult?.passed) sessionStorage.setItem('pendingCertificateResult', JSON.stringify({ level, result: finalResult }));
+    });
+
+    if (isAuthenticated) {
+        certificateName.value = root.dataset.displayName || '';
+        const saved = sessionStorage.getItem('pendingCertificateResult');
+        if (saved) {
+            sessionStorage.removeItem('pendingCertificateResult');
+            try {
+                const pending = JSON.parse(saved);
+                if (pending.result?.passed) {
+                    level = pending.level;
+                    finalResult = pending.result;
+                    panel.style.display = '';
+                    levelPicker.style.display = 'none';
+                    progress.textContent = `Тест завершено: ${finalResult.total} акордів.`;
+                    outcome.textContent = 'тест пройдено';
+                    outcome.className = 'mt-4 text-success';
+                    outcome.style.display = '';
+                    correctCount.textContent = finalResult.correctCount;
+                    incorrectCount.textContent = finalResult.incorrectCount;
+                    certificateForm.style.display = '';
+                }
+            } catch { sessionStorage.removeItem('pendingCertificateResult'); }
+        }
+    }
 
     document.getElementById('printCertificate').addEventListener('click', () => {
         document.body.classList.add('certified-print-mode');
