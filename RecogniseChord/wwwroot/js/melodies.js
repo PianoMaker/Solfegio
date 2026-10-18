@@ -86,6 +86,12 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         const notationWidth = element.clientWidth || element.parentElement?.clientWidth || 320;
+        const configuredScale = Number.parseFloat(element.dataset.size);
+        const baseScale = Number.isFinite(configuredScale) && configuredScale > 0
+            ? configuredScale
+            : 0.85;
+        const responsiveScale = baseScale * (0.75 / 0.85);
+        const configuredFirstBarLayoutReduction = Number.parseFloat(element.dataset.firstbarLayoutReduction);
         if (!notationWidth) return;
 
         window.renderPatternString(
@@ -97,14 +103,16 @@ document.addEventListener("DOMContentLoaded", function () {
             notationWidth,
             90,
             0,
-            element.dataset.barwidth || 160,
+            60,
             40,
             10,
             512,
-            0.85,
-            0.75,
+            baseScale,
+            responsiveScale,
             element.dataset.key || "C",
-            true
+            true,
+            Number.parseFloat(element.dataset.notewidth) || 30,
+            Number.isFinite(configuredFirstBarLayoutReduction) ? configuredFirstBarLayoutReduction : 80
         );
     }
 

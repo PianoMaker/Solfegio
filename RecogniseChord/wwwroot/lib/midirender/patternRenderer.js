@@ -364,7 +364,9 @@ function renderPatternString(
     BASESCALING = 1,
     SCALINGFACTOR = 0.6,
     keySign = "C",
-    FIT_TO_WIDTH = false
+    FIT_TO_WIDTH = false,
+    MinNoteWidth = 30,
+    FirstBarLayoutReduction = 80
 ) {   
     
     try {
@@ -392,22 +394,58 @@ function renderPatternString(
         const GEN_WIDTH = FIT_TO_WIDTH
             ? Math.max(160, containerWidth || GENERALWIDTH || 1200)
             : Math.max(MIN_SCORE_WIDTH, containerWidth || GENERALWIDTH || 1200);
+        console.log("containerWidth = ", containerWidth)
 
+        // Мінімальна ширина такту залежить від кількості нот у ньому.
+        const MIN_BARWIDTH = Math.min(BARWIDTH, 60);
+        const AddWidthForFirstBar = 40;
+        const measureLayouts = [];
+        let row = [];
+        let rowUsedWidth = 0;
+        const availableRowWidth = Math.max(1, GEN_WIDTH - Xmargin);
 
-        // 1) Єдиний bar width для всієї сесії рендера
-        // МІНІМАЛЬНА ШИРИНА ТАКТУ, щоб не були вузькими
-        const MIN_BARWIDTH = Math.min(BARWIDTH, 150); // налаштовуване значення
-        const naiveBarWidth = GetMeanBarWidth(BARWIDTH, GEN_WIDTH);
-        const actualBarWidth = Math.max(MIN_BARWIDTH, naiveBarWidth);
+        for (let i = 0; i < measures.length; i++) {
+            const notesMinWidth = measures[i].notes.reduce((total, note) => {
+                const duration = String(note?.__durationCode || note?.getDuration?.() || 'q')
+                    .replace(/r$/, '')
+                    .replace(/\./g, '');
+                const isQuarterOrLonger = ['q', 'h', 'w'].includes(duration);
+                return total + MinNoteWidth + (isQuarterOrLonger ? 10 : 0);
+            }, 0);
+            const minWidth = Math.max(MIN_BARWIDTH, notesMinWidth);
+            let staveWidth = minWidth + (row.length === 0 ? AddWidthForFirstBar : 0);
 
-        // 2) Локальний підрахунок кількості рядків за вже обчисленим actualBarWidth (спільна утиліта)
-        const rows = calculateRows(measures, GEN_WIDTH, actualBarWidth, CLEFZONE, Xmargin);
+            if (row.length > 0 && rowUsedWidth + staveWidth > availableRowWidth) {
+                row[row.length - 1].contentWidth += availableRowWidth - rowUsedWidth;
+                measureLayouts.push(...row);
+                row = [];
+                rowUsedWidth = 0;
+                staveWidth = minWidth + AddWidthForFirstBar;
+            }
+
+            const layout = {
+                index: i,
+                contentWidth: minWidth,
+                isFirstInRow: row.length === 0
+            };
+            row.push(layout);
+            rowUsedWidth += staveWidth;
+        }
+
+        if (row.length > 0) {
+            row[row.length - 1].contentWidth += availableRowWidth - rowUsedWidth;
+            measureLayouts.push(...row);
+        }
+
+        const rows = measureLayouts.length
+            ? measureLayouts.filter(layout => layout.isFirstInRow).length
+            : 1;
 
         // Мінімальний запас по висоті: TOPPADDING (вгорі) + невеликий буфер 10px
         const extra = Math.max(10, TOPPADDING || 0);
         const totalHeight = rows * HEIGHT + extra;
 
-        logEvent(`patternRenderer: ${measures.length} measures, ${rows} rows, totalHeight=${totalHeight}, GEN_WIDTH=${GEN_WIDTH}, actualBarWidth=${actualBarWidth}, keySign=${keySign}`);
+        logEvent(`patternRenderer: ${measures.length} measures, ${rows} rows, totalHeight=${totalHeight}, GEN_WIDTH=${GEN_WIDTH}, keySign=${keySign}`);
 
 
 
@@ -422,7 +460,7 @@ function renderPatternString(
             factoryWidth: GEN_WIDTH
         });
 
-        // 3) Передаємо той самий actualBarWidth у рендер (щоб обтікання збігалось)
+        // Рендер використовує ті самі ширини, що й розрахунок перенесення рядків.
         const factory = new Vex.Flow.Factory({
             renderer: { elementId: ELEMENT_FOR_RENDERING, width: GEN_WIDTH, height: totalHeight }
         });
@@ -435,26 +473,27 @@ function renderPatternString(
         // Render measure by measure similar to renderMeasures
         let Xposition = Xmargin;
         let Yposition = TOPPADDING;
-        let isFirstMeasureInRow = true;
-
         //РЕНДЕР КОЖНОГО ТАКТУ
-        for (let i = 0; i < measures.length; i++) {
-            const previousY = Yposition;
-            ({ Xposition, Yposition } = adjustXYposition(
-                Xposition, GEN_WIDTH, actualBarWidth, Yposition, HEIGHT, Xmargin, i, 0));
-            if (Yposition !== previousY) {
-                isFirstMeasureInRow = true;
+        for (const layout of measureLayouts) {
+            const i = layout.index;
+            const notesinmeasure = measures[i].notes.length;
+            if (layout.isFirstInRow && i > 0) {
+                Xposition = Xmargin;
+                Yposition += HEIGHT;
             }
-            console.log("keySign = ", keySign);
-            let STAVE_WIDTH = adjustStaveWidth(actualBarWidth, i, CLEFZONE, isFirstMeasureInRow, false);
-            const stave = setStave(Xposition, Yposition, STAVE_WIDTH, i, numerator, denominator, isFirstMeasureInRow, false, false, keySign);
+            console.log("bar  = ", i, "keySign = ", keySign, "notesinmeasure = ", notesinmeasure);
+            const STAVE_WIDTH = layout.contentWidth + (layout.isFirstInRow ? AddWidthForFirstBar : 0);
+            const noteWidthReduction = i === 0
+                ? FirstBarLayoutReduction
+                : (layout.isFirstInRow ? 80 : 30);
+            console.log(`Measure ${i + 1}: stave drawing width=${STAVE_WIDTH}px, note layout width=${Math.max(0, STAVE_WIDTH - noteWidthReduction)}px`);
+            const stave = setStave(Xposition, Yposition, STAVE_WIDTH, i, numerator, denominator, layout.isFirstInRow, false, false, keySign);
             stave.setContext(context).draw();
 
             const ties = measures[i].ties || [];
-            drawMeasure(measures[i].notes, actualBarWidth, context, stave, ties, i, commentsDiv || { innerHTML: '' }, numerator, denominator, 480); // midiRenderer.js
+            drawMeasure(measures[i].notes, STAVE_WIDTH, context, stave, ties, i, commentsDiv || { innerHTML: '' }, numerator, denominator, 480, layout.isFirstInRow, noteWidthReduction); // midiRenderer.js
 
             Xposition += STAVE_WIDTH;
-            isFirstMeasureInRow = false;
         }
 
         // ----------------------

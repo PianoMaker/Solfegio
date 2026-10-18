@@ -1,4 +1,4 @@
-﻿// midiRenderer.js
+// midiRenderer.js
 
 let info = "";
 const ActiveNotesReadElement = document.getElementById("activeNotesRead");
@@ -513,7 +513,7 @@ function renderMeasures(measureMap, measures, ticksPerBeat, context, Xmargin, TO
 
 
 		// Передаємо ticksPerBeat в drawMeasure
-		drawMeasure(notes, BARWIDTH, context, stave, ties, index, commentsDiv, currentNumerator, currentDenominator, ticksPerBeat);
+		drawMeasure(notes, BARWIDTH, context, stave, ties, index, commentsDiv, currentNumerator, currentDenominator, ticksPerBeat, isFirstMeasureInRow);
 
 		Xposition += STAVE_WIDTH;
 
@@ -1170,7 +1170,7 @@ function checkConcide(event, lastNoteOnTime) {
 // ----------------------
 // Використовує Vex.Flow.Voice, Vex.Flow.Formatter та makeBeams для форматування та рендерингу нот.
 
-function drawMeasure(notes, BARWIDTH, context, stave, ties, index, commentsDiv, currentNumerator, currentDenominator, ticksPerBeat) {
+function drawMeasure(notes, BARWIDTH, context, stave, ties, index, commentsDiv, currentNumerator, currentDenominator, ticksPerBeat, isFirstMeasureInRow = false, formatWidthReduction = isFirstMeasureInRow ? 80 : 30) {
 
 	try {
 		if (notes.length > 0) {
@@ -1202,7 +1202,8 @@ function drawMeasure(notes, BARWIDTH, context, stave, ties, index, commentsDiv, 
 
 			// Форматуємо голос
 			const formatter = new Vex.Flow.Formatter();
-			formatter.joinVoices([voice]).format([voice], BARWIDTH - 50);
+			const formatWidth = Math.max(0, BARWIDTH - formatWidthReduction);
+			formatter.joinVoices([voice]).format([voice], formatWidth);
 
 			// логування деталей нот для налагодження
 			notes.forEach((note, index) => {

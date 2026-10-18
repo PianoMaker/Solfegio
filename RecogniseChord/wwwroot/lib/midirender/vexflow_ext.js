@@ -243,9 +243,14 @@ function getStaveWidth(BARWIDTH, index, CLEFZONE) {
 // ----------------------
 // ФУНКЦІЯ ДЛЯ ОТРИМАННЯ ШИРИНИ ТАКТУ З УРАХУВАННЯМ ЗМІНИ РОЗМІРУ ТАКТУ
 // ----------------------
-function adjustStaveWidth(BARWIDTH, index, CLEFZONE, isFirstMeasureInRow = false, timeSignatureChanged = false) {
-    console.log("FOO: midiRenderer.js - adjustStaveWidth");
+function adjustStaveWidth(BARWIDTH, index, CLEFZONE, isFirstMeasureInRow = false, timeSignatureChanged = false, notesinmeasure = 0) {
+    console.log(`FOO: midiRenderer.js - adjustStaveWidth, notesinmeasure = ${notesinmeasure}`);
     let STAVE_WIDTH = BARWIDTH;
+
+    logPositions(`Measure ${index + 1}: bar STAVE_WIDTH=${STAVE_WIDTH}`);
+    if (notesinmeasure === 1) STAVE_WIDTH = 40;
+    if (notesinmeasure === 2) STAVE_WIDTH = 60;
+    logPositions(`Measure ${index + 1}: apply notesinmeasure ${notesinmeasure} STAVE_WIDTH=${STAVE_WIDTH}`);
 
     // Додаємо CLEFZONE для першого такту взагалі або для першого такту в кожному рядку
     if (index === 0 || isFirstMeasureInRow) {
@@ -258,7 +263,9 @@ function adjustStaveWidth(BARWIDTH, index, CLEFZONE, isFirstMeasureInRow = false
         STAVE_WIDTH += 30; // Додатковий простір для розміру такту
         console.log(`Adding extra space for time signature change to measure ${index + 1}, total width: ${STAVE_WIDTH}`);
     }
-	logPositions(`Measure ${index + 1}: STAVE_WIDTH=${STAVE_WIDTH}`);
+    
+
+	
     return STAVE_WIDTH;
 }
 // ----------------------
@@ -410,12 +417,13 @@ function logVexFlow(msg) {
 }
 
 function logPositions(msg) {
+    console.debug(msg);
     const vexPositions = document.getElementById("vexPositions");
 	if (!vexPositions) {
         return;
     }
     vexPositions.innerHTML += `<div>${msg}</div>`;
-	console.debug(msg);
+	
 }
 
 // ----------------------
