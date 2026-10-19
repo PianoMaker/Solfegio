@@ -138,6 +138,9 @@
   <data name="Piano" xml:space="preserve">
     <value>Piano</value>
   </data>
+  <data name="Projects" xml:space="preserve">
+    <value>Проєкти</value>
+  </data>
   <data name="Recognise" xml:space="preserve">
     <value>Recognise</value>
   </data>

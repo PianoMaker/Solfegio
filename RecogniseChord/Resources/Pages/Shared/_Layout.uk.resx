@@ -147,4 +147,13 @@
   <data name="Certificates" xml:space="preserve">
     <value>Сертифікати</value>
   </data>
+  <data name="Projects" xml:space="preserve">
+    <value>Проєкти</value>
+  </data>
+  <data name="MusicSurveys" xml:space="preserve">
+    <value>Музичні опитування</value>
+  </data>
+  <data name="WorldClassicsInUkrainian" xml:space="preserve">
+    <value>Світова класика українською</value>
+  </data>
 </root>

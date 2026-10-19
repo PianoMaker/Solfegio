@@ -14,6 +14,8 @@
     <meta name="description" content="@Localizer["MetaDescription"]" />
     <meta name="robots" content="index, follow" />
 
+    <link rel="icon" type="image/svg+xml" href="~/favicon.svg" />
+
     <link rel="canonical"
           href="https://solfegio.azurewebsites.net@(Context.Request.Path)" />
 
@@ -71,6 +73,16 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" asp-page="/GetCertified">@Localizer["Certificates"]</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="projectsMenu" role="button"
+                               data-bs-toggle="dropdown" aria-expanded="false">
+                                @Localizer["Projects"]
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="projectsMenu">
+                                <li><a class="dropdown-item" href="https://musicsurveyua.azurewebsites.net/" target="_blank" rel="noopener noreferrer">@Localizer["MusicSurveys"]</a></li>
+                                <li><a class="dropdown-item" href="https://musicinukrainian.wordpress.com/" target="_blank" rel="noopener noreferrer">@Localizer["WorldClassicsInUkrainian"]</a></li>
+                            </ul>
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="langMenu" role="button"

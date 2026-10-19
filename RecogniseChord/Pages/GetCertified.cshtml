@@ -46,18 +46,55 @@
       data-verify-level="@Localizer["VerificationLevel"]"
       data-verify-score="@Localizer["Score"]"
       data-verify-date="@Localizer["IssuedOn"]">
-    <h1>@Localizer["Certificates"]</h1>
+    <h1 class="display-4">@Localizer["Certificates"]</h1>
     @if (!string.IsNullOrEmpty(Model.LoginError))
     {
         <p class="alert alert-danger" role="alert">@Localizer[Model.LoginError]</p>
     }
-    <p>@Localizer["QuizIntroduction"]</p>
+    <p>Запрошуємо здобути сертифікат, що засвідчує ваше вміння розпізнавати на слух акорди!</p>
 
+    <!--КНОПКИ-->
     <div id="quizLevelPicker" class="my-4">
         <p>@Localizer["ChooseLevel"]</p>
-        <button type="button" class="btn btn-primary m-2" data-level="easy">@Localizer["EasyDescription"]</button>
-        <button type="button" class="btn btn-primary m-2" data-level="base">@Localizer["BaseDescription"]</button>
-        <button type="button" class="btn btn-primary m-2" data-level="advanced">@Localizer["AdvancedDescription"]</button>
+        <div class="quiz-level-options">
+            <div class="quiz-level-option">
+                <div class="quiz-level-action">
+                    <svg class="quiz-level-icon" viewBox="0 0 48 48" aria-hidden="true" focusable="false">
+                        <circle cx="24" cy="24" r="21" fill="#fff2cf" stroke="#976b32" stroke-width="2" />
+                        <path d="M27 11v19.5a5.5 5.5 0 1 1-3-4.9V16l13-3v14.5a5.5 5.5 0 1 1-3-4.9V10z" fill="#976b32" />
+                        <path d="M9 22h7M32 35h7" stroke="#c79743" stroke-width="1.5" stroke-linecap="round" />
+                    </svg>
+                    <button type="button" class="btn btn-primary" data-level="easy">@Localizer["Easy"]</button>
+                </div>
+                <p>@Localizer["EasyDescription"]</p>
+            </div>
+            <div class="quiz-level-option">
+                <div class="quiz-level-action">
+                    <svg class="quiz-level-icon" viewBox="0 0 48 48" aria-hidden="true" focusable="false">
+                        <circle cx="24" cy="24" r="21" fill="#fff2cf" stroke="#976b32" stroke-width="2" />
+                        <path d="M11 17h25M10 22h26M10 27h26M11 32h25" stroke="#c79743" stroke-width="1.4" stroke-linecap="round" />
+                        <path d="M18 11v15a4 4 0 1 1-2-3.5V13l9-2v12a4 4 0 1 1-2-3.5V12zM31 18v12a3.5 3.5 0 1 1-2-3.1V20z" fill="#976b32" />
+                    </svg>
+                    <button type="button" class="btn btn-primary" data-level="base">@Localizer["Base"]</button>
+                </div>
+                <p>@Localizer["BaseDescription"]</p>
+            </div>
+            <div class="quiz-level-option">
+                <div class="quiz-level-action">
+                    <svg class="quiz-level-icon" viewBox="0 0 48 48" aria-hidden="true" focusable="false">
+                        <circle cx="24" cy="24" r="21" fill="#fff2cf" stroke="#976b32" stroke-width="2" />
+                        <path d="m9 20 15-8 15 8-15 8-15-8z" fill="#976b32" stroke="#704b20" stroke-width="1.5" stroke-linejoin="round" />
+                        <path d="M15 23v8c5 4 13 4 18 0v-8l-9 5z" fill="#c79743" stroke="#704b20" stroke-width="1.3" stroke-linejoin="round" />
+                        <path d="M39 20v11m0 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4z" fill="none" stroke="#704b20" stroke-width="2" stroke-linecap="round" />
+                    </svg>
+                    <button type="button" class="btn btn-primary" data-level="advanced">@Localizer["Advanced"]</button>
+                </div>
+                <p>@Localizer["AdvancedDescription"]</p>
+            </div>
+        </div>
+    </div>
+    <div class="inner certificate-intro m-5">
+        <p>@Localizer["QuizIntroduction"]</p>
     </div>
 
     <section id="quizPanel" class="mx-auto" style="display:none; max-width:640px">
@@ -157,6 +194,61 @@
     .verify-certificate-button:active {
         background-color: #976b32;
         border-color: #976b32;
+    }
+
+    #certifiedQuiz .certificate-intro {
+        max-width: 900px;
+        margin: 1rem auto;
+        padding: 20px;
+        border: 1px solid var(--footer-color);
+        border-radius: 25px;
+        background-color: rgba(254, 254, 254, 0.75);
+    }
+
+    #quizLevelPicker .quiz-level-options {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 12px;
+    }
+
+    #quizLevelPicker .quiz-level-option {
+        flex: 1 1 190px;
+        max-width: 260px;
+        padding: 12px;
+        border: 1px solid var(--footer-color);
+        border-radius: 14px;
+        background-color: rgba(254, 254, 254, 0.75);
+        transition: background-color 150ms ease, box-shadow 150ms ease;
+    }
+
+    #quizLevelPicker .quiz-level-option:hover,
+    #quizLevelPicker .quiz-level-option:focus-within,
+    #quizLevelPicker .quiz-level-option:active {
+        background-color: #fff2b8;
+        box-shadow: 0 3px 10px rgba(112, 78, 30, 0.2);
+    }
+
+    #quizLevelPicker .quiz-level-option .btn {
+        min-width: 120px;
+    }
+
+    #quizLevelPicker .quiz-level-action {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    #quizLevelPicker .quiz-level-icon {
+        display: block;
+        width: 48px;
+        height: 48px;
+        flex: 0 0 48px;
+    }
+
+    #quizLevelPicker .quiz-level-option p {
+        margin: 10px 0 0;
     }
 
     .certificate-preview {
