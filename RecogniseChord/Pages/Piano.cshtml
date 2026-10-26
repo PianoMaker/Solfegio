@@ -8,6 +8,15 @@
     <h1 class="display-4">@Localizer["PianoTitle"]</h1>
     <p class="text-center text-muted">@Localizer["PianoInstructions"]</p>
 
+    <div class="d-flex justify-content-center align-items-center gap-3" aria-label="Octave controls">
+        <button type="button" id="octave-down" class="btn btn-outline-primary" aria-label="Lower octave">−</button>
+        <span id="octave-label" aria-live="polite">1–3</span>
+        <button type="button" id="octave-up" class="btn btn-outline-primary" aria-label="Raise octave">+</button>
+    </div>
+    <div class="my-3">
+        <button type="button" id="sustain-toggle" class="btn btn-outline-secondary" aria-pressed="false">Sustain: Off</button>
+    </div>
+
     <div class="piano-scroll-wrapper" aria-label="Фортепіанна клавіатура">
         <div id="pianoroll" class="piano-keyboard" role="group" aria-label="@Localizer["PianoKeyboard"]">
             <button type="button" data-key="c" class="piano-key white-key">C1</button>
@@ -55,6 +64,51 @@
     <script>
         const piano = document.getElementById('pianoroll');
         const heldPointers = new Map();
+        let octaveShift = 0;
+
+        function changeOctave(direction) {
+            const nextShift = Math.max(-4, Math.min(4, octaveShift + direction));
+            if (nextShift === octaveShift) return;
+
+            // Release held notes before changing their tokens.
+            for (const key of heldPointers.values()) window.stopNoteFromKey(key);
+            heldPointers.clear();
+            octaveShift = nextShift;
+            const suffix = octaveShift < 0 ? ','.repeat(-octaveShift) : "'".repeat(octaveShift);
+            piano.querySelectorAll('button[data-base-key]').forEach(button => {
+                const baseKey = button.dataset.baseKey;
+                button.dataset.key = baseKey + suffix;
+                const baseOctave = Number(button.dataset.baseOctave);
+                if (button.classList.contains('white-key')) {
+                    button.textContent = button.dataset.note + (baseOctave + octaveShift);
+                } else {
+                    button.setAttribute('aria-label', button.dataset.ariaNote + ' ' + (baseOctave + octaveShift));
+                }
+            });
+            document.getElementById('octave-label').textContent = `${1 + octaveShift}–${3 + octaveShift}`;
+        }
+
+        piano?.querySelectorAll('button[data-key]').forEach(button => {
+            button.dataset.baseKey = button.dataset.key;
+            const match = button.textContent.match(/^(C|D|E|F|G|A|H)(\d+)$/);
+            if (match) {
+                button.dataset.note = match[1];
+                button.dataset.baseOctave = match[2];
+            } else {
+                const label = button.getAttribute('aria-label');
+                button.dataset.ariaNote = label.replace(/\s+\d+$/, '');
+                button.dataset.baseOctave = label.match(/\d+$/)[0];
+            }
+        });
+        document.getElementById('octave-down').addEventListener('click', () => changeOctave(-1));
+        document.getElementById('octave-up').addEventListener('click', () => changeOctave(1));
+        const sustainButton = document.getElementById('sustain-toggle');
+        sustainButton.addEventListener('click', function () {
+            const enabled = sustainButton.getAttribute('aria-pressed') !== 'true';
+            sustainButton.setAttribute('aria-pressed', String(enabled));
+            sustainButton.textContent = `Sustain: ${enabled ? 'On' : 'Off'}`;
+            window.setPianoSustain(enabled);
+        });
 
         piano?.addEventListener('pointerdown', function (event) {
             const keyButton = event.target.closest('button[data-key]');

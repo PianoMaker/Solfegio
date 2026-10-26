@@ -29,7 +29,8 @@ function pianoTokenToMidi(token) {
 	if (!token) return null;
 
 	const apostrophes = (token.match(/['’]+/g) || []).join('').length;
-	const baseToken = token.replace(/['’]+/g, '').toLowerCase();
+	const commas = (token.match(/,+/g) || []).join('').length;
+	const baseToken = token.replace(/['’,]+/g, '').toLowerCase();
 
 	// site tokens mapping (matches _pianoKeys.cshtml)
 	const tokenMap = {
@@ -43,7 +44,7 @@ function pianoTokenToMidi(token) {
 
 	const semitone = tokenMap[baseToken];
 	const BASE_OCTAVE = 4; // UI labels show C1 first row; adjust if you want different default
-	const octave = BASE_OCTAVE + apostrophes;
+	const octave = BASE_OCTAVE + apostrophes - commas;
 	console.debug('[createMelody][piano] final MIDI number', (octave + 1) * 12 + semitone);
 	return (octave + 1) * 12 + semitone;
 }
@@ -156,6 +157,34 @@ window.playPianodisplay = playPianodisplay;
 
 // Sustain a piano key while it is held, then release it smoothly.
 const activePianoNotes = new Map();
+let pianoSustainEnabled = false;
+
+function releasePianoNote(note) {
+	if (!note.oscillator || !note.gain) return;
+
+	try {
+		const now = __audioCtx.currentTime;
+		note.gain.gain.cancelScheduledValues(now);
+		note.gain.gain.setValueAtTime(Math.max(note.gain.gain.value, 0.0001), now);
+		note.gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.04);
+		note.oscillator.stop(now + 0.05);
+	} catch (e) {
+		console.warn('[createMelody][piano] stopNoteFromKey failed', e);
+	}
+}
+
+function setPianoSustain(enabled) {
+	pianoSustainEnabled = enabled;
+	if (enabled) return;
+
+	for (const [key, note] of activePianoNotes) {
+		if (note.released) {
+			activePianoNotes.delete(key);
+			releasePianoNote(note);
+		}
+	}
+}
+window.setPianoSustain = setPianoSustain;
 
 async function startNoteFromKey(key) {
 	if (activePianoNotes.has(key)) return true;
@@ -163,7 +192,7 @@ async function startNoteFromKey(key) {
 	const midi = pianoTokenToMidi(key);
 	if (midi === null) return false;
 
-	const note = { oscillator: null, gain: null };
+	const note = { oscillator: null, gain: null, released: false };
 	activePianoNotes.set(key, note);
 
 	try {
@@ -199,18 +228,12 @@ async function startNoteFromKey(key) {
 function stopNoteFromKey(key) {
 	const note = activePianoNotes.get(key);
 	if (!note) return;
-	activePianoNotes.delete(key);
-	if (!note.oscillator || !note.gain) return;
-
-	try {
-		const now = __audioCtx.currentTime;
-		note.gain.gain.cancelScheduledValues(now);
-		note.gain.gain.setValueAtTime(Math.max(note.gain.gain.value, 0.0001), now);
-		note.gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.04);
-		note.oscillator.stop(now + 0.05);
-	} catch (e) {
-		console.warn('[createMelody][piano] stopNoteFromKey failed', e);
+	if (pianoSustainEnabled) {
+		note.released = true;
+		return;
 	}
+	activePianoNotes.delete(key);
+	releasePianoNote(note);
 }
 
 
