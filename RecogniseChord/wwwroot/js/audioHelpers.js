@@ -212,6 +212,8 @@ async function startNoteFromKey(key) {
 		oscillator.frequency.value = midiToFrequency(midi);
 		gain.gain.setValueAtTime(0.0001, now);
 		gain.gain.exponentialRampToValueAtTime(0.82, now + 0.01);
+		// A piano note naturally decays even while the sustain pedal is down.
+		gain.gain.exponentialRampToValueAtTime(0.08, now + 4);
 		oscillator.connect(gain);
 		gain.connect(ctx.destination);
 		note.oscillator = oscillator;
