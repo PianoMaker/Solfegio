@@ -34,9 +34,11 @@
       data-outcome-passed="@Localizer["OutcomePassed"]"
       data-outcome-failed="@Localizer["OutcomeFailed"]"
       data-finished="@Localizer["QuizFinished"]"
-      data-level-easy="@Localizer["Easy"]"
-      data-level-base="@Localizer["Base"]"
-      data-level-advanced="@Localizer["Advanced"]"
+    data-level-easy="@Localizer["Easy"]"
+    data-level-base="@Localizer["Base"]"
+    data-level-intermediate="@Localizer["Intermediate"]"
+    data-level-advanced="@Localizer["Advanced"]"
+    data-level-expert="@Localizer["Expert"]"
       data-verification-number="@Localizer["VerificationNumber"]"
       data-verify-title="@Localizer["VerifyCertificateTitle"]"
       data-verify="@Localizer["VerifyCertificate"]"
@@ -58,6 +60,7 @@
         <p>@Localizer["ChooseLevel"]</p>
         <div class="quiz-level-options">
             <div class="quiz-level-option">
+                <!--EASY-->
                 <div class="quiz-level-action">
                     <svg class="quiz-level-icon" viewBox="0 0 48 48" aria-hidden="true" focusable="false">
                         <circle cx="24" cy="24" r="21" fill="#fff2cf" stroke="#976b32" stroke-width="2" />
@@ -68,7 +71,8 @@
                 </div>
                 <p>@Localizer["EasyDescription"]</p>
             </div>
-            <div class="quiz-level-option">
+            <!--Base-->
+            <div class="quiz-level-option">                
                 <div class="quiz-level-action">
                     <svg class="quiz-level-icon" viewBox="0 0 48 48" aria-hidden="true" focusable="false">
                         <circle cx="24" cy="24" r="21" fill="#fff2cf" stroke="#976b32" stroke-width="2" />
@@ -79,6 +83,25 @@
                 </div>
                 <p>@Localizer["BaseDescription"]</p>
             </div>
+            <!--Intermediate-->
+            <div class="quiz-level-option">                
+                <div class="quiz-level-action">
+                    <svg class="quiz-level-icon" viewBox="0 0 48 48" aria-hidden="true" focusable="false">
+                        <circle cx="24" cy="24" r="21" fill="#fff2cf" stroke="#976b32" stroke-width="2" />
+                        <path d="M8 34 17 25 24 30 38 14" fill="none"
+                              stroke="#976b32" stroke-width="3"
+                              stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M30 14h8v8" fill="none"
+                              stroke="#c79743" stroke-width="2"
+                              stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    <button type="button" class="btn btn-primary" data-level="intermediate">
+                        @Localizer["Intermediate"]
+                    </button>
+                </div>
+                <p>@Localizer["IntermediateDescription"]</p>
+            </div>
+            <!--Advanced-->
             <div class="quiz-level-option">
                 <div class="quiz-level-action">
                     <svg class="quiz-level-icon" viewBox="0 0 48 48" aria-hidden="true" focusable="false">
@@ -90,9 +113,24 @@
                     <button type="button" class="btn btn-primary" data-level="advanced">@Localizer["Advanced"]</button>
                 </div>
                 <p>@Localizer["AdvancedDescription"]</p>
+            </div>        
+            <!--Expert-->
+            <div class="quiz-level-option">
+                    <div class="quiz-level-action">
+                        <svg class="quiz-level-icon" viewBox="0 0 48 48" aria-hidden="true" focusable="false">
+                            <circle cx="24" cy="24" r="21" fill="#fff2cf" stroke="#976b32" stroke-width="2" />
+                            <path d="M24 8 28 18 39 19 31 27 33 38 24 32 15 38 17 27 9 19 20 18z"
+                                  fill="#976b32" stroke="#704b20" stroke-width="1.2"
+                                  stroke-linejoin="round" />
+                        </svg>
+                        <button type="button" class="btn btn-primary" data-level="expert">
+                            @Localizer["Expert"]
+                        </button>
+                    </div>
+                    <p>@Localizer["ExpertDescription"]</p>
+                </div>
             </div>
         </div>
-    </div>
     <div class="inner certificate-intro m-5">
         <p>@Localizer["QuizIntroduction"]</p>
     </div>
@@ -147,9 +185,9 @@
             <button id="printCertificate" type="button" class="btn btn-outline-primary">@Localizer["PrintCertificate"]</button>
         </section>
     </section>
-
+    <!--Verify Certificate Button-->
     <button type="button" class="btn btn-primary verify-certificate-button mt-3" data-bs-toggle="modal" data-bs-target="#verifyCertificateModal">@Localizer["VerifyCertificate"]</button>
-
+    <!--Certificate-->
     <div class="modal fade" id="verifyCertificateModal" tabindex="-1" aria-labelledby="verifyCertificateModalTitle" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -176,8 +214,9 @@
 </main>
 
 @section Scripts {
-    <script src="~/js/getCertified.js" asp-append-version="true"></script>
+    <script src="~/js/getCertified.js" asp-append-version="true"></script>    
 }
+<link rel="stylesheet" href="~/css/getCertified.css" asp-append-version="true" />
 
 <style>
     #quizLevelPicker .btn-primary,

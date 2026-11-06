@@ -49,14 +49,17 @@ namespace RecogniseChord.Pages
             QuizProgressData? progress;
             try { progress = JsonSerializer.Deserialize<QuizProgressData>(progressJson); }
             catch { return BadRequest(); }
-            if (progress == null || progress.Answered != progress.Total || progress.Incorrect > 1 || progress.Correct + progress.Incorrect != progress.Total)
+            if (progress == null || progress.Answered != progress.Total || progress.Incorrect > (progress.Level == "easy" ? 3 : 1) || progress.Correct + progress.Incorrect != progress.Total)
                 return BadRequest();
 
+            //Кількість питань у сертифікаційному тесті залежить від рівня складності
             var expectedTotal = progress.Level switch
             {
                 "easy" => 10,
                 "base" => 15,
+                "intermediate" => 15,
                 "advanced" => 20,
+                "expert" => 20,
                 _ => 0
             };
             if (progress.Total != expectedTotal) return BadRequest();

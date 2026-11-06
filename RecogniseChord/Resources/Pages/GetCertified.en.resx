@@ -130,13 +130,13 @@
     <value>Choose a level:</value>
   </data>
   <data name="EasyDescription" xml:space="preserve">
-    <value>10 chords · 2–3 notes · 60 sec</value>
+    <value>10 chords · 2–3 notes · 90 sec</value>
   </data>
   <data name="BaseDescription" xml:space="preserve">
-    <value>15 chords · 2–4 notes · 30 sec</value>
+    <value>15 chords · 2–4 notes · 60 sec</value>
   </data>
   <data name="AdvancedDescription" xml:space="preserve">
-    <value>20 chords · 3–5 notes · 20 sec</value>
+    <value>20 chords · 3–5 notes · 30 sec</value>
   </data>
   <data name="Correct" xml:space="preserve">
     <value>Correct</value>
@@ -281,5 +281,11 @@
   </data>
   <data name="GoogleNameOnly" xml:space="preserve">
     <value>The certificate name is taken from your Google profile.</value>
+  </data>
+  <data name="IntermediateDescription" xml:space="preserve">
+    <value>15 chords · 3–4 notes · 40 sec</value>
+  </data>
+  <data name="ExpertDescription" xml:space="preserve">
+    <value>20 chords · 4–5 notes · 25 sec</value>
   </data>
 </root>

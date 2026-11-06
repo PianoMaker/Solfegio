@@ -114,9 +114,11 @@ namespace RecogniseChord.Pages
         {
             var bounds = level?.ToLowerInvariant() switch
             {
-                "easy" => (Min: 2, Max: 3, Seconds: 60, Total: 10),
-                "base" => (Min: 2, Max: 4, Seconds: 30, Total: 15),
-                "advanced" => (Min: 3, Max: 5, Seconds: 20, Total: 20),
+                "easy" => (Min: 2, Max: 3, Seconds: 90, Total: 10),
+                "base" => (Min: 2, Max: 4, Seconds: 60, Total: 15),
+                "intermediate" => (Min: 3, Max: 4, Seconds: 40, Total: 15),
+                "advanced" => (Min: 3, Max: 5, Seconds: 30,     Total: 20),
+                "expert" => (Min: 4, Max: 5, Seconds: 25, Total: 20),
                 _ => (Min: 0, Max: 0, Seconds: 0, Total: 0)
             };
             if (bounds.Min == 0) return BadRequest();
@@ -132,7 +134,7 @@ namespace RecogniseChord.Pages
                 progress = new CertifiedQuizProgress { Level = level.ToLowerInvariant(), Total = bounds.Total };
             if (progress.Answered >= progress.Total) return BadRequest();
 
-            var chord = GenerateRandomChord(bounds.Min, bounds.Max);
+            var chord = GenerateRandomChord(bounds.Min, bounds.Max, certifiedLevel: level.ToLowerInvariant());
             progress.ChordStartedAtUtc = DateTime.UtcNow;
             TempData[CurrentChordKey] = JsonSerializer.Serialize(chord);
             TempData[QuizProgressKey] = JsonSerializer.Serialize(progress);
@@ -168,10 +170,15 @@ namespace RecogniseChord.Pages
 
             var actual = RestoreChordData();
             if (actual == null) return BadRequest();
+            
+            // Determine time limit based on level            
             var timeLimit = progress.Level switch
             {
-                "easy" => 60,
-                "base" => 30,
+                "easy" => 90,
+                "base" => 60,
+                "intermediate" => 40,
+                "advanced" => 30,
+                "expert" => 25,
                 _ => 20
             };
             var timeExpired = timedOut || DateTime.UtcNow - progress.ChordStartedAtUtc > TimeSpan.FromSeconds(timeLimit);
@@ -194,7 +201,7 @@ namespace RecogniseChord.Pages
                 correctCount = progress.Correct,
                 incorrectCount = progress.Incorrect,
                 complete = progress.Answered == progress.Total,
-                passed = progress.Answered == progress.Total && progress.Incorrect <= 1,
+                passed = progress.Answered == progress.Total && progress.Incorrect <= (progress.Level == "easy" ? 3 : 2),
                 total = progress.Total
             });
         }
@@ -713,7 +720,7 @@ namespace RecogniseChord.Pages
         }
 
 
-        private ChordData GenerateRandomChord(int minCount = 2, int? maxCount = null)
+        private ChordData GenerateRandomChord(int minCount = 2, int? maxCount = null, string? certifiedLevel = null)
         {
             var rnd = new Random();
             int count = rnd.Next(minCount, (maxCount ?? MaxCount) + 1); //кількість звуків
@@ -757,7 +764,7 @@ namespace RecogniseChord.Pages
             }
             else if (count == 3)
             {
-                var triTypes = new[] { "TRI", "SEXT", "QSEXT" };
+                var triTypes = certifiedLevel == "easy" ? new[] { "TRI" } : new[] { "TRI", "SEXT", "QSEXT" };
                 typeKey = triTypes[rnd.Next(triTypes.Length)];
                 string[] qualitiesForGen = (typeKey == "SEXT" || typeKey == "QSEXT")
                    ? new[] { "MAJ", "MIN", "DIM" }
@@ -769,7 +776,7 @@ namespace RecogniseChord.Pages
             }
             else if (count == 4)
             {
-                var septTypes = new[] { "SEPT", "QUINTS", "TERZQ", "SEC" };
+                var septTypes = certifiedLevel == "base" ? new[] { "SEPT" } : new[] { "SEPT", "QUINTS", "TERZQ", "SEC" };
 
                 var septQualities = Enum.GetNames(typeof(SEPTS))
                     .Where(q => q != "ALTPRIM" && q != "ALTQUINT")
@@ -793,23 +800,15 @@ namespace RecogniseChord.Pages
                     : SEPTS.MAJMAJ;
 
                 chord.SeventhChord(root, septQuality);
-
-                // Обернення застосовується тільки для інших якостей
-                if (qualityKey != "DIMDIM")
-                {
+                if (certifiedLevel != "base" && qualityKey != "DIMDIM")
                     ApplySeventhInversion(chord, typeKey);
-                }
+
             }
             else if (count == 5)
             {
-                var ninthTypes = new[]
-                {
-        "NONACORD",
-        "NONACORD_1i",
-        "NONACORD_2i",
-        "NONACORD_3i",
-        "NONACORD_4i"
-    };
+                var ninthTypes = certifiedLevel == "advanced"
+                    ? new[] { "NONACORD" }
+                    : new[] { "NONACORD", "NONACORD_1i", "NONACORD_2i", "NONACORD_3i", "NONACORD_4i" };
 
                 typeKey = ninthTypes[rnd.Next(ninthTypes.Length)];
 
@@ -833,25 +832,18 @@ namespace RecogniseChord.Pages
 
                 // Створюємо сам нонакорд
                 chord.NinthChord(root, ninthQuality);
-
-                // Застосовуємо обернення тільки для дозволених якостей
-                if (qualityKey == "NMAJ" ||
-                    qualityKey == "NDOM" ||
-                    qualityKey == "NMIN")
-                {
+                if (certifiedLevel != "advanced" &&
+                    (qualityKey == "NMAJ" || qualityKey == "NDOM" || qualityKey == "NMIN"))
                     ApplyNinthInversion(chord, typeKey);
-                }
+
             }
-            if (chord.GetHighestMidiNote() > highestpitch)
+            MessageL(COLORS.gray, "Checking pitch limit: " + chord.GetHighestMidiNote());
+            while (chord.GetHighestMidiNote() > highestpitch)
             {
-                MessageL(COLORS.gray, "Adjusting rchord octave down to fit pitch limit");
+                MessageL(COLORS.darkred, "Adjusting chord octave down to fit pitch limit");
                 chord.OctDown();
             }
-            else
-            {
-                MessageL(COLORS.gray, $"no changes, highest = {chord.GetHighestMidiNote()}");
 
-            }
 
             // ПОСТ-ОБРОБКА: ціла нота, тембр
 

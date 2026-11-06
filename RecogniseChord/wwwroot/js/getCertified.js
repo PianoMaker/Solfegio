@@ -34,6 +34,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const isAuthenticated = root.dataset.authenticated === 'true';
     const token = document.querySelector('#quizTokenForm input[name="__RequestVerificationToken"]')?.value;
     const text = root.dataset;
+    function getLevelName(level) {
+        const names = {
+            easy: text.levelEasy,
+            base: text.levelBase,
+            intermediate: text.levelIntermediate,
+            advanced: text.levelAdvanced,
+            expert: text.levelExpert
+        };
+
+        return names[level] || level;
+    }
 
     function format(template, ...values) {
         return values.reduce((result, value, index) => result.replace(`{${index}}`, value), template);
@@ -76,7 +87,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function updateAnswerOptions() {
         const response = await fetch(endpoint(root.dataset.optionsUrl, {
-            count: countSelect.value || (level === 'advanced' ? 3 : 2),
+            count: countSelect.value || ({
+                easy: 2,
+                base: 2,
+                intermediate: 3,
+                advanced: 3,
+                expert: 4
+            }[level]),
             type: typeSelect.value
         }));
         if (!response.ok) throw new Error(text.errorOptions);
@@ -108,8 +125,21 @@ document.addEventListener('DOMContentLoaded', () => {
         audio.src = new URL(chord.audioUrl, window.location.href).href;
         audio.load();
 
-        const minCount = level === 'advanced' ? 3 : 2;
-        const maxCount = level === 'easy' ? 3 : (level === 'base' ? 4 : 5);
+        const minCount = {
+            easy: 2,
+            base: 2,
+            intermediate: 3,
+            advanced: 3,
+            expert: 4
+        }[level];
+
+        const maxCount = {
+            easy: 3,
+            base: 4,
+            intermediate: 4,
+            advanced: 5,
+            expert: 5
+        }[level];
         fillSelect(countSelect, Array.from({ length: maxCount - minCount + 1 }, (_, i) => {
             const value = String(minCount + i);
             return { value, label: value };
@@ -214,7 +244,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const issued = await response.json();
             finalResult = { ...finalResult, passed: true, correctCount: issued.correctCount, total: issued.total };
             certificateRecipient.textContent = issued.recipientName;
-            certificateLevel.textContent = issued.level === 'easy' ? text.levelEasy : (issued.level === 'base' ? text.levelBase : text.levelAdvanced);
+            getLevelName(issued.level)
             certificateScore.textContent = `${issued.correctCount} / ${issued.total}`;
             certificateDate.textContent = new Intl.DateTimeFormat(text.culture.startsWith('en') ? 'en-US' : 'uk-UA', { dateStyle: 'long' }).format(new Date(issued.issuedAtUtc));
             certificateNumber.textContent = issued.number;
@@ -246,7 +276,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 message.className = 'alert alert-success';
                 const date = new Intl.DateTimeFormat(text.culture.startsWith('en') ? 'en-US' : 'uk-UA', { dateStyle: 'long' }).format(new Date(result.issuedAtUtc));
-                message.textContent = `${text.verifyName}: ${result.recipientName} · ${text.verifyLevel}: ${result.level === 'easy' ? text.levelEasy : (result.level === 'base' ? text.levelBase : text.levelAdvanced)} · ${text.verifyScore}: ${result.correctCount} / ${result.total} · ${text.verifyDate}: ${date}`;
+                message.textContent = `${text.verifyName}: ${result.recipientName} · ${text.verifyLevel}: ${getLevelName(result.level)} · ${text.verifyScore}: ${result.correctCount} / ${result.total} · ${text.verifyDate}: ${date}`;
             }
             lookupResult.append(message);
         } catch {
