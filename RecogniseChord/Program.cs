@@ -30,7 +30,8 @@ public class Program
                 {
                     ServiceURL = r2Endpoint,
                     AuthenticationRegion = "auto",
-                    ForcePathStyle = true
+                    ForcePathStyle = true,
+                    RequestChecksumCalculation = RequestChecksumCalculation.WHEN_REQUIRED
                 }));
             builder.Services.AddSingleton<R2JsonObjectStore>();
             builder.Services.AddSingleton<ICertificateStore, R2CertificateStore>();

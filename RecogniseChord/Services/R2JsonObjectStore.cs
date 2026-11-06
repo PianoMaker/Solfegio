@@ -25,7 +25,9 @@ public sealed class R2JsonObjectStore
             BucketName = _bucketName,
             Key = key,
             ContentBody = JsonSerializer.Serialize(value, JsonOptions),
-            ContentType = "application/json"
+            ContentType = "application/json",
+            DisablePayloadSigning = true,
+            UseChunkEncoding = false
         });
     }
 
@@ -68,7 +70,7 @@ public sealed class R2JsonObjectStore
                 ContinuationToken = continuationToken
             });
 
-            foreach (var item in response.S3Objects)
+            foreach (var item in response.S3Objects ?? [])
             {
                 var value = await GetAsync<T>(item.Key);
                 if (value is not null)
