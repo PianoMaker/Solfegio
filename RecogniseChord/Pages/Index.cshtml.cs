@@ -12,6 +12,7 @@ using NAudio.SoundFont;
 using static Music.Engine;
 using static Music.Messages;
 using RecogniseChord.Models;
+using RecogniseChord.Services;
 using NuGet.Protocol;
 
 namespace RecogniseChord.Pages
@@ -21,16 +22,23 @@ namespace RecogniseChord.Pages
         private readonly ILogger<IndexModel> _logger;
         private readonly IStringLocalizer _localizer;
         private readonly IFailedQuizAttemptStore _failedQuizAttemptStore;
+        private readonly ICertifiedQuizChordAttemptStore _certifiedQuizChordAttemptStore;
 
         public IWebHostEnvironment _environment;
         [BindProperty] public string ChordCode { get; set; }
 
-        public IndexModel(ILogger<IndexModel> logger, IWebHostEnvironment environment, IStringLocalizerFactory localizerFactory, IFailedQuizAttemptStore failedQuizAttemptStore)
+        public IndexModel(
+            ILogger<IndexModel> logger,
+            IWebHostEnvironment environment,
+            IStringLocalizerFactory localizerFactory,
+            IFailedQuizAttemptStore failedQuizAttemptStore,
+            ICertifiedQuizChordAttemptStore certifiedQuizChordAttemptStore)
         {
             _logger = logger;
             _environment = environment;
             _localizer = localizerFactory.Create("Pages.Index", typeof(IndexModel).Assembly.GetName().Name!);
             _failedQuizAttemptStore = failedQuizAttemptStore;
+            _certifiedQuizChordAttemptStore = certifiedQuizChordAttemptStore;
             Console.WriteLine($"index constructor environment = {environment.ToString()}");
         }
 
@@ -192,6 +200,21 @@ namespace RecogniseChord.Pages
             progress.Answered++;
             if (correct) progress.Correct++;
             else progress.Incorrect++;
+
+            try
+            {
+                await _certifiedQuizChordAttemptStore.RecordAsync(new CertifiedQuizChordAttempt
+                {
+                    ChordCount = actual.Count,
+                    Correct = correct,
+                    AttemptedAtUtc = DateTimeOffset.UtcNow
+                });
+            }
+            catch (Exception exception)
+            {
+                _logger.LogError(exception, "Failed to record certified quiz chord attempt.");
+            }
+
             TempData[QuizProgressKey] = JsonSerializer.Serialize(progress);
 
             var complete = progress.Answered == progress.Total;

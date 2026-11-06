@@ -5,6 +5,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Localization;
 using NuGet.Protocol;
 using RecogniseChord.Models;
+using RecogniseChord.Services;
 using static Music.Messages;
 
 namespace RecogniseChord.Pages
@@ -13,6 +14,7 @@ namespace RecogniseChord.Pages
     {
         private readonly ILogger<PrivacyModel> _logger;
         private readonly IStringLocalizer _localizer;
+        private readonly ICertifiedQuizChordAttemptStore _certifiedQuizChordAttemptStore;
 
         public IWebHostEnvironment _environment;
 
@@ -21,14 +23,19 @@ namespace RecogniseChord.Pages
         public SuccessInfo Successes = new();
         public FailInfo Fails = new();
 
-        public PrivacyModel(ILogger<PrivacyModel> logger, IWebHostEnvironment environment, IStringLocalizerFactory localizerFactory)
+        public PrivacyModel(
+            ILogger<PrivacyModel> logger,
+            IWebHostEnvironment environment,
+            IStringLocalizerFactory localizerFactory,
+            ICertifiedQuizChordAttemptStore certifiedQuizChordAttemptStore)
         {
             _logger = logger;
             _environment = environment;
             _localizer = localizerFactory.Create("Pages.Index", typeof(IndexModel).Assembly.GetName().Name!);
+            _certifiedQuizChordAttemptStore = certifiedQuizChordAttemptStore;
         }
 
-        public void OnGet()
+        public async Task OnGetAsync()
         {
 
             string FilePath = Path.Combine(_environment.WebRootPath, "info", "info.txt");
@@ -66,6 +73,39 @@ namespace RecogniseChord.Pages
             {
                 ErrorMessageL("file was not found\n");
                 MessageL(Music.COLORS.gray, ex.ToString());
+            }
+
+            try
+            {
+                var certifiedAttempts = await _certifiedQuizChordAttemptStore.ListAsync();
+                Attempts += certifiedAttempts.Count;
+
+                foreach (var attempt in certifiedAttempts)
+                {
+                    switch (attempt.ChordCount)
+                    {
+                        case 2:
+                            if (attempt.Correct) Successes.success2s++;
+                            else Fails.fail2s++;
+                            break;
+                        case 3:
+                            if (attempt.Correct) Successes.success3s++;
+                            else Fails.fail3s++;
+                            break;
+                        case 4:
+                            if (attempt.Correct) Successes.success4s++;
+                            else Fails.fail4s++;
+                            break;
+                        case 5:
+                            if (attempt.Correct) Successes.success5s++;
+                            else Fails.fail5s++;
+                            break;
+                    }
+                }
+            }
+            catch (Exception exception)
+            {
+                _logger.LogError(exception, "Failed to load certified quiz chord attempts for public statistics.");
             }
 
 

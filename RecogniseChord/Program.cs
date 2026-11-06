@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc.Razor;
 using System.Globalization;
 using RecogniseChord.Services;
+using Amazon.Runtime;
+using Amazon.S3;
 
 public class Program
 {
@@ -14,8 +16,37 @@ public class Program
         builder.Services.AddRazorPages()
             .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
             .AddDataAnnotationsLocalization();
-        builder.Services.AddSingleton<ICertificateStore, CertificateJsonStore>();
-        builder.Services.AddSingleton<IFailedQuizAttemptStore, FailedQuizAttemptJsonStore>();
+        var r2AccessKeyId = builder.Configuration["CloudflareR2:AccessKeyId"];
+        var r2SecretAccessKey = builder.Configuration["CloudflareR2:SecretAccessKey"];
+        if (!string.IsNullOrWhiteSpace(r2AccessKeyId) && !string.IsNullOrWhiteSpace(r2SecretAccessKey))
+        {
+            var r2Endpoint = builder.Configuration["CloudflareR2:Endpoint"];
+            if (string.IsNullOrWhiteSpace(r2Endpoint) || string.IsNullOrWhiteSpace(builder.Configuration["CloudflareR2:BucketName"]))
+                throw new InvalidOperationException("Cloudflare R2 endpoint and bucket name must be configured.");
+
+            builder.Services.AddSingleton<IAmazonS3>(_ => new AmazonS3Client(
+                new BasicAWSCredentials(r2AccessKeyId, r2SecretAccessKey),
+                new AmazonS3Config
+                {
+                    ServiceURL = r2Endpoint,
+                    AuthenticationRegion = "auto",
+                    ForcePathStyle = true
+                }));
+            builder.Services.AddSingleton<R2JsonObjectStore>();
+            builder.Services.AddSingleton<ICertificateStore, R2CertificateStore>();
+            builder.Services.AddSingleton<IFailedQuizAttemptStore, R2FailedQuizAttemptStore>();
+            builder.Services.AddSingleton<ICertifiedQuizChordAttemptStore, R2CertifiedQuizChordAttemptStore>();
+        }
+        else if (builder.Environment.IsDevelopment())
+        {
+            builder.Services.AddSingleton<ICertificateStore, CertificateJsonStore>();
+            builder.Services.AddSingleton<IFailedQuizAttemptStore, FailedQuizAttemptJsonStore>();
+            builder.Services.AddSingleton<ICertifiedQuizChordAttemptStore, CertifiedQuizChordAttemptJsonStore>();
+        }
+        else
+        {
+            throw new InvalidOperationException("Cloudflare R2 credentials must be configured outside Development.");
+        }
         var googleClientId = builder.Configuration["Google:ClientId"];
         var googleClientSecret = builder.Configuration["Google:ClientSecret"];
         var authentication = builder.Services.AddAuthentication(options =>
