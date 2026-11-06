@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Mvc;
@@ -19,15 +20,17 @@ namespace RecogniseChord.Pages
     {
         private readonly ILogger<IndexModel> _logger;
         private readonly IStringLocalizer _localizer;
+        private readonly IFailedQuizAttemptStore _failedQuizAttemptStore;
 
         public IWebHostEnvironment _environment;
         [BindProperty] public string ChordCode { get; set; }
 
-        public IndexModel(ILogger<IndexModel> logger, IWebHostEnvironment environment, IStringLocalizerFactory localizerFactory)
+        public IndexModel(ILogger<IndexModel> logger, IWebHostEnvironment environment, IStringLocalizerFactory localizerFactory, IFailedQuizAttemptStore failedQuizAttemptStore)
         {
             _logger = logger;
             _environment = environment;
             _localizer = localizerFactory.Create("Pages.Index", typeof(IndexModel).Assembly.GetName().Name!);
+            _failedQuizAttemptStore = failedQuizAttemptStore;
             Console.WriteLine($"index constructor environment = {environment.ToString()}");
         }
 
@@ -160,7 +163,7 @@ namespace RecogniseChord.Pages
             });
         }
 
-        public IActionResult OnPostQuizAnswer(int count, string? type, string? quality, bool timedOut = false)
+        public async Task<IActionResult> OnPostQuizAnswerAsync(int count, string? type, string? quality, bool timedOut = false)
         {
             if (TempData.Peek(QuizProgressKey) is not string progressJson) return BadRequest();
             CertifiedQuizProgress? progress;
@@ -191,6 +194,23 @@ namespace RecogniseChord.Pages
             else progress.Incorrect++;
             TempData[QuizProgressKey] = JsonSerializer.Serialize(progress);
 
+            var complete = progress.Answered == progress.Total;
+            var passed = complete && progress.Incorrect <= (progress.Level == "easy" ? 3 : 2);
+            if (complete && !passed)
+            {
+                var email = User.FindFirstValue(ClaimTypes.Email) ?? User.FindFirstValue("email");
+                var participantName = User.FindFirstValue(ClaimTypes.Name) ?? User.FindFirstValue("name") ?? email ?? "Анонімний користувач";
+                await _failedQuizAttemptStore.RecordAsync(new FailedQuizAttempt
+                {
+                    ParticipantName = participantName,
+                    Email = email,
+                    Level = progress.Level,
+                    CorrectCount = progress.Correct,
+                    Total = progress.Total,
+                    CompletedAtUtc = DateTimeOffset.UtcNow
+                });
+            }
+
             var qualityLabel = GetQualityLabels(actual.Count).GetValueOrDefault(actual.Quality, actual.Quality);
             return new JsonResult(new
             {
@@ -200,8 +220,8 @@ namespace RecogniseChord.Pages
                 answered = progress.Answered,
                 correctCount = progress.Correct,
                 incorrectCount = progress.Incorrect,
-                complete = progress.Answered == progress.Total,
-                passed = progress.Answered == progress.Total && progress.Incorrect <= (progress.Level == "easy" ? 3 : 2),
+                complete,
+                passed,
                 total = progress.Total
             });
         }

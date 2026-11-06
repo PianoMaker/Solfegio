@@ -1,7 +1,11 @@
 @using Microsoft.AspNetCore.Mvc.Localization
 @inject IViewLocalizer Localizer
+@inject IConfiguration Configuration
 @{
     var appName = "Тренувальник сольфеджіо";
+    var adminEmail = Configuration["Admin:Email"];
+    var userEmail = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value ?? User.FindFirst("email")?.Value;
+    var isAdmin = !string.IsNullOrWhiteSpace(adminEmail) && string.Equals(userEmail, adminEmail, StringComparison.OrdinalIgnoreCase);
 }
 <!doctype html>
 <html lang="@CultureInfo.CurrentUICulture.TwoLetterISOLanguageName">
@@ -97,6 +101,12 @@
                         <li class="nav-item">
                             <a class="nav-link" asp-page="/Privacy">@Localizer["About"]</a>
                         </li>
+                        @if (isAdmin)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-page="/Admin/Certificates">Адміністрування</a>
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>

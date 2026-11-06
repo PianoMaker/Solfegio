@@ -15,6 +15,7 @@ public class Program
             .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
             .AddDataAnnotationsLocalization();
         builder.Services.AddSingleton<ICertificateStore, CertificateJsonStore>();
+        builder.Services.AddSingleton<IFailedQuizAttemptStore, FailedQuizAttemptJsonStore>();
         var googleClientId = builder.Configuration["Google:ClientId"];
         var googleClientSecret = builder.Configuration["Google:ClientSecret"];
         var authentication = builder.Services.AddAuthentication(options =>

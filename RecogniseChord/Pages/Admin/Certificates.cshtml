@@ -1,0 +1,81 @@
+@page
+@model RecogniseChord.Pages.Admin.CertificatesModel
+@{
+    ViewData["Title"] = "Адміністрування сертифікатів";
+}
+
+<div class="container py-4">
+    <h1>Адміністрування сертифікатів</h1>
+
+    <section class="my-5">
+        <h2>Видані сертифікати (@Model.Certificates.Count)</h2>
+        @if (Model.Certificates.Count == 0)
+        {
+            <p>Сертифікатів поки немає.</p>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Номер</th>
+                            <th>Власник</th>
+                            <th>Рівень</th>
+                            <th>Результат</th>
+                            <th>Видано (UTC)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var certificate in Model.Certificates)
+                        {
+                            <tr>
+                                <td>@certificate.Number</td>
+                                <td>@certificate.RecipientName</td>
+                                <td>@CertificatesModel.DisplayLevel(certificate.Level)</td>
+                                <td>@certificate.CorrectCount / @certificate.Total</td>
+                                <td>@certificate.IssuedAtUtc.ToString("yyyy-MM-dd HH:mm")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </section>
+
+    <section class="my-5">
+        <h2>Невдалі спроби (@Model.FailedAttempts.Count)</h2>
+        @if (Model.FailedAttempts.Count == 0)
+        {
+            <p>Невдалих завершених спроб поки немає.</p>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Учасник</th>
+                            <th>Email</th>
+                            <th>Рівень</th>
+                            <th>Результат</th>
+                            <th>Завершено (UTC)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var attempt in Model.FailedAttempts)
+                        {
+                            <tr>
+                                <td>@attempt.ParticipantName</td>
+                                <td>@(string.IsNullOrWhiteSpace(attempt.Email) ? "—" : attempt.Email)</td>
+                                <td>@CertificatesModel.DisplayLevel(attempt.Level)</td>
+                                <td>@attempt.CorrectCount / @attempt.Total</td>
+                                <td>@attempt.CompletedAtUtc.ToString("yyyy-MM-dd HH:mm")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </section>
+</div>

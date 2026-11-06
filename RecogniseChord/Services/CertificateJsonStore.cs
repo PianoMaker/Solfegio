@@ -84,6 +84,16 @@ public sealed class CertificateJsonStore : ICertificateStore
         finally { _gate.Release(); }
     }
 
+    public async Task<IReadOnlyList<CertificateRecord>> ListAsync()
+    {
+        await _gate.WaitAsync();
+        try
+        {
+            return _certificates.Values.OrderByDescending(certificate => certificate.IssuedAtUtc).ToArray();
+        }
+        finally { _gate.Release(); }
+    }
+
     private static string CreateNumber()
     {
         Span<char> digits = stackalloc char[10];
