@@ -135,6 +135,7 @@
         <p>@Localizer["QuizIntroduction"]</p>
     </div>
 
+    <!-- Quiz -->
     <section id="quizPanel" class="mx-auto" style="display:none; max-width:640px">
         <p id="quizProgress"></p>
         <p>@Localizer["Correct"]: <span id="quizCorrect">0</span> · @Localizer["Incorrect"]: <span id="quizIncorrect">0</span></p>
@@ -142,16 +143,33 @@
         <audio id="quizAudio" controls preload="none" class="w-100"></audio>
 
         <div class="my-3">
-            <label for="quizCount">@Localizer["CountLabel"]</label>
-            <select id="quizCount" class="form-select mx-auto" style="max-width:220px"></select>
+            <p class="form-label">@Localizer["CountLabel"]</p>
+            <div id="quizCountButtons"
+                 class="quiz-answer-options"
+                 role="group"
+                 aria-label="@Localizer["CountLabel"]">
+            </div>
+            <select id="quizCount" class="d-none"></select>
         </div>
+
         <div class="my-3">
-            <label for="quizType">@Localizer["TypeLabel"]</label>
-            <select id="quizType" class="form-select mx-auto" style="max-width:320px"></select>
+            <p class="form-label">@Localizer["TypeLabel"]</p>
+            <div id="quizTypeButtons"
+                 class="quiz-answer-options"
+                 role="group"
+                 aria-label="@Localizer["TypeLabel"]">
+            </div>
+            <select id="quizType" class="d-none"></select>
         </div>
+
         <div class="my-3">
-            <label for="quizQuality">@Localizer["QualityLabel"]</label>
-            <select id="quizQuality" class="form-select mx-auto" style="max-width:320px"></select>
+            <p class="form-label">@Localizer["QualityLabel"]</p>
+            <div id="quizQualityButtons"
+                 class="quiz-answer-options"
+                 role="group"
+                 aria-label="@Localizer["QualityLabel"]">
+            </div>
+            <select id="quizQuality" class="d-none"></select>
         </div>
 
         <button id="quizSubmit" type="button" class="btn btn-success">@Localizer["Check"]</button>
@@ -218,105 +236,3 @@
 }
 <link rel="stylesheet" href="~/css/getCertified.css" asp-append-version="true" />
 
-<style>
-    #quizLevelPicker .btn-primary,
-    #quizLevelPicker .btn-primary:hover,
-    #quizLevelPicker .btn-primary:focus,
-    #quizLevelPicker .btn-primary:active {
-        background-color: #976b32;
-        border-color: #976b32;
-    }
-
-    .verify-certificate-button,
-    .verify-certificate-button:hover,
-    .verify-certificate-button:focus,
-    .verify-certificate-button:active {
-        background-color: #976b32;
-        border-color: #976b32;
-    }
-
-    #certifiedQuiz .certificate-intro {
-        max-width: 900px;
-        margin: 1rem auto;
-        padding: 20px;
-        border: 1px solid var(--footer-color);
-        border-radius: 25px;
-        background-color: rgba(254, 254, 254, 0.75);
-    }
-
-    #quizLevelPicker .quiz-level-options {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 12px;
-    }
-
-    #quizLevelPicker .quiz-level-option {
-        flex: 1 1 190px;
-        max-width: 260px;
-        padding: 12px;
-        border: 1px solid var(--footer-color);
-        border-radius: 14px;
-        background-color: rgba(254, 254, 254, 0.75);
-        transition: background-color 150ms ease, box-shadow 150ms ease;
-    }
-
-    #quizLevelPicker .quiz-level-option:hover,
-    #quizLevelPicker .quiz-level-option:focus-within,
-    #quizLevelPicker .quiz-level-option:active {
-        background-color: #fff2b8;
-        box-shadow: 0 3px 10px rgba(112, 78, 30, 0.2);
-    }
-
-    #quizLevelPicker .quiz-level-option .btn {
-        min-width: 120px;
-    }
-
-    #quizLevelPicker .quiz-level-action {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-    }
-
-    #quizLevelPicker .quiz-level-icon {
-        display: block;
-        width: 48px;
-        height: 48px;
-        flex: 0 0 48px;
-    }
-
-    #quizLevelPicker .quiz-level-option p {
-        margin: 10px 0 0;
-    }
-
-    .certificate-preview {
-        margin: 2rem auto;
-        padding: 3rem 2rem;
-        max-width: 760px;
-        border: 6px double #8c6b20;
-        background: #fffdf5;
-        color: #262116;
-    }
-    .certificate-kicker { letter-spacing: .3em; font-weight: 700; color: #8c6b20; }
-    #certificateRecipient { margin: 1.5rem 0; font-family: Georgia, serif; }
-    .certificate-qr { display: block; width: 160px; height: 160px; margin-inline: auto; image-rendering: pixelated; }
-    @@media print {
-        body.certified-print-mode * { visibility: hidden !important; }
-        body.certified-print-mode #certificatePreview,
-        body.certified-print-mode #certificatePreview * { visibility: visible !important; }
-        body.certified-print-mode #certificatePreview {
-            display: block !important;
-            position: fixed;
-            inset: 0;
-            width: 100%;
-            max-width: none;
-            min-height: 100vh;
-            margin: 0;
-            padding: 15vh 3rem;
-            border: 8px double #8c6b20;
-        }
-        body.certified-print-mode #printCertificate { display: none !important; }
-        body.certified-print-mode #certificateVerificationLink { color: #262116; text-decoration: none; }
-    }
-</style>

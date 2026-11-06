@@ -1036,6 +1036,13 @@ namespace RecogniseChord.Pages
                 }
             }
 
+            // Для терцій і секст не показуємо якість PERFECT.
+            if (count == 2 &&
+                (typeKey == "TERZIA" || typeKey == "SEKSTA" || typeKey == "SEPTYMA" || typeKey == "SECUNDA"))
+            {
+                labels.Remove("PERFECT");
+            }
+
             QualityOptions.AddRange(labels.Select(option => new QualityOption
             {
                 Key = option.Key,

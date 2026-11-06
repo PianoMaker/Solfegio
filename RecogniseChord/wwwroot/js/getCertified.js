@@ -12,6 +12,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const countSelect = document.getElementById('quizCount');
     const typeSelect = document.getElementById('quizType');
     const qualitySelect = document.getElementById('quizQuality');
+    const countButtons = document.getElementById('quizCountButtons');
+    const typeButtons = document.getElementById('quizTypeButtons');
+    const qualityButtons = document.getElementById('quizQualityButtons');
+    let optionsRequestId = 0;
     const submitButton = document.getElementById('quizSubmit');
     const nextButton = document.getElementById('quizNext');
     const feedback = document.getElementById('quizFeedback');
@@ -63,7 +67,48 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function fillSelect(select, items, placeholder) {
         select.replaceChildren(new Option(placeholder, ''));
-        for (const item of items) select.add(new Option(item.label, item.value));
+        for (const item of items) {
+            select.add(new Option(item.label, item.value));
+        }
+    }
+    function renderOptionButtons(container, select) {
+        container.replaceChildren();
+
+        Array.from(select.options)
+            .filter(option => option.value !== '')
+            .forEach(option => {
+                const button = document.createElement('button');
+
+                button.type = 'button';
+                button.className = 'btn btn-outline-primary';
+                button.textContent = option.textContent;
+                button.disabled = select.disabled;
+
+                const selected = select.value === option.value;
+
+                if (selected) {
+                    button.classList.add('active');
+                }
+
+                button.setAttribute('aria-pressed', String(selected));
+
+                button.addEventListener('click', () => {
+                    if (select.disabled) return;
+
+                    select.value = option.value;
+                    select.dispatchEvent(
+                        new Event('change', { bubbles: true })
+                    );
+                });
+
+                container.appendChild(button);
+            });
+    }
+
+    function renderAllOptionButtons() {
+        renderOptionButtons(countButtons, countSelect);
+        renderOptionButtons(typeButtons, typeSelect);
+        renderOptionButtons(qualityButtons, qualitySelect);
     }
 
     countSelect.addEventListener('keydown', event => {
@@ -86,22 +131,33 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     async function updateAnswerOptions() {
-        const response = await fetch(endpoint(root.dataset.optionsUrl, {
-            count: countSelect.value || ({
-                easy: 2,
-                base: 2,
-                intermediate: 3,
-                advanced: 3,
-                expert: 4
-            }[level]),
-            type: typeSelect.value
-        }));
-        if (!response.ok) throw new Error(text.errorOptions);
-        const options = await response.json();
+        const requestId = ++optionsRequestId;
         const oldType = typeSelect.value;
+
+        const response = await fetch(endpoint(root.dataset.optionsUrl, {
+            count: countSelect.value,
+            type: oldType
+        }));
+
+        if (!response.ok) {
+            throw new Error(text.errorOptions);
+        }
+
+        const options = await response.json();
+
+        // Ігноруємо застарілі відповіді сервера.
+        if (requestId !== optionsRequestId) return;
+
         fillSelect(typeSelect, options.types, text.placeholderType);
-        if (options.types.some(option => option.value === oldType)) typeSelect.value = oldType;
+
+        // Зберігаємо попередній вибір, якщо він ще доступний.
+        if (options.types.some(option => option.value === oldType)) {
+            typeSelect.value = oldType;
+        }
+
         fillSelect(qualitySelect, options.qualities, text.placeholderQuality);
+
+        renderAllOptionButtons();
     }
 
     async function loadChord(reset = false) {
@@ -109,6 +165,7 @@ document.addEventListener('DOMContentLoaded', () => {
         feedback.textContent = '';
         outcome.style.display = 'none';
         certificateForm.style.display = 'none';
+        googleLoginPrompt.style.display = 'none';
         certificatePreview.style.display = 'none';
         submitButton.disabled = false;
         submitButton.style.display = '';
@@ -116,6 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
         countSelect.disabled = false;
         typeSelect.disabled = false;
         qualitySelect.disabled = false;
+        renderAllOptionButtons();
 
         const result = await fetch(endpoint(root.dataset.nextUrl, { level, reset }));
         if (!result.ok) throw new Error(text.errorNext);
@@ -144,8 +202,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const value = String(minCount + i);
             return { value, label: value };
         }), text.placeholderCount);
+
         countSelect.value = String(minCount);
         typeSelect.value = '';
+        qualitySelect.value = '';
+
         await updateAnswerOptions();
 
         secondsLeft = chord.timeLimitSeconds;
@@ -156,6 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
             timer.textContent = `${Math.max(0, secondsLeft)} ${text.seconds}`;
             if (secondsLeft <= 0) submitAnswer(true).catch(showError);
         }, 1000);
+        
     }
 
     async function submitAnswer(timedOut = false) {
@@ -189,6 +251,7 @@ document.addEventListener('DOMContentLoaded', () => {
         countSelect.disabled = true;
         typeSelect.disabled = true;
         qualitySelect.disabled = true;
+        renderAllOptionButtons();
 
         if (result.complete) {
             submitButton.style.display = 'none';
@@ -198,6 +261,8 @@ document.addEventListener('DOMContentLoaded', () => {
             outcome.textContent = result.passed ? text.outcomePassed : text.outcomeFailed;
             outcome.className = result.passed ? 'mt-4 text-success' : 'mt-4 text-danger';
             outcome.style.display = '';
+            googleLoginPrompt.style.display = 'none';
+            certificateForm.style.display = 'none';
             if (result.passed) {
                 googleLoginPrompt.style.display = isAuthenticated ? 'none' : '';
                 certificateForm.style.display = isAuthenticated ? '' : 'none';
@@ -215,8 +280,19 @@ document.addEventListener('DOMContentLoaded', () => {
         feedback.className = 'mt-3 text-danger';
     }
 
-    countSelect.addEventListener('change', () => updateAnswerOptions().catch(showError));
-    typeSelect.addEventListener('change', () => updateAnswerOptions().catch(showError));
+    countSelect.addEventListener('change', () => {
+        renderAllOptionButtons();
+        updateAnswerOptions().catch(showError);
+    });
+
+    typeSelect.addEventListener('change', () => {
+        renderAllOptionButtons();
+        updateAnswerOptions().catch(showError);
+    });
+
+    qualitySelect.addEventListener('change', () => {
+        renderAllOptionButtons();
+    });
     submitButton.addEventListener('click', () => submitAnswer(false).catch(showError));
     nextButton.addEventListener('click', () => loadChord().catch(showError));
 
