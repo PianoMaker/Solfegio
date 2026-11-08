@@ -138,6 +138,9 @@
   <data name="Piano" xml:space="preserve">
     <value>Piano</value>
   </data>
+  <data name="Projects" xml:space="preserve">
+    <value>Projects</value>
+  </data>
   <data name="Recognise" xml:space="preserve">
     <value>Recognise a chord</value>
   </data>
@@ -147,13 +150,13 @@
   <data name="Certificates" xml:space="preserve">
     <value>Certificates</value>
   </data>
-  <data name="Projects" xml:space="preserve">
-    <value>Projects</value>
-  </data>
   <data name="MusicSurveys" xml:space="preserve">
     <value>Music Surveys</value>
   </data>
   <data name="WorldClassicsInUkrainian" xml:space="preserve">
     <value>World Classics in Ukrainian</value>
+  </data>
+  <data name="Melody" xml:space="preserve">
+    <value>Melody search</value>
   </data>
 </root>

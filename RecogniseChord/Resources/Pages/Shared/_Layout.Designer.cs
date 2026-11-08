@@ -115,11 +115,29 @@ namespace RecogniseChord.Resources.Pages.Shared {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string Melody {
+            get {
+                return ResourceManager.GetString("Melody", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Online solfeggio trainer for developing musical hearing and practicing chord construction..
         /// </summary>
         internal static string MetaDescription {
             get {
                 return ResourceManager.GetString("MetaDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to music surveys.
+        /// </summary>
+        internal static string MusicSurveys {
+            get {
+                return ResourceManager.GetString("MusicSurveys", resourceCulture);
             }
         }
         
@@ -174,6 +192,15 @@ namespace RecogniseChord.Resources.Pages.Shared {
         internal static string Title {
             get {
                 return ResourceManager.GetString("Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to World Classics in Ukrainian.
+        /// </summary>
+        internal static string WorldClassicsInUkrainian {
+            get {
+                return ResourceManager.GetString("WorldClassicsInUkrainian", resourceCulture);
             }
         }
     }
