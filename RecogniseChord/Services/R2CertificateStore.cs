@@ -38,15 +38,20 @@ public sealed class R2CertificateStore : ICertificateStore
             .FirstOrDefault(certificate =>
                 string.Equals(certificate.OwnerId, ownerId, StringComparison.Ordinal) &&
                 string.Equals(certificate.Level, level, StringComparison.Ordinal));
-        if (existing is not null)
-            return existing;
 
         string number;
-        do
+        if (existing is not null)
         {
-            number = CreateNumber();
+            number = existing.Number;
         }
-        while (await _objects.GetAsync<CertificateRecord>($"certificates/{number}.json") is not null);
+        else
+        {
+            do
+            {
+                number = CreateNumber();
+            }
+            while (await _objects.GetAsync<CertificateRecord>($"certificates/{number}.json") is not null);
+        }
 
         var certificate = new CertificateRecord
         {

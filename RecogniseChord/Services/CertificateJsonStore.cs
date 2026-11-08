@@ -36,11 +36,17 @@ public sealed class CertificateJsonStore : ICertificateStore
             var existing = _certificates.Values.FirstOrDefault(certificate =>
                 string.Equals(certificate.OwnerId, ownerId, StringComparison.Ordinal) &&
                 string.Equals(certificate.Level, level, StringComparison.Ordinal));
-            if (existing != null) return existing;
 
             string number;
-            do { number = CreateNumber(); }
-            while (_certificates.ContainsKey(number));
+            if (existing != null)
+            {
+                number = existing.Number;
+            }
+            else
+            {
+                do { number = CreateNumber(); }
+                while (_certificates.ContainsKey(number));
+            }
 
             var certificate = new CertificateRecord
             {
@@ -52,7 +58,7 @@ public sealed class CertificateJsonStore : ICertificateStore
                 Total = total,
                 IssuedAtUtc = DateTimeOffset.UtcNow
             };
-            _certificates.Add(number, certificate);
+            _certificates[number] = certificate;
 
             var temporaryPath = _filePath + ".tmp";
             try
@@ -63,7 +69,8 @@ public sealed class CertificateJsonStore : ICertificateStore
             }
             catch
             {
-                _certificates.Remove(number);
+                if (existing == null) _certificates.Remove(number);
+                else _certificates[number] = existing;
                 if (File.Exists(temporaryPath)) File.Delete(temporaryPath);
                 throw;
             }

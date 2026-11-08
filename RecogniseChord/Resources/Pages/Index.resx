@@ -166,6 +166,9 @@
   <data name="OCTAVA" xml:space="preserve">
     <value>octave</value>
   </data>
+  <data name="PRIMA" xml:space="preserve">
+    <value>unison</value>
+  </data>
   <data name="TRI" xml:space="preserve">
     <value>triad</value>
   </data>

@@ -156,6 +156,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         fillSelect(qualitySelect, options.qualities, text.placeholderQuality);
+        if (options.qualities.length === 1) {
+            qualitySelect.value = options.qualities[0].value;
+        }
 
         renderAllOptionButtons();
     }

@@ -218,7 +218,7 @@ namespace RecogniseChord.Pages
             TempData[QuizProgressKey] = JsonSerializer.Serialize(progress);
 
             var complete = progress.Answered == progress.Total;
-            var passed = complete && progress.Incorrect <= (progress.Level == "easy" ? 3 : 2);
+            var passed = complete && progress.Incorrect <= CertifiedQuizRules.MaximumIncorrectAnswers;
             if (complete && !passed)
             {
                 var email = User.FindFirstValue(ClaimTypes.Email) ?? User.FindFirstValue("email");
@@ -267,9 +267,7 @@ namespace RecogniseChord.Pages
                 ["MINMAJ"] = _localizer["MINMAJ"],
                 ["MINMIN"] = _localizer["MINMIN"],
                 ["MINDIM"] = _localizer["MINDIM"],
-                ["DIMDIM"] = _localizer["DIMDIM"],
-                ["ALTQUINT"] = _localizer["ALTQUINT"],
-                ["ALTPRIM"] = _localizer["ALTPRIM"]
+                ["DIMDIM"] = _localizer["DIMDIM"]
             },
             5 => new()
             {
@@ -1041,7 +1039,7 @@ namespace RecogniseChord.Pages
             TypeOptions.Clear();
             var keys = count switch
             {
-                2 => new[] { "SECUNDA", "TERZIA", "QUARTA", "QUINTA", "SEKSTA", "SEPTYMA", "OCTAVA" },
+                2 => new[] { "PRIMA", "SECUNDA", "TERZIA", "QUARTA", "QUINTA", "SEKSTA", "SEPTYMA", "OCTAVA" },
                 3 => new[] { "TRI", "SEXT", "QSEXT" },
                 4 => new[] { "SEPT", "QUINTS", "TERZQ", "SEC" },
                 5 => new[] { "NONACORD", "NONACORD_1i", "NONACORD_2i", "NONACORD_3i", "NONACORD_4i" },
@@ -1067,6 +1065,7 @@ namespace RecogniseChord.Pages
             {
                 var perfectTypes = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
                 {
+                    "PRIMA",
                     "QUARTA",
                     "QUINTA",
                     "OCTAVA"

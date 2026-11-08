@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	const recognisebox = document.getElementById('recognisebox');			// поле для вгадування
 	const recognisebutton = document.getElementById('recogniseButton');		// кнопка ""
 	const SelectedQuality = document.getElementById('SelectedQuality');
+   const qualityLabelsByKey = new Map(Array.from(SelectedQuality?.options ?? [], option => [option.value, option.textContent]));
 	const SelectedTimbre = document.getElementById('SelectedTimbre');
 	const selectedType = document.getElementById('SelectedType');
 	const playBtn = document.getElementById('playBtn');						//play button
@@ -277,14 +278,10 @@ document.addEventListener('DOMContentLoaded', function () {
 	function setQualityOptions(options, preserveSelection = false) {
 		if (!SelectedQuality) return;
 		const prev = SelectedQuality.value;
-		SelectedQuality.innerHTML = '';
-		options.forEach(o => {
-			const opt = document.createElement('option');
-			opt.value = o;
-			opt.textContent = o;
-			SelectedQuality.appendChild(opt);
-		});
+     SelectedQuality.replaceChildren(...options.map(key => new Option(qualityLabelsByKey.get(key) || key, key)));
 		if (preserveSelection && options.includes(prev)) SelectedQuality.value = prev;
+		else if (options.length === 1) SelectedQuality.value = options[0];
+		SelectedQuality.dispatchEvent(new Event('change', { bubbles: true }));
 	}
 
 	// =================================
@@ -294,7 +291,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 	if (selectedType) {
 		selectedType.addEventListener('change', (e) => {
-			if (!e.isTrusted) return;
 			const val = (e.target.value || '').trim();
 			sessionStorage.setItem('selectedType', val);
 
@@ -302,20 +298,25 @@ document.addEventListener('DOMContentLoaded', function () {
 			const currentCount = countRadio ? countRadio.value : null;
 			console.log(`selected type change handler is working, ${currentCount} sounds`)
 
-			if (currentCount === 2) {
+           if (currentCount === '2') {
 				const valLower = val.toLowerCase();
 
 				const isPerfect = intervalPerfectKeys.some(k => k.toLowerCase() === valLower) || intervalPerfectUkr.includes(valLower);
 				const isImperfect = intervalImperfectKeys.some(k => k.toLowerCase() === valLower) || intervalImperfectUkr.includes(valLower);
 
 				if (isPerfect) {
-					setQualityOptions(['чиста'], true); 			
+                    setQualityOptions(['PERFECT']);
+					sessionStorage.setItem('SelectedQuality', 'PERFECT');
 				}
 				else if (isImperfect) {
-					setQualityOptions(['велика', 'мала'], true); 			
+                    setQualityOptions(['MAJ', 'MIN'], true);
+					sessionStorage.setItem('SelectedQuality', SelectedQuality.value);
 				}
 			}
 		});
+       if (selectedType.value) {
+			selectedType.dispatchEvent(new Event('change', { bubbles: true }));
+		}
 	}
 	// =================================
 	// Обробник зміни тембру

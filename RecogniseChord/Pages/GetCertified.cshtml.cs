@@ -49,7 +49,7 @@ namespace RecogniseChord.Pages
             QuizProgressData? progress;
             try { progress = JsonSerializer.Deserialize<QuizProgressData>(progressJson); }
             catch { return BadRequest(); }
-            if (progress == null || progress.Answered != progress.Total || progress.Incorrect > (progress.Level == "easy" ? 3 : 1) || progress.Correct + progress.Incorrect != progress.Total)
+            if (progress == null || progress.Answered != progress.Total || progress.Incorrect > CertifiedQuizRules.MaximumIncorrectAnswers || progress.Correct + progress.Incorrect != progress.Total)
                 return BadRequest();
 
             //Кількість питань у сертифікаційному тесті залежить від рівня складності

@@ -165,6 +165,9 @@
   <data name="OCTAVA" xml:space="preserve">
     <value>октава</value>
   </data>
+  <data name="PRIMA" xml:space="preserve">
+    <value>прима</value>
+  </data>
   <data name="TRI" xml:space="preserve">
     <value>тризвук</value>
   </data>
