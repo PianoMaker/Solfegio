@@ -118,13 +118,13 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Choose" xml:space="preserve">
-    <value>Choose parameters and press "Check"</value>
+    <value>Press "play" to listen for sonority. Then choose parameters and press "Check".</value>
   </data>
   <data name="Check" xml:space="preserve">
     <value>Check</value>
   </data>
   <data name="ChordsIntervals" xml:space="preserve">
-    <value>Intervals and Chords</value>
+    <value>Aural identification of sonorities</value>
   </data>
   <data name="AttemptsOnSite" xml:space="preserve">
     <value>attempts on site</value>

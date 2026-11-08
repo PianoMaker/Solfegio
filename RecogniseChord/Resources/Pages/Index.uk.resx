@@ -118,13 +118,13 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Choose" xml:space="preserve">
-    <value>Виберіть параметри акорду та натисніть "Перевірити"</value>
+    <value>Натисніть "відтворити" щоб прослухати співзвуччя. Потім оберіть кількість звуків і тип співзвуччя та натисніть "Перевірити"</value>
   </data>
   <data name="Check" xml:space="preserve">
     <value>Перевірити</value>
   </data>
   <data name="ChordsIntervals" xml:space="preserve">
-    <value>Інтервали і акорди</value>
+    <value>Визначення співзвуччя на слух</value>
   </data>
   <data name="AttemptsOnSite" xml:space="preserve">
     <value>спроб на сайті</value>
