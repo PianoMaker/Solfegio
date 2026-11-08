@@ -120,6 +120,9 @@
   <data name="About" xml:space="preserve">
     <value>About </value>
   </data>
+  <data name="Chords" xml:space="preserve">
+    <value>Chords</value>
+  </data>
   <data name="Build" xml:space="preserve">
     <value>Build</value>
   </data>
@@ -141,6 +144,12 @@
   <data name="Projects" xml:space="preserve">
     <value>Проєкти</value>
   </data>
+  <data name="SiteInfo" xml:space="preserve">
+    <value>About this site</value>
+  </data>
+	<data name="NoteSearch" xml:space="preserve">
+	<value>Search sheet music</value>
+	</data>
   <data name="Recognise" xml:space="preserve">
     <value>Recognise</value>
   </data>

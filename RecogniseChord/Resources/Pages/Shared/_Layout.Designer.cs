@@ -79,6 +79,15 @@ namespace RecogniseChord.Resources.Pages.Shared {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Chords.
+        /// </summary>
+        internal static string Chords {
+            get {
+                return ResourceManager.GetString("Chords", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to ChordsIntervals.
         /// </summary>
         internal static string ChordsIntervals {
@@ -97,6 +106,15 @@ namespace RecogniseChord.Resources.Pages.Shared {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Language.
+        /// </summary>
+        internal static string Lang {
+            get {
+                return ResourceManager.GetString("Lang", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Online solfeggio trainer for developing musical hearing and practicing chord construction..
         /// </summary>
         internal static string MetaDescription {
@@ -106,11 +124,47 @@ namespace RecogniseChord.Resources.Pages.Shared {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Search sheet music.
+        /// </summary>
+        internal static string NoteSearch {
+            get {
+                return ResourceManager.GetString("NoteSearch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Piano.
+        /// </summary>
+        internal static string Piano {
+            get {
+                return ResourceManager.GetString("Piano", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Проєкти.
+        /// </summary>
+        internal static string Projects {
+            get {
+                return ResourceManager.GetString("Projects", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Recognise.
         /// </summary>
         internal static string Recognise {
             get {
                 return ResourceManager.GetString("Recognise", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to About this site.
+        /// </summary>
+        internal static string SiteInfo {
+            get {
+                return ResourceManager.GetString("SiteInfo", resourceCulture);
             }
         }
         

@@ -63,31 +63,23 @@
                 </button>
                 <div class="collapse navbar-collapse" id="navbarCollapse">
                     <ul class="navbar-nav me-auto mb-2 mb-md-0">
-                        <li class="nav-item">
-                            <a class="nav-link" asp-page="/Create">>@Localizer["Build"]</a>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="chordsMenu" role="button"
+                               data-bs-toggle="dropdown" aria-expanded="false">
+                                @Localizer["Chords"]
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="chordsMenu">
+                                <li><a class="dropdown-item" asp-page="/Create">@Localizer["Build"]</a></li>
+                                <li><a class="dropdown-item" asp-page="/Index">@Localizer["Recognise"]</a></li>
+                                <li><a class="dropdown-item" asp-page="/Melodies">@Localizer["Intervals"]</a></li>
+                            </ul>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-page="/Index">>@Localizer["Recognise"]</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-page="/Melodies">@Localizer["Intervals"]</a>
-                        </li>                        
                         <li class="nav-item">
                             <a class="nav-link" asp-page="/Piano">@Localizer["Piano"]</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" asp-page="/GetCertified">@Localizer["Certificates"]</a>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="projectsMenu" role="button"
-                               data-bs-toggle="dropdown" aria-expanded="false">
-                                @Localizer["Projects"]
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="projectsMenu">
-                                <li><a class="dropdown-item" href="https://musicsurveyua.azurewebsites.net/" target="_blank" rel="noopener noreferrer">@Localizer["MusicSurveys"]</a></li>
-                                <li><a class="dropdown-item" href="https://musicinukrainian.wordpress.com/" target="_blank" rel="noopener noreferrer">@Localizer["WorldClassicsInUkrainian"]</a></li>
-                            </ul>
-                        </li>
+                        </li>                        
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="langMenu" role="button"
                                data-bs-toggle="dropdown" aria-expanded="false">
@@ -98,8 +90,44 @@
                                 <li><a class="dropdown-item" href='@Url.Page("/Setlanguage", new { culture = "en", returnUrl = Context.Request.Path + Context.Request.QueryString })'>EN</a></li>
                             </ul>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-page="/Privacy">@Localizer["About"]</a>
+                        <!--ПРОЄКТИ-->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle"
+                               href="#"
+                               id="aboutMenu"
+                               role="button"
+                               data-bs-toggle="dropdown"
+                               aria-expanded="false">
+                                @Localizer["About"]
+                            </a>
+
+                            <ul class="dropdown-menu" aria-labelledby="aboutMenu">
+                                <li><a class="dropdown-item" asp-page="/Privacy">@Localizer["SiteInfo"]</a></li>
+                                <li>
+                                    <a class="dropdown-item"
+                                       href="https://musicsurveyua.azurewebsites.net/"
+                                       target="_blank"
+                                       rel="noopener noreferrer">
+                                        @Localizer["MusicSurveys"]
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item"
+                                       href="https://noty-ua.azurewebsites.net/"
+                                       target="_blank"
+                                       rel="noopener noreferrer">
+                                        @Localizer["NoteSearch"]
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item"
+                                       href="https://musicinukrainian.wordpress.com/"
+                                       target="_blank"
+                                       rel="noopener noreferrer">
+                                        @Localizer["WorldClassicsInUkrainian"]
+                                    </a>
+                                </li>
+                            </ul>
                         </li>
                         @if (isAdmin)
                         {
@@ -137,6 +165,7 @@
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
     
     @RenderSection("Scripts", required: false)
 </body>
