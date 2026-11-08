@@ -34,6 +34,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const verifyForm = document.getElementById('verifyCertificateForm');
     const lookupNumber = document.getElementById('certificateLookupNumber');
     const lookupResult = document.getElementById('certificateLookupResult');
+    const downloadVerifiedCertificate = document.getElementById('downloadVerifiedCertificate');
+    let verifiedCertificateForDownload = null;
     let finalResult = null;
     const isAuthenticated = root.dataset.authenticated === 'true';
     const token = document.querySelector('#quizTokenForm input[name="__RequestVerificationToken"]')?.value;
@@ -52,6 +54,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function format(template, ...values) {
         return values.reduce((result, value, index) => result.replace(`{${index}}`, value), template);
+    }
+
+    function showCertificatePreview(certificate) {
+        certificateRecipient.textContent = certificate.recipientName;
+        certificateLevel.textContent = getLevelName(certificate.level);
+        certificateScore.textContent = `${certificate.correctCount} / ${certificate.total}`;
+        certificateDate.textContent = new Intl.DateTimeFormat(text.culture.startsWith('en') ? 'en-US' : 'uk-UA', { dateStyle: 'long' }).format(new Date(certificate.issuedAtUtc));
+        certificateNumber.textContent = certificate.number;
+        certificateQr.src = certificate.qrUrl;
+        certificateVerificationLink.href = certificate.verificationUrl;
+        certificateVerificationLink.textContent = text.verifyTitle;
+        certificatePreview.style.display = '';
     }
 
     let level = '';
@@ -322,15 +336,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) throw new Error(text.errorIssue);
             const issued = await response.json();
             finalResult = { ...finalResult, passed: true, correctCount: issued.correctCount, total: issued.total };
-            certificateRecipient.textContent = issued.recipientName;
-            getLevelName(issued.level)
-            certificateScore.textContent = `${issued.correctCount} / ${issued.total}`;
-            certificateDate.textContent = new Intl.DateTimeFormat(text.culture.startsWith('en') ? 'en-US' : 'uk-UA', { dateStyle: 'long' }).format(new Date(issued.issuedAtUtc));
-            certificateNumber.textContent = issued.number;
-            certificateQr.src = issued.qrUrl;
-            certificateVerificationLink.href = issued.verificationUrl;
-            certificateVerificationLink.textContent = text.verifyTitle;
-            certificatePreview.style.display = '';
+            showCertificatePreview(issued);
         } catch (error) {
             showError(error);
         } finally {
@@ -342,6 +348,8 @@ document.addEventListener('DOMContentLoaded', () => {
         event.preventDefault();
         if (!verifyForm.reportValidity()) return;
         lookupResult.replaceChildren();
+        verifiedCertificateForDownload = null;
+        if (downloadVerifiedCertificate) downloadVerifiedCertificate.style.display = 'none';
         try {
             const url = new URL(root.dataset.lookupUrl, window.location.href);
             url.searchParams.set('number', lookupNumber.value.trim());
@@ -356,6 +364,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 message.className = 'alert alert-success';
                 const date = new Intl.DateTimeFormat(text.culture.startsWith('en') ? 'en-US' : 'uk-UA', { dateStyle: 'long' }).format(new Date(result.issuedAtUtc));
                 message.textContent = `${text.verifyName}: ${result.recipientName} · ${text.verifyLevel}: ${getLevelName(result.level)} · ${text.verifyScore}: ${result.correctCount} / ${result.total} · ${text.verifyDate}: ${date}`;
+                verifiedCertificateForDownload = result;
+                if (downloadVerifiedCertificate) downloadVerifiedCertificate.style.display = '';
             }
             lookupResult.append(message);
         } catch {
@@ -364,6 +374,16 @@ document.addEventListener('DOMContentLoaded', () => {
             message.textContent = text.verifyError;
             lookupResult.append(message);
         }
+    });
+
+    downloadVerifiedCertificate?.addEventListener('click', async () => {
+        if (!verifiedCertificateForDownload) return;
+        showCertificatePreview(verifiedCertificateForDownload);
+        if (typeof certificateQr.decode === 'function') {
+            await certificateQr.decode().catch(() => { });
+        }
+        document.body.classList.add('certified-print-mode');
+        window.print();
     });
 
     document.getElementById('googleLoginButton').addEventListener('click', () => {

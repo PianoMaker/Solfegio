@@ -37,7 +37,9 @@ public class VerifyCertificateModel : PageModel
             level = certificate.Level,
             correctCount = certificate.CorrectCount,
             total = certificate.Total,
-            issuedAtUtc = certificate.IssuedAtUtc
+            issuedAtUtc = certificate.IssuedAtUtc,
+            verificationUrl = Url.Page("/VerifyCertificate", pageHandler: null, values: new { number = certificate.Number }, protocol: Request.Scheme),
+            qrUrl = Url.Page("/GetCertified", pageHandler: "Qr", values: new { number = certificate.Number }, protocol: Request.Scheme)
         });
     }
 }

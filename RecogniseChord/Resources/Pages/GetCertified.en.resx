@@ -204,6 +204,9 @@
   <data name="PrintCertificate" xml:space="preserve">
     <value>Print / save as PDF</value>
   </data>
+  <data name="DownloadCertificate" xml:space="preserve">
+    <value>Download certificate</value>
+  </data>
   <data name="ErrorOptions" xml:space="preserve">
     <value>Could not load answer options.</value>
   </data>

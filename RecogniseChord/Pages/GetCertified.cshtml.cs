@@ -22,6 +22,17 @@ namespace RecogniseChord.Pages
         }
 
         public bool IsAuthenticated => User.Identity?.IsAuthenticated == true;
+        public bool IsAdmin
+        {
+            get
+            {
+                var adminEmail = _configuration["Admin:Email"];
+                var userEmail = User.FindFirstValue(ClaimTypes.Email) ?? User.FindFirstValue("email");
+                return User.Identity?.IsAuthenticated == true &&
+                    !string.IsNullOrWhiteSpace(adminEmail) &&
+                    string.Equals(userEmail, adminEmail, StringComparison.OrdinalIgnoreCase);
+            }
+        }
         public string DisplayName => User.FindFirstValue(ClaimTypes.Name) ?? User.FindFirstValue("name") ?? User.FindFirstValue(ClaimTypes.Email) ?? string.Empty;
         [TempData]
         public string? LoginError { get; set; }
